@@ -1,0 +1,373 @@
+@import url("https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+:root {
+  --paper: #ede7da;
+  --paper-dark: #e4dcc8;
+  --paper-line: #cfc6ac;
+  --ink: #23283b;
+  --ink-soft: #5a5f73;
+  --kraft: #7a5c3e;
+  --kraft-dark: #5e4530;
+  --debt-red: #a23b3b;
+  --paid-green: #3f6b4f;
+  --shadow: rgba(35, 40, 59, 0.16);
+  --radius: 3px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
+  background-size: 100% 2.4rem;
+  background-position: 0 5.6rem;
+  color: var(--ink);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* ---------- Portada / cabecera ---------- */
+
+.cover {
+  background: var(--kraft);
+  color: #f3ecdd;
+  padding: 1.8rem 2rem 1.6rem;
+  box-shadow: 0 3px 0 var(--kraft-dark);
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cover h1 {
+  font-family: "Special Elite", "IBM Plex Mono", monospace;
+  font-size: 1.7rem;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.cover p {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+  color: #d9cdb1;
+  font-style: italic;
+}
+
+/* ---------- Barra de acciones ---------- */
+
+.toolbar {
+  max-width: 780px;
+  margin: 4rem auto 0;
+  padding: 0 1.5rem;
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 220px;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  background: #fbf8f0;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.92rem;
+  color: var(--ink);
+}
+
+.search-box input:focus {
+  outline: 2px solid var(--kraft);
+  outline-offset: 1px;
+}
+
+.btn-nuevo {
+  background: var(--ink);
+  color: #f3ecdd;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.65rem 1.1rem;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn-nuevo:hover {
+  background: #363c56;
+}
+.btn-nuevo:focus-visible {
+  outline: 2px solid var(--kraft);
+  outline-offset: 2px;
+}
+
+/* ---------- Libro de cuentas ---------- */
+
+.libro {
+  max-width: 780px;
+  margin: 1.4rem auto 3rem;
+  padding: 0 1.5rem;
+}
+
+.fila-cliente {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  padding: 0.65rem 0.2rem;
+  text-decoration: none;
+  color: inherit;
+  border-bottom: 1px dashed transparent;
+}
+
+.fila-cliente:hover .nombre-cliente {
+  color: var(--kraft-dark);
+}
+
+.nombre-cliente {
+  font-weight: 600;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.leader {
+  flex: 1;
+  border-bottom: 1px dotted var(--paper-line);
+  transform: translateY(-4px);
+}
+
+.saldo {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.95rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.saldo.debe {
+  color: var(--debt-red);
+}
+.saldo.al-dia {
+  color: var(--paid-green);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--paid-green);
+  border-radius: 20px;
+  padding: 0.15rem 0.55rem;
+  display: inline-block;
+}
+
+/* ---------- Estado vacío ---------- */
+
+.vacio {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: var(--ink-soft);
+}
+
+.vacio p {
+  font-size: 0.95rem;
+  max-width: 34ch;
+  margin: 0.4rem auto 1.2rem;
+  line-height: 1.5;
+}
+
+.vacio .sello {
+  font-family: "Special Elite", monospace;
+  font-size: 1.1rem;
+  color: var(--kraft);
+  border: 2px solid var(--kraft);
+  display: inline-block;
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+}
+
+/* ---------- Formulario ---------- */
+
+.form-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-width: 420px;
+  padding-top: 0.8rem;
+}
+
+.form-cliente label {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+  margin-top: 0.6rem;
+}
+
+.form-cliente input {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--paper-line);
+  border-radius: var(--radius);
+  background: #fbf8f0;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.form-cliente input:focus {
+  outline: 2px solid var(--kraft);
+  outline-offset: 1px;
+}
+
+.form-acciones {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.btn-cancelar {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  text-decoration: underline;
+}
+
+/* ---------- Balance: dato principal de la ficha ---------- */
+
+.balance-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 1.4rem 1.6rem;
+  border-radius: var(--radius);
+  margin-bottom: 1.4rem;
+  border: 1px solid var(--paper-line);
+  background: #fbf8f0;
+}
+
+.balance-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+.balance-monto {
+  font-family: "Special Elite", "IBM Plex Mono", monospace;
+  font-size: 2.4rem;
+  line-height: 1.1;
+}
+
+.balance-hero.debe {
+  border-color: var(--debt-red);
+  background: #f7edea;
+}
+.balance-hero.debe .balance-monto {
+  color: var(--debt-red);
+}
+
+.balance-hero.al-dia {
+  border-color: var(--paid-green);
+  background: #eef3ec;
+}
+.balance-hero.al-dia .balance-monto {
+  color: var(--paid-green);
+}
+
+/* ---------- Datos de contacto ---------- */
+
+.ficha-contacto {
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--kraft);
+  margin-bottom: 1.2rem;
+}
+
+.ficha-contacto h2 {
+  font-family: "Special Elite", "IBM Plex Mono", monospace;
+  font-size: 1.3rem;
+  margin: 0 0 0.5rem;
+}
+
+.ficha-contacto dl {
+  display: flex;
+  gap: 1.6rem;
+  flex-wrap: wrap;
+  margin: 0;
+}
+
+.ficha-contacto dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.ficha-contacto dd {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 0.88rem;
+  margin: 0.1rem 0 0;
+}
+
+/* ---------- Acciones principales ---------- */
+
+.ficha-acciones {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1.8rem;
+}
+
+.btn-pagar {
+  background: var(--paid-green);
+}
+.btn-pagar:hover {
+  background: #34573f;
+}
+
+.ficha-seccion {
+  margin-top: 1.8rem;
+}
+
+.ficha-seccion h3 {
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin: 0 0 0.5rem;
+}
+
+.vacio-inline {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+/* ---------- Accesibilidad / responsive ---------- */
+
+@media (max-width: 480px) {
+  .cover {
+    padding: 1.4rem 1.2rem;
+  }
+  .cover h1 {
+    font-size: 1.4rem;
+  }
+  .toolbar,
+  .libro {
+    padding: 0 1rem;
+  }
+  .nombre-cliente {
+    font-size: 0.92rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
