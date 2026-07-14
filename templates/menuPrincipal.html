@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CobrApp</title>
     <link rel="stylesheet" href="/static/css/style.css" />
+    <head>
+      <link rel="icon" type="image/png" href="../static/img/favico.ico" />
+      <link rel="shortcut icon" href="../static/img/favico.ico" />
+    </head>
   </head>
   <body>
     <header class="cover">
@@ -40,7 +44,7 @@
         href="/clientes/{{.ID}}"
         data-nombre="{{.Nombre}} {{.Apellido}}"
       >
-        <span class="nombre-cliente">id: {{.ID}}|{{.Nombre}} {{.Apellido}}</span>
+        <span class="nombre-cliente">(id {{.ID}}) <span></span> {{.Nombre}} {{.Apellido}}</span>
         <span class="leader"></span>
         {{if gt .Saldo 0.0}}
         <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
