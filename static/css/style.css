@@ -1,70 +1,81 @@
-@import url("https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 :root {
-  --paper: #ede7da;
-  --paper-dark: #e4dcc8;
-  --paper-line: #cfc6ac;
-  --ink: #23283b;
-  --ink-soft: #5a5f73;
-  --kraft: #7a5c3e;
-  --kraft-dark: #5e4530;
-  --debt-red: #a23b3b;
-  --paid-green: #3f6b4f;
-  --shadow: rgba(35, 40, 59, 0.16);
-  --radius: 3px;
+  --bg-main: #f9fafb;
+  --bg-card: #ffffff;
+  --text-main: #111827;
+  --text-muted: #6b7280;
+  --border-color: #e5e7eb;
+  
+  --accent: #000000;
+  --accent-hover: #1f2937;
+  --accent-fg: #ffffff;
+  
+  --debt-bg: #fef2f2;
+  --debt-text: #b91c1c;
+  --debt-border: #fee2e2;
+  
+  --paid-bg: #f0fdf4;
+  --paid-text: #15803d;
+  --paid-border: #dcfce7;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-full: 9999px;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  margin: 0;
-  background: var(--paper);
-  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px);
-  background-size: 100% 2.4rem;
-  background-position: 0 5.6rem;
-  color: var(--ink);
-  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: "Inter", system-ui, sans-serif;
   min-height: 100vh;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* ---------- Portada / cabecera ---------- */
 
 .cover {
-  background: var(--kraft);
-  color: #f3ecdd;
-  padding: 1.8rem 2rem 1.6rem;
-  box-shadow: 0 3px 0 var(--kraft-dark);
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 1.5rem;
+  background: transparent;
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .cover h1 {
-  font-family: "Special Elite", "IBM Plex Mono", monospace;
-  font-size: 1.7rem;
-  letter-spacing: 0.04em;
-  margin: 0;
+  font-size: 1.875rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--text-main);
 }
 
 .cover p {
-  margin: 0.2rem 0 0;
-  font-size: 0.85rem;
-  color: #d9cdb1;
-  font-style: italic;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  font-style: normal;
 }
 
 /* ---------- Barra de acciones ---------- */
 
 .toolbar {
   max-width: 780px;
-  margin: 4rem auto 0;
+  margin: 0 auto 2rem;
   padding: 0 1.5rem;
   display: flex;
-  gap: 0.75rem;
+  gap: 1rem;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
@@ -73,99 +84,152 @@ body {
 .search-box {
   flex: 1;
   min-width: 220px;
-  position: relative;
 }
 
-.search-box input {
+.search-box input, .form-cliente input {
   width: 100%;
-  padding: 0.6rem 0.9rem;
-  border: 1px solid var(--paper-line);
-  border-radius: var(--radius);
-  background: #fbf8f0;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 0.92rem;
-  color: var(--ink);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
 }
 
-.search-box input:focus {
-  outline: 2px solid var(--kraft);
-  outline-offset: 1px;
+.search-box input:focus, .form-cliente input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .btn-nuevo {
-  background: var(--ink);
-  color: #f3ecdd;
-  border: none;
-  border-radius: var(--radius);
-  padding: 0.65rem 1.1rem;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-weight: 600;
-  font-size: 0.88rem;
+  background: var(--accent);
+  color: var(--accent-fg);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 0.875rem;
   cursor: pointer;
-  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
 }
 
 .btn-nuevo:hover {
-  background: #363c56;
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
-.btn-nuevo:focus-visible {
-  outline: 2px solid var(--kraft);
-  outline-offset: 2px;
+
+/* ---------- Botones secundarios (Cancelar/Volver) ---------- */
+
+button.btn-nuevo[onclick*="location.href = '/'"],
+button.btn-nuevo[onclick*="location.href = '/clientes/"] {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+button.btn-nuevo[onclick*="location.href = '/'"]:hover,
+button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
+  background: var(--bg-main);
+}
+
+.btn-cancelar {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-muted);
+  text-decoration: none;
+  align-self: flex-start; 
+  width: fit-content;
+}
+
+.btn-cancelar:hover {
+  background: transparent;
+  text-decoration: underline;
+  color: var(--text-main);
 }
 
 /* ---------- Libro de cuentas ---------- */
 
 .libro {
   max-width: 780px;
-  margin: 1.4rem auto 3rem;
+  margin: 0 auto 3rem;
   padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#listaClientes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 .fila-cliente {
   display: flex;
-  align-items: baseline;
-  gap: 0.6rem;
-  padding: 0.65rem 0.2rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
   text-decoration: none;
-  color: inherit;
-  border-bottom: 1px dashed transparent;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 
-.fila-cliente:hover .nombre-cliente {
-  color: var(--kraft-dark);
+.fila-cliente:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .nombre-cliente {
-  font-weight: 600;
-  font-size: 1rem;
-  white-space: nowrap;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--text-main);
+}
+
+.nombre-cliente span {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.75rem;
 }
 
 .leader {
-  flex: 1;
-  border-bottom: 1px dotted var(--paper-line);
-  transform: translateY(-4px);
+  display: none;
 }
 
 .saldo {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.95rem;
-  font-weight: 500;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.125rem 0.625rem;
+  border-radius: var(--radius-full);
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .saldo.debe {
-  color: var(--debt-red);
+  background: var(--debt-bg);
+  color: var(--debt-text);
+  border: 1px solid var(--debt-border);
 }
+
 .saldo.al-dia {
-  color: var(--paid-green);
-  font-size: 0.78rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border: 1px solid var(--paid-green);
-  border-radius: 20px;
-  padding: 0.15rem 0.55rem;
-  display: inline-block;
+  background: var(--paid-bg);
+  color: var(--paid-text);
+  border: 1px solid var(--paid-border);
 }
 
 /* ---------- Estado vacío ---------- */
@@ -173,24 +237,27 @@ body {
 .vacio {
   text-align: center;
   padding: 3rem 1.5rem;
-  color: var(--ink-soft);
-}
-
-.vacio p {
-  font-size: 0.95rem;
-  max-width: 34ch;
-  margin: 0.4rem auto 1.2rem;
-  line-height: 1.5;
+  background: var(--bg-card);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  margin: 0 1.5rem;
 }
 
 .vacio .sello {
-  font-family: "Special Elite", monospace;
-  font-size: 1.1rem;
-  color: var(--kraft);
-  border: 2px solid var(--kraft);
-  display: inline-block;
-  padding: 0.3rem 0.8rem;
-  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-main);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+}
+
+.vacio-inline {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  padding: 1.5rem;
+  text-align: center;
 }
 
 /* ---------- Formulario ---------- */
@@ -198,43 +265,31 @@ body {
 .form-cliente {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  max-width: 420px;
-  padding-top: 0.8rem;
+  gap: 1rem;
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  max-width: 480px;
 }
 
 .form-cliente label {
-  font-size: 0.82rem;
-  color: var(--ink-soft);
-  margin-top: 0.6rem;
-}
-
-.form-cliente input {
-  padding: 0.55rem 0.7rem;
-  border: 1px solid var(--paper-line);
-  border-radius: var(--radius);
-  background: #fbf8f0;
-  font-family: "IBM Plex Sans", sans-serif;
-  font-size: 0.95rem;
-  color: var(--ink);
-}
-
-.form-cliente input:focus {
-  outline: 2px solid var(--kraft);
-  outline-offset: 1px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: -0.5rem;
 }
 
 .form-acciones {
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 1.4rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
 }
 
-.btn-cancelar {
-  color: var(--ink-soft);
-  font-size: 0.88rem;
-  text-decoration: underline;
+.form-acciones .btn-nuevo {
+  width: 100%;
 }
 
 /* ---------- Balance: dato principal de la ficha ---------- */
@@ -243,126 +298,170 @@ body {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.3rem;
-  padding: 1.4rem 1.6rem;
-  border-radius: var(--radius);
-  margin-bottom: 1.4rem;
-  border: 1px solid var(--paper-line);
-  background: #fbf8f0;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  box-shadow: var(--shadow-sm);
 }
 
 .balance-label {
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-soft);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 .balance-monto {
-  font-family: "Special Elite", "IBM Plex Mono", monospace;
-  font-size: 2.4rem;
-  line-height: 1.1;
+  font-family: inherit;
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.025em;
 }
 
-.balance-hero.debe {
-  border-color: var(--debt-red);
-  background: #f7edea;
-}
 .balance-hero.debe .balance-monto {
-  color: var(--debt-red);
+  color: var(--debt-text);
+}
+
+.balance-hero.al-dia .balance-monto {
+  color: var(--paid-text);
 }
 
 .balance-hero.al-dia {
-  border-color: var(--paid-green);
-  background: #eef3ec;
-}
-.balance-hero.al-dia .balance-monto {
-  color: var(--paid-green);
+  border-color: var(--paid-border);
+  background: var(--paid-bg);
 }
 
 /* ---------- Datos de contacto ---------- */
 
 .ficha-contacto {
-  padding-bottom: 1rem;
-  border-bottom: 2px solid var(--kraft);
-  margin-bottom: 1.2rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .ficha-contacto h2 {
-  font-family: "Special Elite", "IBM Plex Mono", monospace;
-  font-size: 1.3rem;
-  margin: 0 0 0.5rem;
+  font-family: inherit;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  letter-spacing: -0.025em;
 }
 
 .ficha-contacto dl {
   display: flex;
-  gap: 1.6rem;
-  flex-wrap: wrap;
-  margin: 0;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ficha-contacto dl div {
+  display: flex;
+  flex-direction: column;
 }
 
 .ficha-contacto dt {
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-soft);
-  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 .ficha-contacto dd {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 0.88rem;
-  margin: 0.1rem 0 0;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  font-weight: 400;
 }
 
 /* ---------- Acciones principales ---------- */
 
 .ficha-acciones {
   display: flex;
-  gap: 0.8rem;
-  margin-bottom: 1.8rem;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.ficha-acciones .btn-nuevo {
+  flex: 1;
 }
 
 .btn-pagar {
-  background: var(--paid-green);
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
 }
+
 .btn-pagar:hover {
-  background: #34573f;
+  background: var(--bg-main);
+  border-color: var(--border-color);
+}
+
+/* ---------- Tablas de Compras y Pagos ---------- */
+
+.contenedor-tablas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
 }
 
 .ficha-seccion {
-  margin-top: 1.8rem;
+  margin-top: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .ficha-seccion h3 {
-  font-size: 0.95rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--ink-soft);
-  margin: 0 0 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-main);
+  margin: 0;
+  padding: 0.75rem 1rem;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--border-color);
 }
 
-.vacio-inline {
-  color: var(--ink-soft);
-  font-size: 0.88rem;
-  font-style: italic;
+.ficha-seccion .fila-cliente {
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0.75rem 1rem;
+  background: transparent;
 }
 
-/* ---------- Accesibilidad / responsive ---------- */
+.ficha-seccion .fila-cliente:last-child {
+  border-bottom: none;
+}
 
-@media (max-width: 480px) {
-  .cover {
-    padding: 1.4rem 1.2rem;
+/* ---------- Responsive ---------- */
+
+@media (max-width: 640px) {
+  #listaClientes {
+    grid-template-columns: 1fr;
   }
-  .cover h1 {
-    font-size: 1.4rem;
+  .contenedor-tablas {
+    grid-template-columns: 1fr;
   }
-  .toolbar,
-  .libro {
-    padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .form-acciones {
+    flex-direction: row;
+    justify-content: flex-end;
   }
-  .nombre-cliente {
-    font-size: 0.92rem;
+  .form-acciones .btn-nuevo {
+    width: auto;
+  }
+  .ficha-contacto dl {
+    flex-direction: row;
+    gap: 2.5rem;
   }
 }
 
@@ -370,4 +469,44 @@ body {
   * {
     transition: none !important;
   }
+}
+
+/* ---------- Modo Oscuro ---------- */
+body.dark {
+  --bg-main: #111827;
+  --bg-card: #1f2937;
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  
+  --accent: #ffffff;
+  --accent-hover: #e5e7eb;
+  --accent-fg: #000000;
+  
+  --debt-bg: #450a0a;
+  --debt-text: #fca5a5;
+  --debt-border: #7f1d1d;
+  
+  --paid-bg: #052e16;
+  --paid-text: #86efac;
+  --paid-border: #14532d;
+}
+
+/* Botoncito para cambiar el tema */
+.btn-theme {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-md);
+  padding: 0.4rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.btn-theme:hover {
+  background: var(--bg-main);
 }

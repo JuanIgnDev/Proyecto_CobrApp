@@ -53,7 +53,8 @@
     </button>
   </div>
 
-  <section class="ficha-seccion">
+  <div class="contenedor-tablas">
+<section class="ficha-seccion">
     <h3>Compras</h3>
     {{if .Compras}} {{range .Compras}}
     <div class="fila-cliente">
@@ -80,5 +81,6 @@
     <p class="vacio-inline">Todavía no hay pagos cargados.</p>
     {{end}}
   </section>
+  </div>
 </main>
 {{end}}
