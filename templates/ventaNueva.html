@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <head>
+      <link rel="icon" type="image/png" href="../static/img/favico.ico" />
+      <link rel="shortcut icon" href="../static/img/favico.ico" />
+    </head>
+    <title>CobrApp — Nueva venta</title>
+  </head>
+  <body>
+    <header class="cover">
+      <div>
+        <h1>CobrApp</h1>
+        <p>Nueva venta para {{.Cliente.Nombre}} {{.Cliente.Apellido}}</p>
+      </div>
+    </header>
+
+    <main class="libro">
+      <a
+        href="/clientes/{{.Cliente.ID}}"
+        class="btn-cancelar"
+        style="display: inline-block; margin-bottom: 1rem"
+        >&larr; Volver a la ficha</a
+      >
+
+      {{if .Error}}
+      <p class="saldo debe" style="display: block; margin-bottom: 1rem">
+        {{.Error}}
+      </p>
+      {{end}}
+
+      <form
+        method="POST"
+        action="/clientes/{{.Cliente.ID}}/venta_nueva"
+        class="form-cliente"
+      >
+        <label for="total">Total</label>
+        <input
+          type="number"
+          id="total"
+          name="total"
+          step="0.01"
+          min="0"
+          required
+          autofocus
+        />
+
+        <label for="descripcion">Descripción</label>
+        <input
+          type="text"
+          id="descripcion"
+          name="descripcion"
+          placeholder="Ej: 2 kg de harina"
+        />
+
+        <div class="form-acciones">
+          <button type="submit" class="btn-nuevo">Guardar venta</button>
+          <a href="/clientes/{{.Cliente.ID}}" class="btn-cancelar">Cancelar</a>
+        </div>
+      </form>
+    </main>
+  </body>
+</html>

@@ -5,3 +5,5 @@ Agregar estadisticas.
 Agregar recordatorios para pagos del propio negocio.
 
 Hacer backup, investigar como hacerlo correctamente.
+
+

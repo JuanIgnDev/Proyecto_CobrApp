@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/css/style.css" />
+    <head>
+      <link rel="icon" type="image/png" href="../static/img/favico.ico" />
+      <link rel="shortcut icon" href="../static/img/favico.ico" />
+    </head>
     <title>CobrApp — {{.Nombre}} {{.Apellido}}</title>
   </head>
   <body>
@@ -76,16 +80,30 @@
 
       <section class="ficha-seccion">
         <h3>Compras</h3>
-        <p class="vacio-inline">
-          Todavía no cargamos el historial de compras acá.
-        </p>
+        {{if .Compras}} {{range .Compras}}
+        <div class="fila-cliente">
+          <span class="nombre-cliente">{{.Fecha}} — {{.Descripcion}}</span>
+          <span class="leader"></span>
+          <span class="saldo debe">${{printf "%.2f" .Total}}</span>
+        </div>
+        {{end}} {{else}}
+        <p class="vacio-inline">Todavía no hay compras cargadas.</p>
+        {{end}}
       </section>
 
       <section class="ficha-seccion">
         <h3>Pagos</h3>
-        <p class="vacio-inline">
-          Todavía no cargamos el historial de pagos acá.
-        </p>
+        {{if .Pagos}} {{range .Pagos}}
+        <div class="fila-cliente">
+          <span class="nombre-cliente"
+            >{{.Fecha}}{{if .Observacion}} — {{.Observacion}}{{end}}</span
+          >
+          <span class="leader"></span>
+          <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
+        </div>
+        {{end}} {{else}}
+        <p class="vacio-inline">Todavía no hay pagos cargados.</p>
+        {{end}}
       </section>
     </main>
   </body>
