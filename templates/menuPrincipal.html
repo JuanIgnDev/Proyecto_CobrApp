@@ -1,78 +1,62 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CobrApp</title>
-    <link rel="stylesheet" href="/static/css/style.css" />
-    <head>
-      <link rel="icon" type="image/png" href="../static/img/favico.ico" />
-      <link rel="shortcut icon" href="../static/img/favico.ico" />
-    </head>
-  </head>
-  <body>
-    <header class="cover">
-      <div>
-        <h1>CobrApp</h1>
-        <p>Libro de cuentas de clientes</p>
-      </div>
-    </header>
+{{define "contenido"}}
+<div class="toolbar">
+  <div class="search-box">
+    <input
+      type="text"
+      id="buscador"
+      placeholder="Buscar cliente..."
+      autocomplete="off"
+    />
+  </div>
+  <button
+    class="btn-nuevo"
+    type="button"
+    onclick="location.href = '/cliente_nuevo'"
+  >
+    + Nuevo cliente
+  </button>
+</div>
 
-    <div class="toolbar">
-      <div class="search-box">
-        <input
-          type="text"
-          id="buscador"
-          placeholder="Buscar cliente..."
-          autocomplete="off"
-        />
-      </div>
-      <button
-        class="btn-nuevo"
-        type="button"
-        onclick="location.href = '/cliente_nuevo'"
-      >
-        + Nuevo cliente
-      </button>
-    </div>
-
-    {{if .Clientes}}
-    <main class="libro" id="listaClientes">
-      {{range .Clientes}}
-      <a
-        class="fila-cliente"
-        href="/clientes/{{.ID}}"
-        data-nombre="{{.Nombre}} {{.Apellido}}"
-      >
-        <span class="nombre-cliente">(id {{.ID}}) <span></span> {{.Nombre}} {{.Apellido}}</span>
-        <span class="leader"></span>
-        {{if gt .Saldo 0.0}}
-        <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
-        {{else}}
-        <span class="saldo al-dia">Al día</span>
-        {{end}}
-      </a>
-      {{end}}
-    </main>
+{{if .Clientes}}
+<main class="libro" id="listaClientes">
+  {{range .Clientes}}
+  <a
+    class="fila-cliente"
+    href="/clientes/{{.ID}}"
+    data-nombre="{{.Nombre}} {{.Apellido}}"
+  >
+    <span class="nombre-cliente"
+      >id: {{.ID}} <span>---</span> {{.Nombre}} {{.Apellido}}</span
+    >
+    <span class="leader"></span>
+    {{if gt .Saldo 0.0}}
+    <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
     {{else}}
-    <div class="vacio">
-      <span class="sello">SIN REGISTROS</span>
-
+    <span class="saldo al-dia">Al día</span>
     {{end}}
+  </a>
+  {{end}}
+</main>
+{{else}}
+<div class="vacio">
+  <span class="sello">SIN REGISTROS</span>
 
-    <script>
-      const buscador = document.getElementById("buscador");
-      const lista = document.getElementById("listaClientes");
+  {{end}}
 
-      if (buscador && lista) {
-        buscador.addEventListener("input", () => {
-          const q = buscador.value.trim().toLowerCase();
-          lista.querySelectorAll(".fila-cliente").forEach((fila) => {
-            const nombre = fila.dataset.nombre.toLowerCase();
-            fila.style.display = nombre.includes(q) ? "" : "none";
-          });
+  <script>
+    const buscador = document.getElementById("buscador");
+    const lista = document.getElementById("listaClientes");
+
+    if (buscador && lista) {
+      buscador.addEventListener("input", () => {
+        const q = buscador.value.trim().toLowerCase();
+        lista.querySelectorAll(".fila-cliente").forEach((fila) => {
+          const nombre = fila.dataset.nombre.toLowerCase();
+          fila.style.display = nombre.includes(q) ? "" : "none";
         });
-      }
-    </script>
-  </body>
-</html>
+      });
+    }
+  </script>
+</div>
+
+{{end}}

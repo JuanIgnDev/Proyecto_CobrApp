@@ -1,73 +1,57 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/static/css/style.css" />
-    <head>
-      <link rel="icon" type="image/png" href="../static/img/favico.ico" />
-      <link rel="shortcut icon" href="../static/img/favico.ico" />
-    </head>
-    <title>CobrApp — Nuevo pago</title>
-  </head>
-  <body>
-    <header class="cover">
-      <div>
-        <h1>CobrApp</h1>
-        <p>Nuevo pago de {{.Cliente.Nombre}} {{.Cliente.Apellido}}</p>
-      </div>
-    </header>
+{{define "contenido"}}
+<main class="libro">
+  <a
+    href="/clientes/{{.Cliente.ID}}"
+    class="btn-cancelar"
+    style="display: inline-block; margin-bottom: 1rem"
+    >&larr; Volver a la ficha</a
+  >
 
-    <main class="libro">
-      <a
-        href="/clientes/{{.Cliente.ID}}"
-        class="btn-cancelar"
-        style="display: inline-block; margin-bottom: 1rem"
-        >&larr; Volver a la ficha</a
+  {{if gt .Cliente.Saldo 0.0}}
+  <div class="balance-hero debe" style="margin-bottom: 1.4rem">
+    <span class="balance-label">Saldo antes de este pago</span>
+    <span class="balance-monto">${{printf "%.2f" .Cliente.Saldo}}</span>
+  </div>
+  {{end}} {{if .Error}}
+  <p class="saldo debe" style="display: block; margin-bottom: 1rem">
+    {{.Error}}
+  </p>
+  {{end}}
+
+  <form
+    method="POST"
+    action="/clientes/{{.Cliente.ID}}/pago_nuevo"
+    class="form-cliente"
+  >
+    <label for="monto">Monto</label>
+    <input
+      type="number"
+      id="monto"
+      name="monto"
+      step="0.01"
+      min="0"
+      required
+      autofocus
+    />
+
+    <label for="observacion">Observación</label>
+    <input
+      type="text"
+      id="observacion"
+      name="observacion"
+      placeholder="Ej: Pago parcial en efectivo"
+    />
+
+    <div class="form-acciones">
+      <button type="submit" class="btn-nuevo btn-pagar">Registrar cobro</button>
+      <button
+        class="btn-nuevo"
+        type="button"
+        onclick="location.href = '/clientes/{{.Cliente.ID}}'"
       >
-
-      {{if gt .Cliente.Saldo 0.0}}
-      <div class="balance-hero debe" style="margin-bottom: 1.4rem">
-        <span class="balance-label">Saldo antes de este pago</span>
-        <span class="balance-monto">${{printf "%.2f" .Cliente.Saldo}}</span>
-      </div>
-      {{end}} {{if .Error}}
-      <p class="saldo debe" style="display: block; margin-bottom: 1rem">
-        {{.Error}}
-      </p>
-      {{end}}
-
-      <form
-        method="POST"
-        action="/clientes/{{.Cliente.ID}}/pago_nuevo"
-        class="form-cliente"
-      >
-        <label for="monto">Monto</label>
-        <input
-          type="number"
-          id="monto"
-          name="monto"
-          step="0.01"
-          min="0"
-          required
-          autofocus
-        />
-
-        <label for="observacion">Observación</label>
-        <input
-          type="text"
-          id="observacion"
-          name="observacion"
-          placeholder="Ej: Pago parcial en efectivo"
-        />
-
-        <div class="form-acciones">
-          <button type="submit" class="btn-nuevo btn-pagar">
-            Guardar pago
-          </button>
-          <a href="/clientes/{{.Cliente.ID}}" class="btn-cancelar">Cancelar</a>
-        </div>
-      </form>
-    </main>
-  </body>
-</html>
+        Cancelar
+      </button>
+    </div>
+  </form>
+</main>
+{{end}}

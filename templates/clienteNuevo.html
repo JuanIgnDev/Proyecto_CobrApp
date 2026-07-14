@@ -1,72 +1,51 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/static/css/style.css" />
-    <head>
-      <link rel="icon" type="image/png" href="../static/img/favico.ico" />
-      <link rel="shortcut icon" href="../static/img/favico.ico" />
-    </head>
-    <title>CobrApp</title>
-  </head>
-  <body>
-    <header class="cover">
-      <div>
-        <h1>CobrApp</h1>
-        <p>Nueva hoja de cuenta</p>
-      </div>
-    </header>
+{{define "contenido"}} {{if .Error}}
+<div class="toolbar">
+  <span class="saldo debe">{{.Error}}</span>
+</div>
+{{end}}
 
-    {{if .Error}}
-    <div class="toolbar">
-      <span class="saldo debe">{{.Error}}</span>
-    </div>
-    {{end}}
-
-    <form method="POST" action="/cliente_nuevo" class="toolbar">
-      <div class="search-box">
-        <input
-          type="text"
-          id="nombre"
-          name="nombre"
-          placeholder="Nombre/s"
-          autocomplete="off"
-          required
-        />
-      </div>
-      <div class="search-box">
-        <input
-          type="text"
-          id="apellido"
-          name="apellido"
-          placeholder="Apellido/s"
-          autocomplete="off"
-          required
-        />
-      </div>
-      <div class="search-box">
-        <input
-          type="tel"
-          id="telefono"
-          name="telefono"
-          placeholder="Teléfono (opcional)"
-          autocomplete="off"
-        />
-      </div>
-      <div class="search-box">
-        <input
-          type="email"
-          id="email"
-          name="email"
-          placeholder="Email (opcional)"
-          autocomplete="off"
-        />
-      </div>
-      <button class="btn-nuevo" type="submit">+Agregar</button>
-      <button class="btn-nuevo" type="button" onclick="location.href = '/'">
-        -Volver
-      </button>
-    </form>
-  </body>
-</html>
+<form method="POST" action="/cliente_nuevo" class="toolbar">
+  <div class="search-box">
+    <input
+      type="text"
+      id="nombre"
+      name="nombre"
+      placeholder="Nombre/s"
+      autocomplete="off"
+      required
+    />
+  </div>
+  <div class="search-box">
+    <input
+      type="text"
+      id="apellido"
+      name="apellido"
+      placeholder="Apellido/s"
+      autocomplete="off"
+      required
+    />
+  </div>
+  <div class="search-box">
+    <input
+      type="tel"
+      id="telefono"
+      name="telefono"
+      placeholder="Teléfono (opcional)"
+      autocomplete="off"
+    />
+  </div>
+  <div class="search-box">
+    <input
+      type="email"
+      id="email"
+      name="email"
+      placeholder="Email (opcional)"
+      autocomplete="off"
+    />
+  </div>
+  <button class="btn-nuevo" type="submit">+Agregar</button>
+  <button class="btn-nuevo" type="button" onclick="location.href = '/'">
+    -Cancelar
+  </button>
+</form>
+{{end}}
