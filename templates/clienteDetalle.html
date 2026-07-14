@@ -1,110 +1,84 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/static/css/style.css" />
-    <head>
-      <link rel="icon" type="image/png" href="../static/img/favico.ico" />
-      <link rel="shortcut icon" href="../static/img/favico.ico" />
-    </head>
-    <title>CobrApp — {{.Nombre}} {{.Apellido}}</title>
-  </head>
-  <body>
-    <header class="cover">
+{{define "contenido"}}
+<main class="libro">
+  <a
+    href="/"
+    class="btn-cancelar"
+    style="display: inline-block; margin-bottom: 1rem"
+    >&larr; Volver al libro</a
+  >
+
+  <!-- Balance: el dato principal, arriba de todo -->
+  <section class="balance-hero {{if gt .Saldo 0.0}}debe{{else}}al-dia{{end}}">
+    <span class="balance-label">Saldo actual</span>
+    {{if gt .Saldo 0.0}}
+    <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
+    {{else}}
+    <span class="balance-monto">Al día</span>
+    {{end}}
+  </section>
+
+  <!-- Datos de contacto -->
+  <section class="ficha-contacto">
+    <h2>{{.Nombre}} {{.Apellido}}</h2>
+    <dl>
+      {{if .Email}}
       <div>
-        <h1>CobrApp</h1>
-        <p>Ficha de cliente</p>
+        <dt>Email</dt>
+        <dd>{{.Email}}</dd>
       </div>
-    </header>
-
-    <main class="libro">
-      <a
-        href="/"
-        class="btn-cancelar"
-        style="display: inline-block; margin-bottom: 1rem"
-        >&larr; Volver al libro</a
-      >
-
-      <!-- Balance: el dato principal, arriba de todo -->
-      <section
-        class="balance-hero {{if gt .Saldo 0.0}}debe{{else}}al-dia{{end}}"
-      >
-        <span class="balance-label">Saldo actual</span>
-        {{if gt .Saldo 0.0}}
-        <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
-        {{else}}
-        <span class="balance-monto">Al día</span>
-        {{end}}
-      </section>
-
-      <!-- Datos de contacto -->
-      <section class="ficha-contacto">
-        <h2>{{.Nombre}} {{.Apellido}}</h2>
-        <dl>
-          {{if .Email}}
-          <div>
-            <dt>Email</dt>
-            <dd>{{.Email}}</dd>
-          </div>
-          {{end}} {{if .Telefono}}
-          <div>
-            <dt>Teléfono</dt>
-            <dd>{{.Telefono}}</dd>
-          </div>
-          {{end}}
-        </dl>
-      </section>
-
-      <!-- Acciones principales -->
-      <div class="ficha-acciones">
-        <button
-          class="btn-nuevo"
-          type="button"
-          onclick="location.href='/clientes/{{.ID}}/venta_nueva'"
-        >
-          + Vender
-        </button>
-        <button
-          class="btn-nuevo btn-pagar"
-          type="button"
-          onclick="location.href='/clientes/{{.ID}}/pago_nuevo'"
-        >
-          + Pagar
-        </button>
+      {{end}} {{if .Telefono}}
+      <div>
+        <dt>Teléfono</dt>
+        <dd>{{.Telefono}}</dd>
       </div>
+      {{end}}
+    </dl>
+  </section>
 
-      {{/* Cuando armemos compra.go y pago.go, estas dos secciones van a iterar
-      con range .Compras y range .Pagos, igual que menuPrincipal.html itera
-      .Clientes */}}
+  <!-- Acciones principales -->
+  <div class="ficha-acciones">
+    <button
+      class="btn-nuevo"
+      type="button"
+      onclick="location.href='/clientes/{{.ID}}/venta_nueva'"
+    >
+      Vender
+    </button>
+    <button
+      class="btn-nuevo btn-pagar"
+      type="button"
+      onclick="location.href='/clientes/{{.ID}}/pago_nuevo'"
+    >
+      Cobrar
+    </button>
+  </div>
 
-      <section class="ficha-seccion">
-        <h3>Compras</h3>
-        {{if .Compras}} {{range .Compras}}
-        <div class="fila-cliente">
-          <span class="nombre-cliente">{{.Fecha}} — {{.Descripcion}}</span>
-          <span class="leader"></span>
-          <span class="saldo debe">${{printf "%.2f" .Total}}</span>
-        </div>
-        {{end}} {{else}}
-        <p class="vacio-inline">Todavía no hay compras cargadas.</p>
-        {{end}}
-      </section>
+  <section class="ficha-seccion">
+    <h3>Compras</h3>
+    {{if .Compras}} {{range .Compras}}
+    <div class="fila-cliente">
+      <span class="nombre-cliente">{{.Fecha}} — {{.Descripcion}}</span>
+      <span class="leader"></span>
+      <span class="saldo debe">${{printf "%.2f" .Total}}</span>
+    </div>
+    {{end}} {{else}}
+    <p class="vacio-inline">Todavía no hay compras cargadas.</p>
+    {{end}}
+  </section>
 
-      <section class="ficha-seccion">
-        <h3>Pagos</h3>
-        {{if .Pagos}} {{range .Pagos}}
-        <div class="fila-cliente">
-          <span class="nombre-cliente"
-            >{{.Fecha}}{{if .Observacion}} — {{.Observacion}}{{end}}</span
-          >
-          <span class="leader"></span>
-          <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
-        </div>
-        {{end}} {{else}}
-        <p class="vacio-inline">Todavía no hay pagos cargados.</p>
-        {{end}}
-      </section>
-    </main>
-  </body>
-</html>
+  <section class="ficha-seccion">
+    <h3>Pagos</h3>
+    {{if .Pagos}} {{range .Pagos}}
+    <div class="fila-cliente">
+      <span class="nombre-cliente"
+        >{{.Fecha}}{{if .Observacion}} — {{.Observacion}}{{end}}</span
+      >
+      <span class="leader"></span>
+      <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
+    </div>
+    {{end}} {{else}}
+    <p class="vacio-inline">Todavía no hay pagos cargados.</p>
+    {{end}}
+  </section>
+</main>
+{{end}}
