@@ -1,51 +1,26 @@
-{{define "contenido"}} {{if .Error}}
-<div class="toolbar">
-  <span class="saldo debe">{{.Error}}</span>
-</div>
-{{end}}
+{{define "contenido"}} 
+<div style="max-width: 520px; margin: 0 auto; padding-top: 2rem;">
+  
+  {{if .Error}}
+  <div id="form-error" style="margin-bottom: 1rem; text-align: center;">
+    <span class="saldo debe" style="padding: 0.5rem 1rem; display: inline-block; border-radius: var(--radius-md);">
+      {{.Error}}
+    </span>
+  </div>
+  {{end}}
 
-<form method="POST" action="/cliente_nuevo" class="toolbar">
-  <div class="search-box">
-    <input
-      type="text"
-      id="nombre"
-      name="nombre"
-      placeholder="Nombre/s"
-      autocomplete="off"
-      required
-    />
-  </div>
-  <div class="search-box">
-    <input
-      type="text"
-      id="apellido"
-      name="apellido"
-      placeholder="Apellido/s"
-      autocomplete="off"
-      required
-    />
-  </div>
-  <div class="search-box">
-    <input
-      type="tel"
-      id="telefono"
-      name="telefono"
-      placeholder="Teléfono (opcional)"
-      autocomplete="off"
-    />
-  </div>
-  <div class="search-box">
-    <input
-      type="email"
-      id="email"
-      name="email"
-      placeholder="Email (opcional)"
-      autocomplete="off"
-    />
-  </div>
-  <button class="btn-nuevo" type="submit">+Agregar</button>
-  <button class="btn-nuevo" type="button" onclick="location.href = '/'">
-    -Cancelar
-  </button>
-</form>
+  <form method="POST" action="/cliente_nuevo" class="form-cliente form-grid">
+    <input type="text" id="nombre" name="nombre" placeholder="Nombre/s" autocomplete="off" required />
+    <input type="text" id="apellido" name="apellido" placeholder="Apellido/s" autocomplete="off" required />
+    
+    <input type="tel" id="telefono" name="telefono" placeholder="Teléfono (opcional)" autocomplete="off" />
+    <input type="email" id="email" name="email" placeholder="Email (opcional)" autocomplete="off" />
+    
+    <div class="form-acciones-grid">
+      <button class="btn-nuevo btn-hover-green" type="submit">+ Agregar Cliente</button>
+      <button class="btn-nuevo btn-hover-red" type="button" onclick="location.href = '/'">- Cancelar</button>
+    </div>
+  </form>
+
+</div>
 {{end}}

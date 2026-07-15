@@ -4,7 +4,7 @@
     href="/"
     class="btn-cancelar"
     style="display: inline-block; margin-bottom: 1rem"
-    >&larr; Volver al libro</a
+    >&larr; Volver al inicio</a
   >
 
   <!-- Balance: el dato principal, arriba de todo -->
@@ -42,43 +42,126 @@
       type="button"
       onclick="location.href='/clientes/{{.ID}}/venta_nueva'"
     >
-      Vender
+      + Cargar Venta
     </button>
     <button
       class="btn-nuevo btn-pagar"
       type="button"
       onclick="location.href='/clientes/{{.ID}}/pago_nuevo'"
     >
-      Cobrar
+      + Registrar Pago
     </button>
   </div>
 
   <div class="contenedor-tablas">
-<section class="ficha-seccion">
+  <section class="ficha-seccion">
     <h3>Compras</h3>
-    {{if .Compras}} {{range .Compras}}
-    <div class="fila-cliente">
-      <span class="nombre-cliente">{{.Fecha}} — {{.Descripcion}}</span>
-      <span class="leader"></span>
-      <span class="saldo debe">${{printf "%.2f" .Total}}</span>
-    </div>
-    {{end}} {{else}}
-    <p class="vacio-inline">Todavía no hay compras cargadas.</p>
+    
+    {{if .Compras}} 
+      <div id="lista-compras">
+        <!-- range con $index para saber en qué posición estamos -->
+        {{range $index, $compra := .Compras}}
+          <div class="fila-cliente compra-item" {{if ge $index 3}}style="display: none;"{{end}}>
+            <!-- Contenedor en columna para Fecha y Producto -->
+            <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+              <span style="font-size: 0.75rem; color: var(--text-muted);">{{.Fecha}}</span>
+              
+              {{if .Descripcion}}
+                <span style="font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: var(--text-main);">
+                  {{.Descripcion}}
+                </span>
+              {{end}}
+            </div>
+            <!-- El precio sigue a la derecha -->
+            <span class="saldo debe">${{printf "%.2f" .Total}}</span>
+          </div>
+        {{end}}
+      </div>
+      
+      <!-- Si hay estrictamente más de 3 compras, renderizamos el botón de Ver más -->
+      {{if gt (len .Compras) 3}}
+        <div style="background: var(--bg-main); border-top: 1px solid var(--border-color);">
+          <button id="btn-ver-compras" type="button" class="btn-cancelar" style="width: 100%; padding: 0.75rem; text-align: center; align-self: auto;">
+            Ver historial completo ({{len .Compras}}) ↓
+          </button>
+        </div>
+
+        <script>
+          document.getElementById('btn-ver-compras').addEventListener('click', function() {
+            const items = document.querySelectorAll('.compra-item');
+            const expandir = this.innerText.includes('completo');
+            
+            items.forEach((item, index) => {
+              // Solo interactuamos con los elementos del 4to en adelante
+              if (index >= 3) {
+                item.style.display = expandir ? 'flex' : 'none';
+              }
+            });
+            
+            // Cambiamos el texto y la flechita del botón
+            this.innerText = expandir ? 'Ocultar historial ↑' : 'Ver historial completo ({{len .Compras}}) ↓';
+          });
+        </script>
+      {{end}}
+
+    {{else}}
+      <p class="vacio-inline">Todavía no hay compras cargadas.</p>
     {{end}}
   </section>
 
   <section class="ficha-seccion">
     <h3>Pagos</h3>
-    {{if .Pagos}} {{range .Pagos}}
-    <div class="fila-cliente">
-      <span class="nombre-cliente"
-        >{{.Fecha}}{{if .Observacion}} — {{.Observacion}}{{end}}</span
-      >
-      <span class="leader"></span>
-      <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
-    </div>
-    {{end}} {{else}}
-    <p class="vacio-inline">Todavía no hay pagos cargados.</p>
+    
+    {{if .Pagos}} 
+      <div id="lista-pagos">
+        <!-- range con $index para saber en qué posición estamos -->
+        {{range $index, $pago := .Pagos}}
+          <!-- Si el índice es mayor o igual a 3, lo ocultamos -->
+          <div class="fila-cliente pago-item" {{if ge $index 3}}style="display: none;"{{end}}>
+            
+            <!-- Contenedor en columna para Fecha y Observación -->
+            <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+              <span style="font-size: 0.75rem; color: var(--text-muted);">{{.Fecha}}</span>
+              
+              <span style="font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: var(--text-main);">
+                {{if .Observacion}}{{.Observacion}}{{else}}PAGO{{end}}
+              </span>
+            </div>
+
+            <!-- El monto sigue a la derecha con la clase al-dia (verde) -->
+            <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
+          </div>
+        {{end}}
+      </div>
+      
+      <!-- Si hay estrictamente más de 3 pagos, renderizamos el botón de Ver más -->
+      {{if gt (len .Pagos) 3}}
+        <div style="background: var(--bg-main); border-top: 1px solid var(--border-color);">
+          <button id="btn-ver-pagos" type="button" class="btn-cancelar" style="width: 100%; padding: 0.75rem; text-align: center; align-self: auto;">
+            Ver historial completo ({{len .Pagos}}) ↓
+          </button>
+        </div>
+
+        <script>
+          document.getElementById('btn-ver-pagos').addEventListener('click', function() {
+            const items = document.querySelectorAll('.pago-item');
+            const expandir = this.innerText.includes('completo');
+            
+            items.forEach((item, index) => {
+              // Solo interactuamos con los elementos del 4to en adelante
+              if (index >= 3) {
+                item.style.display = expandir ? 'flex' : 'none';
+              }
+            });
+            
+            // Cambiamos el texto y la flechita del botón
+            this.innerText = expandir ? 'Ocultar historial ↑' : 'Ver historial completo ({{len .Pagos}}) ↓';
+          });
+        </script>
+      {{end}}
+
+    {{else}}
+      <p class="vacio-inline">Todavía no hay pagos cargados.</p>
     {{end}}
   </section>
   </div>
