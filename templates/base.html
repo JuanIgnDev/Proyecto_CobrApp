@@ -8,50 +8,75 @@
     <link rel="icon" type="image/png" href="../static/img/favico.ico" />
     <link rel="shortcut icon" href="../static/img/favico.ico" />
     <title>CobrApp</title>
-    
+
     <!-- Script para evitar el "fogonazo" blanco al recargar la página -->
     <script>
-      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
+      if (
+        localStorage.getItem("theme") === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
       }
     </script>
   </head>
-  
+
   <body>
-    <header class="cover" style="flex-direction: row; justify-content: space-between; align-items: center;">
+    <header
+      class="cover"
+      style="
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      "
+    >
       <div>
         <h1>
-          <a href="/" style="text-decoration: none; color: inherit;">CobrApp</a>
+          <a href="/" style="text-decoration: none; color: inherit">CobrApp</a>
         </h1>
       </div>
-      <button id="themeToggle" class="btn-theme" title="Cambiar tema">
-        <span id="themeIcon">🌙</span>
-      </button>
+
+      <div class="retoque_header_padre">
+        <div class="retoque_header_hijo">
+          <button id="themeToggle" class="btn-theme" title="Cambiar tema">
+            <span id="themeIcon">🌙</span>
+          </button>
+        </div>
+
+        <div class="retoque_header_hijo">
+          <!--Aca agrego boton de cerrar sesion en caso de estar la seision iniciada-->
+          {{block "acciones-header" .}}
+          <form method="POST" action="/logout">
+            <button type="submit" class="btn-nuevo">Cerrar sesión</button>
+          </form>
+          {{end}}
+        </div>
+      </div>
     </header>
 
     <main class="libro">{{block "contenido" .}}{{end}}</main>
 
     <!-- Lógica del botón de tema -->
     <script>
-      const btn = document.getElementById('themeToggle');
-      const icon = document.getElementById('themeIcon');
-      
+      const btn = document.getElementById("themeToggle");
+      const icon = document.getElementById("themeIcon");
+
       // Sincronizar el estado de la clase con el body
-      if (document.documentElement.classList.contains('dark')) {
-        document.body.classList.add('dark');
-        icon.textContent = '☀️';
+      if (document.documentElement.classList.contains("dark")) {
+        document.body.classList.add("dark");
+        icon.textContent = "☀️";
       }
 
-      btn.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        document.documentElement.classList.toggle('dark');
-        
-        if (document.body.classList.contains('dark')) {
-          localStorage.setItem('theme', 'dark');
-          icon.textContent = '☀️';
+      btn.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        document.documentElement.classList.toggle("dark");
+
+        if (document.body.classList.contains("dark")) {
+          localStorage.setItem("theme", "dark");
+          icon.textContent = "☀️";
         } else {
-          localStorage.setItem('theme', 'light');
-          icon.textContent = '🌙';
+          localStorage.setItem("theme", "light");
+          icon.textContent = "🌙";
         }
       });
     </script>

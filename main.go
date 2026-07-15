@@ -23,18 +23,48 @@ func main() {
 	//carga archivos css
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
 
-	mux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
-		clientes := ObtenerClientes(db)
-		renderizar(w, "menuPrincipal.html",struct{ Clientes []Cliente }{Clientes: clientes} )
+	// --- Login / logout: NUNCA van envueltas en requiereLogin, si no nadie podría loguearse ---
+
+	mux.HandleFunc("GET /login", func(w http.ResponseWriter, r *http.Request) {
+		renderizar(w, "login.html", struct{ Error string }{})
 	})
+
+	mux.HandleFunc("POST /login", func(w http.ResponseWriter, r *http.Request) {
+		usuario := r.FormValue("usuario")
+		password := r.FormValue("password")
+
+		if !validarCredenciales(usuario, password) {
+			renderizar(w, "login.html", struct{ Error string }{Error: "Usuario o contraseña incorrectos."})
+			return
+		}
+
+		if err := crearSesion(w); err != nil {
+			http.Error(w, "No se pudo iniciar sesión", http.StatusInternalServerError)
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	})
+
+	mux.HandleFunc("POST /logout", func(w http.ResponseWriter, r *http.Request) {
+		cerrarSesion(w, r)
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+	})
+
+	// --- De acá para abajo, todo pasa primero por requiereLogin ---
+
+	mux.HandleFunc("GET /{$}", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+		clientes := ObtenerClientes(db)
+		renderizar(w, "menuPrincipal.html", struct{ Clientes []Cliente }{Clientes: clientes})
+	}))
 
 	// 4. Formulario de cliente nuevo (mostrar)
-	mux.HandleFunc("GET /cliente_nuevo", func(w http.ResponseWriter, r *http.Request) {
-		renderizar(w, "clienteNuevo.html", nil)
-	})
+	mux.HandleFunc("GET /cliente_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+		renderizar(w, "clienteNuevo.html", struct{ Error string }{})
+	}))
 
 	// 5. Formulario de cliente nuevo (guardar)
-	mux.HandleFunc("POST /cliente_nuevo", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST /cliente_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		nombre := r.FormValue("nombre")
 		apellido := r.FormValue("apellido")
 		email := r.FormValue("email")
@@ -52,10 +82,10 @@ func main() {
 		}
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
-	})
+	}))
 
 	// 6. Detalle de un cliente puntual
-	mux.HandleFunc("GET /clientes/{id}", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /clientes/{id}", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
 		id, err := strconv.Atoi(idStr)
@@ -74,14 +104,14 @@ func main() {
 		pagos := ObtenerPagosDeCliente(db, id)
 
 		renderizar(w, "clienteDetalle.html", struct {
-		*Cliente
-		Compras []Compra
-		Pagos   []Pago
+			*Cliente
+			Compras []Compra
+			Pagos   []Pago
 		}{Cliente: cliente, Compras: compras, Pagos: pagos})
-	})
+	}))
 
 	// 8. Formulario de venta nueva (mostrar)
-	mux.HandleFunc("GET /clientes/{id}/venta_nueva", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /clientes/{id}/venta_nueva", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -97,10 +127,10 @@ func main() {
 			Cliente *Cliente
 			Error   string
 		}{Cliente: cliente})
-	})
+	}))
 
 	// 9. Formulario de venta nueva (guardar)
-	mux.HandleFunc("POST /clientes/{id}/venta_nueva", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST /clientes/{id}/venta_nueva", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -127,10 +157,10 @@ func main() {
 		}
 
 		http.Redirect(w, r, "/clientes/"+strconv.Itoa(id), http.StatusSeeOther)
-	})
+	}))
 
 	// 10. Formulario de pago nuevo (mostrar)
-	mux.HandleFunc("GET /clientes/{id}/pago_nuevo", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /clientes/{id}/pago_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -147,10 +177,10 @@ func main() {
 			Cliente *Cliente
 			Error   string
 		}{Cliente: cliente})
-	})
+	}))
 
 	// 11. Formulario de pago nuevo (guardar)
-	mux.HandleFunc("POST /clientes/{id}/pago_nuevo", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("POST /clientes/{id}/pago_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -177,7 +207,7 @@ func main() {
 		}
 
 		http.Redirect(w, r, "/clientes/"+strconv.Itoa(id), http.StatusSeeOther)
-	})
+	}))
 
 	// 12. Arranca el servidor
 	log.Println("Servidor iniciado en http://localhost:8080")

@@ -6,22 +6,22 @@
   --text-main: #111827;
   --text-muted: #6b7280;
   --border-color: #e5e7eb;
-  
+
   --accent: #000000;
   --accent-hover: #1f2937;
   --accent-fg: #ffffff;
-  
+
   --debt-bg: #fef2f2;
   --debt-text: #b91c1c;
   --debt-border: #fee2e2;
-  
+
   --paid-bg: #f0fdf4;
   --paid-text: #15803d;
   --paid-border: #dcfce7;
-  
+
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  
+
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
@@ -86,7 +86,8 @@ body {
   min-width: 220px;
 }
 
-.search-box input, .form-cliente input {
+.search-box input,
+.form-cliente input {
   width: 100%;
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--border-color);
@@ -99,7 +100,8 @@ body {
   transition: all 0.2s ease;
 }
 
-.search-box input:focus, .form-cliente input:focus {
+.search-box input:focus,
+.form-cliente input:focus {
   outline: none;
   border-color: var(--accent);
   box-shadow: 0 0 0 1px var(--accent);
@@ -147,7 +149,7 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   padding: 0;
   color: var(--text-muted);
   text-decoration: none;
-  align-self: flex-start; 
+  align-self: flex-start;
   width: fit-content;
 }
 
@@ -185,7 +187,9 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s, border-color 0.2s;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
 }
 
 .fila-cliente:hover {
@@ -440,6 +444,20 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   border-bottom: none;
 }
 
+.login-wrap {
+  padding: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.retoque_header_padre {
+  display: flex;
+}
+
+.retoque_header_hijo {
+  padding-left: 1rem;
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 640px) {
@@ -478,15 +496,15 @@ body.dark {
   --text-main: #f9fafb;
   --text-muted: #9ca3af;
   --border-color: #374151;
-  
+
   --accent: #ffffff;
   --accent-hover: #e5e7eb;
   --accent-fg: #000000;
-  
+
   --debt-bg: #450a0a;
   --debt-text: #fca5a5;
   --debt-border: #7f1d1d;
-  
+
   --paid-bg: #052e16;
   --paid-text: #86efac;
   --paid-border: #14532d;
