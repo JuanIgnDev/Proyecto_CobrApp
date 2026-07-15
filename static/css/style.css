@@ -1,5 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
+/* =========================================
+   VARIABLES GLOBALES
+   ========================================= */
 :root {
   --bg-main: #f9fafb;
   --bg-card: #ffffff;
@@ -28,6 +31,9 @@
   --radius-full: 9999px;
 }
 
+/* =========================================
+   RESET Y BASE
+   ========================================= */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -43,8 +49,9 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- Portada / cabecera ---------- */
-
+/* =========================================
+   HEADER / PORTADA
+   ========================================= */
 .cover {
   max-width: 780px;
   margin: 0 auto;
@@ -68,17 +75,17 @@ body {
   font-style: normal;
 }
 
-/* ---------- Barra de acciones ---------- */
-
+/* =========================================
+   BARRA DE ACCIONES (TOOLBAR)
+   ========================================= */
 .toolbar {
-  max-width: 780px;
-  margin: 0 auto 2rem;
-  padding: 0 1.5rem;
-  display: flex;
+  width: 100%;
+  margin: 0 0 2rem 0; /* Reseteado para que alinee perfecto con las tarjetas */
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr auto;
   gap: 1rem;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
 }
 
 .search-box {
@@ -105,6 +112,9 @@ body {
   box-shadow: 0 0 0 1px var(--accent);
 }
 
+/* =========================================
+   BOTONES
+   ========================================= */
 .btn-nuevo {
   background: var(--accent);
   color: var(--accent-fg);
@@ -127,20 +137,6 @@ body {
   border-color: var(--accent-hover);
 }
 
-/* ---------- Botones secundarios (Cancelar/Volver) ---------- */
-
-button.btn-nuevo[onclick*="location.href = '/'"],
-button.btn-nuevo[onclick*="location.href = '/clientes/"] {
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-}
-
-button.btn-nuevo[onclick*="location.href = '/'"]:hover,
-button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
-  background: var(--bg-main);
-}
-
 .btn-cancelar {
   background: transparent;
   border: none;
@@ -157,8 +153,20 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   color: var(--text-main);
 }
 
-/* ---------- Libro de cuentas ---------- */
+.btn-pagar {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
 
+.btn-pagar:hover {
+  background: var(--bg-main);
+  border-color: var(--border-color);
+}
+
+/* =========================================
+   GRILLAS Y TARJETAS (LIBRO DE CUENTAS)
+   ========================================= */
 .libro {
   max-width: 780px;
   margin: 0 auto 3rem;
@@ -170,8 +178,11 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
 
 #listaClientes {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr; /* Para que queden uno al lado del otro */
   gap: 1rem;
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
 .fila-cliente {
@@ -208,6 +219,9 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   display: none;
 }
 
+/* =========================================
+   ESTADOS (SALDOS Y VACÍOS)
+   ========================================= */
 .saldo {
   font-family: inherit;
   font-size: 0.75rem;
@@ -231,8 +245,6 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   color: var(--paid-text);
   border: 1px solid var(--paid-border);
 }
-
-/* ---------- Estado vacío ---------- */
 
 .vacio {
   text-align: center;
@@ -260,40 +272,9 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   text-align: center;
 }
 
-/* ---------- Formulario ---------- */
-
-.form-cliente {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  background: var(--bg-card);
-  padding: 1.5rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  max-width: 480px;
-}
-
-.form-cliente label {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-main);
-  margin-bottom: -0.5rem;
-}
-
-.form-acciones {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 1rem;
-}
-
-.form-acciones .btn-nuevo {
-  width: 100%;
-}
-
-/* ---------- Balance: dato principal de la ficha ---------- */
-
+/* =========================================
+   COMPONENTES DE LA FICHA DEL CLIENTE
+   ========================================= */
 .balance-hero {
   display: flex;
   flex-direction: column;
@@ -321,20 +302,12 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   letter-spacing: -0.025em;
 }
 
-.balance-hero.debe .balance-monto {
-  color: var(--debt-text);
-}
-
-.balance-hero.al-dia .balance-monto {
-  color: var(--paid-text);
-}
-
+.balance-hero.debe .balance-monto { color: var(--debt-text); }
+.balance-hero.al-dia .balance-monto { color: var(--paid-text); }
 .balance-hero.al-dia {
   border-color: var(--paid-border);
   background: var(--paid-bg);
 }
-
-/* ---------- Datos de contacto ---------- */
 
 .ficha-contacto {
   padding: 1.5rem;
@@ -376,8 +349,6 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   font-weight: 400;
 }
 
-/* ---------- Acciones principales ---------- */
-
 .ficha-acciones {
   display: flex;
   gap: 0.75rem;
@@ -387,19 +358,6 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
 .ficha-acciones .btn-nuevo {
   flex: 1;
 }
-
-.btn-pagar {
-  background: var(--bg-card);
-  color: var(--text-main);
-  border: 1px solid var(--border-color);
-}
-
-.btn-pagar:hover {
-  background: var(--bg-main);
-  border-color: var(--border-color);
-}
-
-/* ---------- Tablas de Compras y Pagos ---------- */
 
 .contenedor-tablas {
   display: grid;
@@ -440,8 +398,209 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   border-bottom: none;
 }
 
-/* ---------- Responsive ---------- */
+/* =========================================
+   FORMULARIOS
+   ========================================= */
+.form-cliente {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  max-width: 480px;
+}
 
+.form-cliente label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-main);
+  margin-bottom: -0.5rem;
+}
+
+.form-acciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.form-acciones .btn-nuevo {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-acciones-grid {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-rows: 1fr 1fr; /* Botones uno al lado del otro */
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* --- Botones Hover Animados (Agregar / Cancelar) --- */
+.btn-hover-green, .btn-hover-red {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  background-color: transparent !important;
+  color: var(--text-main) !important; /* TEXTO OSCURO POR DEFECTO PARA AMBOS */
+  border: 1px solid var(--accent) !important; /* BORDECITO NEGRO PARA AMBOS */
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-hover-green::before, .btn-hover-red::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-color: var(--bg-card); /* FONDO BLANCO POR DEFECTO PARA AMBOS */
+}
+
+/* El círculo expansivo de color */
+.btn-hover-green::after, .btn-hover-red::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  padding-bottom: 150%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(0); /* Arranca invisible en el centro */
+  transition: transform 0.4s ease-out;
+  z-index: -1;
+}
+
+.btn-hover-green::after { background-color: #16a34a; } /* Color Verde */
+.btn-hover-red::after { background-color: #dc2626; } /* Color Rojo */
+
+/* Efectos al pasar el mouse */
+.btn-hover-green:hover::after, .btn-hover-red:hover::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.btn-hover-green:hover, .btn-hover-red:hover {
+  color: #ffffff !important; /* El texto se vuelve blanco sobre el color */
+  border-color: transparent !important; /* Se oculta el borde negro */
+}
+
+/* =========================================
+   ANIMACIÓN DE CARGA (SPINNER)
+   ========================================= */
+.btn-loading {
+  color: transparent !important;
+  pointer-events: none; /* Evita que el usuario haga doble clic */
+  position: relative;
+}
+
+.btn-loading::after {
+  content: "";
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  top: 50%;
+  left: 50%;
+  margin-top: -0.625rem;
+  margin-left: -0.625rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  z-index: 2;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* =========================================
+   NOTIFICACIONES TOAST (SNACKBAR)
+   ========================================= */
+#toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toast {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border-left: 4px solid #10b981; /* Verde esmeralda por defecto */
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  font-weight: 500;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transform: translateX(120%); /* Arranca oculto a la derecha */
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efecto rebote */
+}
+
+.toast.show {
+  transform: translateX(0);
+}
+
+.toast.error {
+  border-left-color: #ef4444; /* Rojo para errores */
+}
+
+/* =========================================
+   MODO OSCURO
+   ========================================= */
+body.dark {
+  --bg-main: #111827;
+  --bg-card: #1f2937;
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --border-color: #374151;
+  
+  --accent: #ffffff;
+  --accent-hover: #e5e7eb;
+  --accent-fg: #000000;
+  
+  --debt-bg: #450a0a;
+  --debt-text: #fca5a5;
+  --debt-border: #7f1d1d;
+  
+  --paid-bg: #052e16;
+  --paid-text: #86efac;
+  --paid-border: #14532d;
+}
+
+.btn-theme {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-md);
+  padding: 0.4rem;
+  cursor: pointer;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.btn-theme:hover {
+  background: var(--bg-main);
+}
+
+/* =========================================
+   RESPONSIVE (CELULARES)
+   ========================================= */
 @media (max-width: 640px) {
   #listaClientes {
     grid-template-columns: 1fr;
@@ -469,44 +628,4 @@ button.btn-nuevo[onclick*="location.href = '/clientes/"]:hover {
   * {
     transition: none !important;
   }
-}
-
-/* ---------- Modo Oscuro ---------- */
-body.dark {
-  --bg-main: #111827;
-  --bg-card: #1f2937;
-  --text-main: #f9fafb;
-  --text-muted: #9ca3af;
-  --border-color: #374151;
-  
-  --accent: #ffffff;
-  --accent-hover: #e5e7eb;
-  --accent-fg: #000000;
-  
-  --debt-bg: #450a0a;
-  --debt-text: #fca5a5;
-  --debt-border: #7f1d1d;
-  
-  --paid-bg: #052e16;
-  --paid-text: #86efac;
-  --paid-border: #14532d;
-}
-
-/* Botoncito para cambiar el tema */
-.btn-theme {
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-main);
-  border-radius: var(--radius-md);
-  padding: 0.4rem;
-  cursor: pointer;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 0.2s;
-}
-
-.btn-theme:hover {
-  background: var(--bg-main);
 }

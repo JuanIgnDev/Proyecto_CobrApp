@@ -13,7 +13,7 @@
     <span class="balance-monto">${{printf "%.2f" .Cliente.Saldo}}</span>
   </div>
   {{end}} {{if .Error}}
-  <p class="saldo debe" style="display: block; margin-bottom: 1rem">
+  <p id="form-error" class="saldo debe" style="display: block; margin-bottom: 1rem">
     {{.Error}}
   </p>
   {{end}}
@@ -23,13 +23,15 @@
     action="/clientes/{{.Cliente.ID}}/pago_nuevo"
     class="form-cliente"
   >
-    <label for="monto">Monto</label>
+    <label for="monto">Total</label>
     <input
-      type="number"
+      type="text"
+      inputmode="decimal"
       id="monto"
       name="monto"
-      step="0.01"
-      min="0"
+      class="input-moneda"
+      placeholder="0,00"
+      autocomplete="off"
       required
       autofocus
     />
