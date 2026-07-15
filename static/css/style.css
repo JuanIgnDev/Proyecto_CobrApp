@@ -242,6 +242,7 @@ body {
   background: var(--debt-bg);
   color: var(--debt-text);
   border: 1px solid var(--debt-border);
+  text-align: center;
 }
 
 .saldo.al-dia {
@@ -407,8 +408,8 @@ body {
 }
 
 .login-wrap {
-  padding: 1.5rem;
-  display: flex;
+  margin: 2rem;
+  display: grid;
   justify-content: center;
 }
 
@@ -466,6 +467,11 @@ body {
   grid-template-rows: 1fr 1fr; /* Botones uno al lado del otro */
   gap: 1rem;
   margin-top: 0.5rem;
+}
+
+.btn-ingresar {
+  display: block;
+  margin: 5px auto 0;
 }
 
 /* --- Botones Hover Animados (Agregar / Cancelar) --- */

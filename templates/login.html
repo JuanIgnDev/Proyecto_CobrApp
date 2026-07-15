@@ -3,34 +3,47 @@
 {{end}} {{define "contenido"}}
 <div class="login-wrap">
   {{if .Error}}
-  <p class="saldo debe" style="display: block; margin-bottom: 1rem">
+  <p
+    class="saldo debe"
+    id="error-login"
+    style="display: block; margin-bottom: 1rem"
+  >
     {{.Error}}
   </p>
   {{end}}
 
   <form method="POST" action="/login" class="form-cliente">
-    <label for="usuario">Usuario</label>
+    <p style="font-weight: bold; text-align: center">INICIAR SESION</p>
+
     <input
       type="text"
       id="usuario"
       name="usuario"
+      placeholder="Usuario"
       required
       autofocus
       autocomplete="username"
     />
 
-    <label for="password">Contraseña</label>
     <input
       type="password"
       id="password"
       name="password"
+      placeholder="Contraseña"
       required
-      autocomplete="current-password"
     />
 
-    <div class="form-acciones">
-      <button type="submit" class="btn-nuevo">Ingresar</button>
-    </div>
+    <button type="submit" class="btn-nuevo btn-ingresar">Ingresar</button>
   </form>
 </div>
+
+<script>
+  const error = document.getElementById("error-login");
+  if (error) {
+    setTimeout(() => {
+      error.style.display = "none";
+    }, 5000);
+  }
+</script>
+
 {{end}}
