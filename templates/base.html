@@ -5,28 +5,53 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/static/css/style.css" />
-    <link rel="icon" type="image/png" href="../static/img/favico.ico" />
-    <link rel="shortcut icon" href="../static/img/favico.ico" />
+    <link rel="icon" type="image/png" href="../static/img/icono.png" />
+    <link rel="shortcut icon" href="../static/img/icono.png" />
     <title>CobrApp</title>
-    
+
     <!-- Este script SÍ va acá arriba para evitar que la pantalla parpadee en blanco -->
     <script>
-      if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
+      if (
+        localStorage.getItem("theme") === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
       }
     </script>
   </head>
-  
+
   <body>
-    <header class="cover" style="flex-direction: row; justify-content: space-between; align-items: center;">
+    <header
+      class="cover"
+      style="
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      "
+    >
       <div>
         <h1>
-          <a href="/" style="text-decoration: none; color: inherit;">CobrApp</a>
+          <a href="/" style="text-decoration: none; color: inherit">CobrApp</a>
         </h1>
       </div>
-      <button id="themeToggle" class="btn-theme" title="Cambiar tema">
-        <span id="themeIcon">🌙</span>
-      </button>
+
+      <div class="retoque_header_padre">
+        <div class="retoque_header_hijo">
+          <button id="themeToggle" class="btn-theme" title="Cambiar tema">
+            <span id="themeIcon">🌙</span>
+          </button>
+        </div>
+
+        <div class="retoque_header_hijo">
+          <!--Aca agrego boton de cerrar sesion en caso de estar la seision iniciada-->
+          {{block "acciones-header" .}}
+          <form method="POST" action="/logout">
+            <button type="submit" class="btn-nuevo">Cerrar sesión</button>
+          </form>
+          {{end}}
+        </div>
+      </div>
     </header>
 
     <!-- Acá se inyectan tus formularios y tablas -->
@@ -38,44 +63,44 @@
     <!-- TODOS LOS SCRIPTS VAN ACÁ ABAJO, DESPUÉS DE QUE LA PÁGINA YA CARGÓ -->
     <script>
       /* --- 0. LÓGICA DEL BOTÓN DE MODO OSCURO --- */
-      const btnTheme = document.getElementById('themeToggle');
-      const iconTheme = document.getElementById('themeIcon');
-      
-      if (document.documentElement.classList.contains('dark')) {
-        document.body.classList.add('dark');
-        iconTheme.textContent = '☀️';
+      const btnTheme = document.getElementById("themeToggle");
+      const iconTheme = document.getElementById("themeIcon");
+
+      if (document.documentElement.classList.contains("dark")) {
+        document.body.classList.add("dark");
+        iconTheme.textContent = "☀️";
       }
 
-      btnTheme.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        document.documentElement.classList.toggle('dark');
-        
-        if (document.body.classList.contains('dark')) {
-          localStorage.setItem('theme', 'dark');
-          iconTheme.textContent = '☀️';
+      btnTheme.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        document.documentElement.classList.toggle("dark");
+
+        if (document.body.classList.contains("dark")) {
+          localStorage.setItem("theme", "dark");
+          iconTheme.textContent = "☀️";
         } else {
-          localStorage.setItem('theme', 'light');
-          iconTheme.textContent = '🌙';
+          localStorage.setItem("theme", "light");
+          iconTheme.textContent = "🌙";
         }
       });
 
       /* --- 1. LÓGICA DE NOTIFICACIONES TOAST --- */
       function showToast(message, isError = false) {
-        const container = document.getElementById('toast-container');
+        const container = document.getElementById("toast-container");
         if (!container) return;
 
-        const toast = document.createElement('div');
-        toast.className = `toast ${isError ? 'error' : ''}`;
-        toast.innerHTML = `<span>${isError ? '❌' : '✅'}</span> <span>${message}</span>`;
-        
+        const toast = document.createElement("div");
+        toast.className = `toast ${isError ? "error" : ""}`;
+        toast.innerHTML = `<span>${isError ? "❌" : "✅"}</span> <span>${message}</span>`;
+
         container.appendChild(toast);
-        
+
         // Animación de entrada
-        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => toast.classList.add("show"), 10);
 
         // Remover después de 3.5 segundos
         setTimeout(() => {
-          toast.classList.remove('show');
+          toast.classList.remove("show");
           setTimeout(() => toast.remove(), 400); // Esperar que termine la animación
         }, 3500);
       }
@@ -88,59 +113,65 @@
         const hayError = document.getElementById("form-error");
 
         if (pendingToast && !hayError) {
-            showToast(pendingToast);
+          showToast(pendingToast);
         }
         sessionStorage.removeItem("toastMsg"); // Limpiarlo siempre, haya error o no
       });
 
       /* --- 2. LÓGICA GLOBAL DE FORMULARIOS --- */
-      document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', function(e) {
+      document.querySelectorAll("form").forEach((form) => {
+        form.addEventListener("submit", function (e) {
           // A. Spinner en el botón
           const btnSubmit = form.querySelector('button[type="submit"]');
           if (btnSubmit) {
-            btnSubmit.classList.add('btn-loading');
+            btnSubmit.classList.add("btn-loading");
           }
 
           // B. Configurar el Toast para cuando la página recargue con éxito
-          if (form.action.includes('cliente_nuevo')) {
-              sessionStorage.setItem("toastMsg", "Cliente creado exitosamente");
-          } else if (form.action.includes('pago_nuevo')) {
-              sessionStorage.setItem("toastMsg", "El pago se registró correctamente");
-          } else if (form.action.includes('venta_nueva')) {
-              sessionStorage.setItem("toastMsg", "La venta se guardó correctamente");
+          if (form.action.includes("cliente_nuevo")) {
+            sessionStorage.setItem("toastMsg", "Cliente creado exitosamente");
+          } else if (form.action.includes("pago_nuevo")) {
+            sessionStorage.setItem(
+              "toastMsg",
+              "El pago se registró correctamente",
+            );
+          } else if (form.action.includes("venta_nueva")) {
+            sessionStorage.setItem(
+              "toastMsg",
+              "La venta se guardó correctamente",
+            );
           }
 
           // C. Limpiar la máscara de moneda antes de enviarlo a Go
-          const currencyInputs = form.querySelectorAll('.input-moneda');
-          currencyInputs.forEach(input => {
+          const currencyInputs = form.querySelectorAll(".input-moneda");
+          currencyInputs.forEach((input) => {
             let val = input.value;
-            val = val.replace(/\./g, ''); // Sacamos los puntos de miles
-            val = val.replace(',', '.');  // Cambiamos la coma decimal por punto (formato Go)
+            val = val.replace(/\./g, ""); // Sacamos los puntos de miles
+            val = val.replace(",", "."); // Cambiamos la coma decimal por punto (formato Go)
             input.value = val;
           });
         });
       });
 
       /* --- 3. MÁSCARA DE MONEDA EN VIVO --- */
-      document.querySelectorAll('.input-moneda').forEach(input => {
-         input.addEventListener('input', function(e) {
-            // Permitir solo números y comas
-            let value = this.value.replace(/[^0-9,]/g, '');
-            
-            // Asegurar que solo haya una coma
-            const parts = value.split(',');
-            if (parts.length > 2) {
-               value = parts[0] + ',' + parts.slice(1).join('');
-            }
+      document.querySelectorAll(".input-moneda").forEach((input) => {
+        input.addEventListener("input", function (e) {
+          // Permitir solo números y comas
+          let value = this.value.replace(/[^0-9,]/g, "");
 
-            // Formatear los miles con puntos
-            if (parts[0]) {
-               parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            }
+          // Asegurar que solo haya una coma
+          const parts = value.split(",");
+          if (parts.length > 2) {
+            value = parts[0] + "," + parts.slice(1).join("");
+          }
 
-            this.value = parts.join(',');
-         });
+          // Formatear los miles con puntos
+          if (parts[0]) {
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          }
+
+          this.value = parts.join(",");
+        });
       });
     </script>
   </body>

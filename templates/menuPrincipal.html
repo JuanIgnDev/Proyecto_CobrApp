@@ -23,11 +23,9 @@
   <a
     class="fila-cliente"
     href="/clientes/{{.ID}}"
-    data-nombre="{{.Nombre}} {{.Apellido}}"
+    data-nombre="{{.ID}}{{.Nombre}} {{.Apellido}}"
   >
-    <span class="nombre-cliente"
-      >id: {{.ID}} {{.Nombre}} {{.Apellido}}</span
-    >
+    <span class="nombre-cliente">id: {{.ID}} {{.Nombre}} {{.Apellido}}</span>
     <span class="leader"></span>
     {{if gt .Saldo 0.0}}
     <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
