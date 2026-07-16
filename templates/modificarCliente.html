@@ -15,12 +15,17 @@
   </div>
   {{end}}
 
-  <form method="POST" action="/cliente_nuevo" class="form-cliente form-grid">
+  <form
+    method="POST"
+    action="/clientes/{{.Cliente.ID}}/editar"
+    class="form-cliente form-grid"
+  >
     <input
       type="text"
       id="nombre"
       name="nombre"
       placeholder="Nombre/s"
+      value="{{.Cliente.Nombre}}"
       autocomplete="off"
       required
     />
@@ -28,6 +33,7 @@
       type="text"
       id="apellido"
       name="apellido"
+      value="{{.Cliente.Apellido}}"
       placeholder="Apellido/s"
       autocomplete="off"
       required
@@ -37,6 +43,7 @@
       type="tel"
       id="telefono"
       name="telefono"
+      value="{{.Cliente.Telefono}}"
       placeholder="Teléfono (opcional)"
       autocomplete="off"
     />
@@ -44,18 +51,19 @@
       type="email"
       id="email"
       name="email"
+      value="{{.Cliente.Email}}"
       placeholder="Email (opcional)"
       autocomplete="off"
     />
 
     <div class="form-acciones-grid">
       <button class="btn-nuevo btn-hover-green" type="submit">
-        + Agregar Cliente
+        + Modificar Cliente
       </button>
       <button
         class="btn-nuevo btn-hover-red"
         type="button"
-        onclick="location.href = '/'"
+        onclick="location.href = '/clientes/{{.Cliente.ID}}'"
       >
         - Cancelar
       </button>

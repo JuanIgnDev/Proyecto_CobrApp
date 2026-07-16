@@ -7,7 +7,9 @@
   </button>
   <button type="button" class="resumen-item" data-filter="debe">
     <span class="resumen-label">Clientes en deuda</span>
-    <span class="resumen-monto">{{.ClientesEnDeuda}} de {{.TotalClientes}}</span>
+    <span class="resumen-monto"
+      >{{.ClientesEnDeuda}} de {{.TotalClientes}}</span
+    >
   </button>
   <button type="button" class="resumen-item" data-filter="favor">
     <span class="resumen-label">A favor del cliente</span>
@@ -43,18 +45,19 @@
     data-nombre="{{.ID}}{{.Nombre}} {{.Apellido}}"
     data-status="{{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}favor{{else}}aldia{{end}}"
   >
-    <span class="nombre-cliente">id: {{.ID}} {{.Nombre}} {{.Apellido}}</span>
+    <span class="nombre-cliente">
+      {{.Nombre}} {{.Apellido}}
+      <span class="id-cliente">ID: {{.ID}}</span>
+    </span>
     <span class="leader"></span>
-    
-    {{if gt .Saldo 0.0}}
-      <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
-    {{else if lt .Saldo 0.0}}
-      {{$saldoTxt := printf "%.2f" .Saldo}}
-      <span class="saldo a-favor">+${{slice $saldoTxt 1}} A FAVOR</span>
-    {{else}}
-      <span class="saldo al-dia">Al día</span>
-    {{end}}
 
+    {{if gt .Saldo 0.0}}
+    <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
+    {{else if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
+    <span class="saldo a-favor">+${{slice $saldoTxt 1}} A FAVOR</span>
+    {{else}}
+    <span class="saldo al-dia">Al día</span>
+    {{end}}
   </a>
   {{end}}
 </main>
@@ -70,6 +73,27 @@
     if (buscador) {
       buscador.addEventListener("input", () => {
         window.cobrappFiltroTexto(buscador.value);
+      });
+    }
+
+    const array = [".resumen-monto", ".saldo"];
+
+    for (let index = 0; index < array.length; index++) {
+      document.querySelectorAll(array[index]).forEach((saldo) => {
+        let texto = saldo.textContent;
+
+        let numero = texto.match(/[\d.]+/);
+
+        if (numero) {
+          let valor = Number(numero[0]);
+
+          saldo.textContent = texto.replace(
+            numero[0],
+            valor.toLocaleString("es-AR", {
+              minimumFractionDigits: 0,
+            }),
+          );
+        }
       });
     }
   </script>

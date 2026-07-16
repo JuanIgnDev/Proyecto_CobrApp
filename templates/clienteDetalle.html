@@ -3,32 +3,44 @@
   <a href="/" class="btn-cancelar btn-volver">&larr; Volver al inicio</a>
 
   <!-- Balance: el dato principal, arriba de todo -->
-  <section class="balance-hero balance-hero-split {{if gt .Saldo 0.0}}debe{{else}}al-dia{{end}}">
-    
+  <section
+    class="balance-hero balance-hero-split {{if gt .Saldo 0.0}}debe{{else}}al-dia{{end}}"
+  >
     <!-- Columna Izquierda: Saldo normal o Al día -->
     <div class="balance-col-left">
       {{if gt .Saldo 0.0}}
-        <span class="balance-label">Debe:</span>
-        <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
+      <span class="balance-label">Debe:</span>
+      <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
       {{else}}
-        <span class="balance-label">Saldo actual</span>
-        <span class="balance-monto">Al día</span>
+      <span class="balance-label">Saldo actual</span>
+      <span class="balance-monto">Al día</span>
       {{end}}
     </div>
 
     <!-- Columna Derecha: Monto a favor (Solo si es menor a 0) -->
-    {{if lt .Saldo 0.0}}
-      {{$saldoTxt := printf "%.2f" .Saldo}}
-      <div class="balance-col-right">
-        <span class="balance-label">A favor</span>
-        <span class="balance-monto balance-monto-favor">+${{slice $saldoTxt 1}}</span>
-      </div>
+    {{if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
+    <div class="balance-col-right">
+      <span class="balance-label">A favor</span>
+      <span class="balance-monto balance-monto-favor"
+        >+${{slice $saldoTxt 1}}</span
+      >
+    </div>
     {{end}}
   </section>
 
   <!-- Datos de contacto -->
   <section class="ficha-contacto">
-    <h2>{{.Nombre}} {{.Apellido}}</h2>
+    <div class="cabecera-contacto">
+      <h2>{{.Nombre}} {{.Apellido}}</h2>
+
+      <button
+        class="btn-nuevo"
+        onclick="location.href='/clientes/{{.ID}}/editar'"
+      >
+        Editar
+      </button>
+    </div>
+
     <dl>
       {{if .Email}}
       <div>
@@ -63,97 +75,101 @@
   </div>
 
   <div class="contenedor-tablas">
-  <section class="ficha-seccion">
-    <h3>Compras</h3>
-    
-    {{if .Compras}} 
+    <section class="ficha-seccion">
+      <h3>Compras</h3>
+
+      {{if .Compras}}
       <div id="lista-compras">
         {{range $index, $compra := .Compras}}
-          <div class="fila-cliente compra-item {{if ge $index 3}}oculto{{end}}">
-            <div class="item-detalles">
-              <span class="item-fecha">{{.Fecha}}</span>
-              {{if .Descripcion}}
-                <span class="item-descripcion">{{.Descripcion}}</span>
-              {{end}}
-            </div>
-            <span class="saldo debe">${{printf "%.2f" .Total}}</span>
+        <div class="fila-cliente compra-item {{if ge $index 3}}oculto{{end}}">
+          <div class="item-detalles">
+            <span class="item-fecha">{{.Fecha}}</span>
+            {{if .Descripcion}}
+            <span class="item-descripcion">{{.Descripcion}}</span>
+            {{end}}
           </div>
+          <span class="saldo debe">${{printf "%.2f" .Total}}</span>
+        </div>
         {{end}}
       </div>
-      
-      {{if gt (len .Compras) 3}}
-        <div class="historial-footer">
-          <button id="btn-ver-compras" type="button" class="btn-historial">
-            Ver historial completo ({{len .Compras}}) ↓
-          </button>
-        </div>
 
-        <script>
-          document.getElementById('btn-ver-compras').addEventListener('click', function() {
-            const items = document.querySelectorAll('.compra-item');
-            const expandir = this.innerText.includes('completo');
-            
+      {{if gt (len .Compras) 3}}
+      <div class="historial-footer">
+        <button id="btn-ver-compras" type="button" class="btn-historial">
+          Ver historial completo ({{len .Compras}}) ↓
+        </button>
+      </div>
+
+      <script>
+        document
+          .getElementById("btn-ver-compras")
+          .addEventListener("click", function () {
+            const items = document.querySelectorAll(".compra-item");
+            const expandir = this.innerText.includes("completo");
+
             items.forEach((item, index) => {
               if (index >= 3) {
-                item.style.display = expandir ? 'flex' : 'none';
+                item.style.display = expandir ? "flex" : "none";
               }
             });
-            
-            this.innerText = expandir ? 'Ocultar historial ↑' : 'Ver historial completo ({{len .Compras}}) ↓';
+
+            this.innerText = expandir
+              ? "Ocultar historial ↑"
+              : "Ver historial completo ({{len .Compras}}) ↓";
           });
-        </script>
-      {{end}}
-
-    {{else}}
+      </script>
+      {{end}} {{else}}
       <p class="vacio-inline">Todavía no hay compras cargadas.</p>
-    {{end}}
-  </section>
+      {{end}}
+    </section>
 
-  <section class="ficha-seccion">
-    <h3>Pagos</h3>
-    
-    {{if .Pagos}} 
+    <section class="ficha-seccion">
+      <h3>Pagos</h3>
+
+      {{if .Pagos}}
       <div id="lista-pagos">
         {{range $index, $pago := .Pagos}}
-          <div class="fila-cliente pago-item {{if ge $index 3}}oculto{{end}}">
-            <div class="item-detalles">
-              <span class="item-fecha">{{.Fecha}}</span>
-              <span class="item-descripcion">
-                {{if .Observacion}}{{.Observacion}}{{else}}PAGO{{end}}
-              </span>
-            </div>
-            <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
+        <div class="fila-cliente pago-item {{if ge $index 3}}oculto{{end}}">
+          <div class="item-detalles">
+            <span class="item-fecha">{{.Fecha}}</span>
+            <span class="item-descripcion">
+              {{if .Observacion}}{{.Observacion}}{{else}}PAGO{{end}}
+            </span>
           </div>
+          <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
+        </div>
         {{end}}
       </div>
-      
-      {{if gt (len .Pagos) 3}}
-        <div class="historial-footer">
-          <button id="btn-ver-pagos" type="button" class="btn-historial">
-            Ver historial completo ({{len .Pagos}}) ↓
-          </button>
-        </div>
 
-        <script>
-          document.getElementById('btn-ver-pagos').addEventListener('click', function() {
-            const items = document.querySelectorAll('.pago-item');
-            const expandir = this.innerText.includes('completo');
-            
+      {{if gt (len .Pagos) 3}}
+      <div class="historial-footer">
+        <button id="btn-ver-pagos" type="button" class="btn-historial">
+          Ver historial completo ({{len .Pagos}}) ↓
+        </button>
+      </div>
+
+      <script>
+        document
+          .getElementById("btn-ver-pagos")
+          .addEventListener("click", function () {
+            const items = document.querySelectorAll(".pago-item");
+            const expandir = this.innerText.includes("completo");
+
             items.forEach((item, index) => {
               if (index >= 3) {
-                item.style.display = expandir ? 'flex' : 'none';
+                item.style.display = expandir ? "flex" : "none";
               }
             });
-            
-            this.innerText = expandir ? 'Ocultar historial ↑' : 'Ver historial completo ({{len .Pagos}}) ↓';
-          });
-        </script>
-      {{end}}
 
-    {{else}}
+            this.innerText = expandir
+              ? "Ocultar historial ↑"
+              : "Ver historial completo ({{len .Pagos}}) ↓";
+          });
+      </script>
+      {{end}} {{else}}
       <p class="vacio-inline">Todavía no hay pagos cargados.</p>
-    {{end}}
-  </section>
+      {{end}}
+    </section>
   </div>
 </main>
 {{end}}
