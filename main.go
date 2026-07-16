@@ -235,10 +235,57 @@ func main() {
 
 		http.Redirect(w, r, "/clientes/"+strconv.Itoa(id), http.StatusSeeOther)
 	}))
+	
+	//para modificar los clientes
+	mux.HandleFunc("GET /clientes/{id}/editar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
-	// 12. Arranca el servidor
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+
+		cliente, err := ObtenerClientePorID(db, id)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		renderizar(w, "modificarCliente.html", struct {
+			Cliente *Cliente
+			Error   string
+		}{Cliente: cliente})
+	}))
+
+	mux.HandleFunc("POST /clientes/{id}/editar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+		
+		id, err := strconv.Atoi(r.PathValue("id"))
+
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+		nombre := r.FormValue("nombre")
+		apellido := r.FormValue("apellido")
+		email  := r.FormValue("email")
+		telefono := r.FormValue("telefono")
+
+		if nombre == "" || apellido == "" {
+			renderizar(w, "clienteNuevo.html", struct{ Error string }{Error: "Nombre y apellido son obligatorios."})
+			return
+		}
+		
+		if err := ModificarCliente(db, id, nombre, apellido, email, telefono); err != nil {
+			log.Println("Error modificando al cliente:", err)
+			renderizar(w, "clienteNuevo.html", struct{ Error string }{Error: "No se pudo modificar el cliente."})
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}))
+
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
+
 }
 
 func renderizar(w http.ResponseWriter, pagina string, datos any) {

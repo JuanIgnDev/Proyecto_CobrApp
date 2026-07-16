@@ -102,3 +102,31 @@ func CrearCliente(db *sql.DB, nombre, apellido, email, telefono string) error {
 	`, nombre, apellido, emailDB, telefonoDB)
 	return err
 }
+
+// ModificarCliente actualiza los datos de un cliente.
+// email y telefono pueden venir vacíos.
+func ModificarCliente(db *sql.DB, id int, nombre, apellido, email, telefono string) error {
+
+	var emailDB sql.NullString
+	if email != "" {
+		emailDB.String = email
+		emailDB.Valid = true
+	}
+
+	var telefonoDB sql.NullString
+	if telefono != "" {
+		telefonoDB.String = telefono
+		telefonoDB.Valid = true
+	}
+
+	_, err := db.Exec(`
+		UPDATE cliente
+		SET nombre = ?,
+			apellido = ?,
+			email = ?,
+			telefono = ?
+		WHERE id = ?
+	`, nombre, apellido, emailDB, telefonoDB, id)
+
+	return err
+}
