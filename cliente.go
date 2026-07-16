@@ -130,3 +130,12 @@ func ModificarCliente(db *sql.DB, id int, nombre, apellido, email, telefono stri
 
 	return err
 }
+
+func eliminarCliente(db *sql.DB, id int) error {
+	_, err := db.Exec(`
+		DELETE FROM cliente
+		WHERE id = ?
+	`, id)
+
+	return err
+}

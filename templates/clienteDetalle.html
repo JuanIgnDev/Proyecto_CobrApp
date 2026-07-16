@@ -32,13 +32,17 @@
   <section class="ficha-contacto">
     <div class="cabecera-contacto">
       <h2>{{.Nombre}} {{.Apellido}}</h2>
-
-      <button
-        class="btn-nuevo"
-        onclick="location.href='/clientes/{{.ID}}/editar'"
-      >
-        Editar
-      </button>
+      <div>
+        <button
+          class="btn-nuevo"
+          onclick="location.href='/clientes/{{.ID}}/editar'"
+        >
+          Editar
+        </button>
+        <button type="button" onclick="mostrarConfirmacion()" class="btn-nuevo">
+          Eliminar
+        </button>
+      </div>
     </div>
 
     <dl>
@@ -55,6 +59,49 @@
       {{end}}
     </dl>
   </section>
+
+  <!-- LO QUE VA A MOSTRAR CUANDO SE INTENTE ELIMINAR -->
+
+  {{if .Error}}
+  <p
+    class="saldo debe"
+    id="error-login"
+    style="display: block; margin-bottom: 1rem"
+  >
+    {{.Error}}
+  </p>
+  {{end}}
+
+  <div class="login-wrap" id="confirmacion" style="display: none">
+    <form
+      method="POST"
+      action="/clientes/{{.ID}}/eliminar"
+      class="form-cliente"
+    >
+      <p style="font-weight: bold; text-align: center">
+        Ingrese la contraseña para eliminar el cliente!
+      </p>
+
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Contraseña"
+        required
+      />
+
+      <button type="submit" class="btn-nuevo btn-ingresar">
+        Confirmar eliminación
+      </button>
+      <button
+        type="button"
+        class="btn-nuevo btn-ingresar"
+        onclick="dejarDeMostrarConfirmacion()"
+      >
+        Cancelar
+      </button>
+    </form>
+  </div>
 
   <!-- Acciones principales -->
   <div class="ficha-acciones">
@@ -99,25 +146,6 @@
           Ver historial completo ({{len .Compras}}) ↓
         </button>
       </div>
-
-      <script>
-        document
-          .getElementById("btn-ver-compras")
-          .addEventListener("click", function () {
-            const items = document.querySelectorAll(".compra-item");
-            const expandir = this.innerText.includes("completo");
-
-            items.forEach((item, index) => {
-              if (index >= 3) {
-                item.style.display = expandir ? "flex" : "none";
-              }
-            });
-
-            this.innerText = expandir
-              ? "Ocultar historial ↑"
-              : "Ver historial completo ({{len .Compras}}) ↓";
-          });
-      </script>
       {{end}} {{else}}
       <p class="vacio-inline">Todavía no hay compras cargadas.</p>
       {{end}}
@@ -147,7 +175,6 @@
           Ver historial completo ({{len .Pagos}}) ↓
         </button>
       </div>
-
       <script>
         document
           .getElementById("btn-ver-pagos")
@@ -172,4 +199,38 @@
     </section>
   </div>
 </main>
+
+<script>
+  //esto se va a ejecutar y va a mostrar el div de abajo
+  const eliminarCliente = document.getElementById("confirmacion");
+
+  function mostrarConfirmacion() {
+    eliminarCliente.style.display = "block";
+
+    setTimeout(() => {
+      dejarDeMostrarConfirmacion();
+    }, 5000);
+  }
+
+  function dejarDeMostrarConfirmacion() {
+    document.getElementById("confirmacion").style.display = "none";
+  }
+
+  document
+    .getElementById("btn-ver-compras")
+    .addEventListener("click", function () {
+      const items = document.querySelectorAll(".compra-item");
+      const expandir = this.innerText.includes("completo");
+
+      items.forEach((item, index) => {
+        if (index >= 3) {
+          item.style.display = expandir ? "flex" : "none";
+        }
+      });
+
+      this.innerText = expandir
+        ? "Ocultar historial ↑"
+        : "Ver historial completo ({{len .Compras}}) ↓";
+    });
+</script>
 {{end}}
