@@ -55,7 +55,34 @@ func main() {
 
 	mux.HandleFunc("GET /{$}", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		clientes := ObtenerClientes(db)
-		renderizar(w, "menuPrincipal.html", struct{ Clientes []Cliente }{Clientes: clientes})
+
+		var totalACobrar, totalAFavor float64
+		var clientesEnDeuda int
+
+		for _, c := range clientes {
+			if c.Saldo > 0 {
+				totalACobrar += c.Saldo
+				clientesEnDeuda++
+			} else if c.Saldo < 0 {
+				totalAFavor += -c.Saldo // lo pasamos a positivo para mostrarlo
+			}
+		}
+
+		renderizar(w, "menuPrincipal.html", struct {
+			Clientes         []Cliente
+			TotalACobrar     float64
+			TotalAFavor      float64
+			ClientesEnDeuda  int
+			ClientesSinDeuda int
+			TotalClientes    int
+		}{
+			Clientes:         clientes,
+			TotalACobrar:     totalACobrar,
+			TotalAFavor:      totalAFavor,
+			ClientesEnDeuda:  clientesEnDeuda,
+			ClientesSinDeuda: len(clientes) - clientesEnDeuda,
+			TotalClientes:    len(clientes),
+		})
 	}))
 
 	// 4. Formulario de cliente nuevo (mostrar)

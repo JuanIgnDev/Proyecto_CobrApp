@@ -1,19 +1,28 @@
 {{define "contenido"}}
 <main class="libro">
-  <a
-    href="/"
-    class="btn-cancelar"
-    style="display: inline-block; margin-bottom: 1rem"
-    >&larr; Volver al inicio</a
-  >
+  <a href="/" class="btn-cancelar btn-volver">&larr; Volver al inicio</a>
 
   <!-- Balance: el dato principal, arriba de todo -->
-  <section class="balance-hero {{if gt .Saldo 0.0}}debe{{else}}al-dia{{end}}">
-    <span class="balance-label">Saldo actual</span>
-    {{if gt .Saldo 0.0}}
-    <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
-    {{else}}
-    <span class="balance-monto">Al día</span>
+  <section class="balance-hero balance-hero-split {{if gt .Saldo 0.0}}debe{{else}}al-dia{{end}}">
+    
+    <!-- Columna Izquierda: Saldo normal o Al día -->
+    <div class="balance-col-left">
+      {{if gt .Saldo 0.0}}
+        <span class="balance-label">Debe:</span>
+        <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
+      {{else}}
+        <span class="balance-label">Saldo actual</span>
+        <span class="balance-monto">Al día</span>
+      {{end}}
+    </div>
+
+    <!-- Columna Derecha: Monto a favor (Solo si es menor a 0) -->
+    {{if lt .Saldo 0.0}}
+      {{$saldoTxt := printf "%.2f" .Saldo}}
+      <div class="balance-col-right">
+        <span class="balance-label">A favor</span>
+        <span class="balance-monto balance-monto-favor">+${{slice $saldoTxt 1}}</span>
+      </div>
     {{end}}
   </section>
 
@@ -59,29 +68,22 @@
     
     {{if .Compras}} 
       <div id="lista-compras">
-        <!-- range con $index para saber en qué posición estamos -->
         {{range $index, $compra := .Compras}}
-          <div class="fila-cliente compra-item" {{if ge $index 3}}style="display: none;"{{end}}>
-            <!-- Contenedor en columna para Fecha y Producto -->
-            <div style="display: flex; flex-direction: column; gap: 0.2rem;">
-              <span style="font-size: 0.75rem; color: var(--text-muted);">{{.Fecha}}</span>
-              
+          <div class="fila-cliente compra-item {{if ge $index 3}}oculto{{end}}">
+            <div class="item-detalles">
+              <span class="item-fecha">{{.Fecha}}</span>
               {{if .Descripcion}}
-                <span style="font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: var(--text-main);">
-                  {{.Descripcion}}
-                </span>
+                <span class="item-descripcion">{{.Descripcion}}</span>
               {{end}}
             </div>
-            <!-- El precio sigue a la derecha -->
             <span class="saldo debe">${{printf "%.2f" .Total}}</span>
           </div>
         {{end}}
       </div>
       
-      <!-- Si hay estrictamente más de 3 compras, renderizamos el botón de Ver más -->
       {{if gt (len .Compras) 3}}
-        <div style="background: var(--bg-main); border-top: 1px solid var(--border-color);">
-          <button id="btn-ver-compras" type="button" class="btn-cancelar" style="width: 100%; padding: 0.75rem; text-align: center; align-self: auto;">
+        <div class="historial-footer">
+          <button id="btn-ver-compras" type="button" class="btn-historial">
             Ver historial completo ({{len .Compras}}) ↓
           </button>
         </div>
@@ -92,13 +94,11 @@
             const expandir = this.innerText.includes('completo');
             
             items.forEach((item, index) => {
-              // Solo interactuamos con los elementos del 4to en adelante
               if (index >= 3) {
                 item.style.display = expandir ? 'flex' : 'none';
               }
             });
             
-            // Cambiamos el texto y la flechita del botón
             this.innerText = expandir ? 'Ocultar historial ↑' : 'Ver historial completo ({{len .Compras}}) ↓';
           });
         </script>
@@ -114,30 +114,22 @@
     
     {{if .Pagos}} 
       <div id="lista-pagos">
-        <!-- range con $index para saber en qué posición estamos -->
         {{range $index, $pago := .Pagos}}
-          <!-- Si el índice es mayor o igual a 3, lo ocultamos -->
-          <div class="fila-cliente pago-item" {{if ge $index 3}}style="display: none;"{{end}}>
-            
-            <!-- Contenedor en columna para Fecha y Observación -->
-            <div style="display: flex; flex-direction: column; gap: 0.2rem;">
-              <span style="font-size: 0.75rem; color: var(--text-muted);">{{.Fecha}}</span>
-              
-              <span style="font-weight: 700; text-transform: uppercase; font-size: 0.9rem; color: var(--text-main);">
+          <div class="fila-cliente pago-item {{if ge $index 3}}oculto{{end}}">
+            <div class="item-detalles">
+              <span class="item-fecha">{{.Fecha}}</span>
+              <span class="item-descripcion">
                 {{if .Observacion}}{{.Observacion}}{{else}}PAGO{{end}}
               </span>
             </div>
-
-            <!-- El monto sigue a la derecha con la clase al-dia (verde) -->
             <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
           </div>
         {{end}}
       </div>
       
-      <!-- Si hay estrictamente más de 3 pagos, renderizamos el botón de Ver más -->
       {{if gt (len .Pagos) 3}}
-        <div style="background: var(--bg-main); border-top: 1px solid var(--border-color);">
-          <button id="btn-ver-pagos" type="button" class="btn-cancelar" style="width: 100%; padding: 0.75rem; text-align: center; align-self: auto;">
+        <div class="historial-footer">
+          <button id="btn-ver-pagos" type="button" class="btn-historial">
             Ver historial completo ({{len .Pagos}}) ↓
           </button>
         </div>
@@ -148,13 +140,11 @@
             const expandir = this.innerText.includes('completo');
             
             items.forEach((item, index) => {
-              // Solo interactuamos con los elementos del 4to en adelante
               if (index >= 3) {
                 item.style.display = expandir ? 'flex' : 'none';
               }
             });
             
-            // Cambiamos el texto y la flechita del botón
             this.innerText = expandir ? 'Ocultar historial ↑' : 'Ver historial completo ({{len .Pagos}}) ↓';
           });
         </script>

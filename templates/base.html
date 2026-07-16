@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="../static/img/icono.png" />
     <title>CobrApp</title>
 
-    <!-- Este script SÍ va acá arriba para evitar que la pantalla parpadee en blanco -->
+    <!-- Este script va acá arriba para evitar que la pantalla parpadee en blanco -->
     <script>
       if (
         localStorage.getItem("theme") === "dark" ||
@@ -32,7 +32,7 @@
     >
       <div>
         <h1>
-          <a href="/" style="text-decoration: none; color: inherit">CobrApp</a>
+          <a href="/" style="text-decoration: none; color: inherit">CobrApp.</a>
         </h1>
       </div>
 
@@ -54,10 +54,10 @@
       </div>
     </header>
 
-    <!-- Acá se inyectan tus formularios y tablas -->
+    <!-- Acá se inyectan los formularios y tablas -->
     <main class="libro">{{block "contenido" .}}{{end}}</main>
 
-    <!-- Contenedor para los Toasts (Ahora sí está adentro del body) -->
+    <!-- Contenedor para los Toasts -->
     <div id="toast-container"></div>
 
     <!-- TODOS LOS SCRIPTS VAN ACÁ ABAJO, DESPUÉS DE QUE LA PÁGINA YA CARGÓ -->
@@ -146,12 +146,62 @@
           const currencyInputs = form.querySelectorAll(".input-moneda");
           currencyInputs.forEach((input) => {
             let val = input.value;
-            val = val.replace(/\./g, ""); // Sacamos los puntos de miles
-            val = val.replace(",", "."); // Cambiamos la coma decimal por punto (formato Go)
+            val = val.replace(/\./g, "");
+            val = val.replace(",", ".");
             input.value = val;
           });
         });
       });
+
+      /* --- 2.5. LÓGICA DE FILTROS (RESUMEN + BUSCADOR) --- */
+      const resumen = document.getElementById("resumen");
+      const resumenHint = document.getElementById("resumenHint");
+      const filasCliente = document.querySelectorAll(".fila-cliente");
+
+      const filtros = { texto: "", estado: "all" };
+
+      function actualizarListado() {
+        filasCliente.forEach((fila) => {
+          const nombre = (fila.dataset.nombre || "").toLowerCase();
+          const coincideTexto = nombre.includes(filtros.texto);
+          const coincideEstado =
+            filtros.estado === "all" || fila.dataset.status === filtros.estado;
+          fila.style.display = coincideTexto && coincideEstado ? "" : "none";
+        });
+
+        if (resumenHint) {
+          resumenHint.textContent =
+            filtros.estado === "all"
+              ? ""
+              : "Mostrando solo clientes filtrados. Tocá la tarjeta de nuevo para ver todos.";
+        }
+      }
+
+      // Se expone para que el buscador de menuPrincipal.html la reutilice
+      window.cobrappFiltroTexto = function (texto) {
+        filtros.texto = texto.trim().toLowerCase();
+        actualizarListado();
+      };
+
+      if (resumen) {
+        const botonesResumen = resumen.querySelectorAll(".resumen-item");
+
+        botonesResumen.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const filtro = btn.dataset.filter;
+            filtros.estado = filtros.estado === filtro ? "all" : filtro;
+
+            botonesResumen.forEach((b) => {
+              b.classList.toggle(
+                "activo",
+                b.dataset.filter === filtros.estado && filtros.estado !== "all",
+              );
+            });
+
+            actualizarListado();
+          });
+        });
+      }
 
       /* --- 3. MÁSCARA DE MONEDA EN VIVO --- */
       document.querySelectorAll(".input-moneda").forEach((input) => {
