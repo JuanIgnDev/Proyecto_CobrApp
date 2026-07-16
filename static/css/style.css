@@ -10,8 +10,12 @@
   --text-muted: #6b7280;
   --border-color: #e5e7eb;
 
-  --accent: #000000;
-  --accent-hover: #1f2937;
+  --favor-bg: #faeeda;
+  --favor-text: #854f0b;
+  --favor-border: #fac775;
+
+  --accent: #534ab7;
+  --accent-hover: #3c3489;
   --accent-fg: #ffffff;
 
   --debt-bg: #fef2f2;
@@ -66,7 +70,7 @@ body {
   font-size: 1.875rem;
   font-weight: 700;
   letter-spacing: -0.025em;
-  color: var(--text-main);
+  color: var(--accent);
 }
 
 .cover p {
@@ -76,11 +80,73 @@ body {
 }
 
 /* =========================================
+   RESUMEN (TARJETAS FILTRO)
+   ========================================= */
+.resumen {
+  padding-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.resumen-item {
+  text-align: left;
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.2s;
+}
+
+.resumen-item.activo {
+  border-color: var(--accent);
+}
+
+.resumen-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.resumen-monto {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.resumen-monto.debe {
+  color: var(--debt-text);
+}
+
+.resumen-monto.favor {
+  color: var(--favor-text);
+}
+
+.resumen-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: -0.75rem 0 1rem;
+  min-height: 1rem;
+}
+
+@media (max-width: 640px) {
+  .resumen {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =========================================
    BARRA DE ACCIONES (TOOLBAR)
    ========================================= */
 .toolbar {
   width: 100%;
-  margin: 0 0 2rem 0; /* Reseteado para que alinee perfecto con las tarjetas */
+  margin: 0 0 2rem 0;
   padding: 0;
   display: grid;
   grid-template-columns: 1fr auto;
@@ -180,7 +246,7 @@ body {
 
 #listaClientes {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Para que queden uno al lado del otro */
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
   padding: 0;
   margin: 0;
@@ -201,6 +267,23 @@ body {
   transition:
     box-shadow 0.2s,
     border-color 0.2s;
+}
+
+/* Franja de color a la izquierda según el estado del cliente (menú principal) */
+.fila-cliente[data-status] {
+  border-left-width: 4px;
+}
+
+.fila-cliente[data-status="debe"] {
+  border-left-color: var(--debt-text);
+}
+
+.fila-cliente[data-status="favor"] {
+  border-left-color: var(--favor-text);
+}
+
+.fila-cliente[data-status="aldia"] {
+  border-left-color: var(--paid-text);
 }
 
 .fila-cliente:hover {
@@ -249,6 +332,21 @@ body {
   background: var(--paid-bg);
   color: var(--paid-text);
   border: 1px solid var(--paid-border);
+}
+
+.saldo.a-favor {
+  background: var(--favor-bg);
+  color: var(--favor-text);
+  border: 1px solid var(--favor-border);
+}
+
+.balance-hero.a-favor {
+  border-color: var(--favor-border);
+  background: var(--favor-bg);
+}
+
+.balance-hero.a-favor .balance-monto {
+  color: var(--favor-text);
 }
 
 .vacio {
@@ -421,7 +519,6 @@ body {
   padding-left: 1rem;
 }
 
-/* ---------- Responsive ---------- */
 /* =========================================
    FORMULARIOS
    ========================================= */
@@ -464,7 +561,7 @@ body {
 .form-acciones-grid {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-rows: 1fr 1fr; /* Botones uno al lado del otro */
+  grid-template-rows: 1fr 1fr;
   gap: 1rem;
   margin-top: 0.5rem;
 }
@@ -474,15 +571,15 @@ body {
   margin: 5px auto 0;
 }
 
-/* --- Botones Hover Animados (Agregar / Cancelar) --- */
+/* --- Botones Hover Animados --- */
 .btn-hover-green,
 .btn-hover-red {
   position: relative;
   overflow: hidden;
   z-index: 1;
   background-color: transparent !important;
-  color: var(--text-main) !important; /* TEXTO OSCURO POR DEFECTO PARA AMBOS */
-  border: 1px solid var(--accent) !important; /* BORDECITO NEGRO PARA AMBOS */
+  color: var(--text-main) !important;
+  border: 1px solid var(--accent) !important;
   transition:
     color 0.3s ease,
     border-color 0.3s ease;
@@ -494,10 +591,9 @@ body {
   position: absolute;
   inset: 0;
   z-index: -2;
-  background-color: var(--bg-card); /* FONDO BLANCO POR DEFECTO PARA AMBOS */
+  background-color: var(--bg-card);
 }
 
-/* El círculo expansivo de color */
 .btn-hover-green::after,
 .btn-hover-red::after {
   content: "";
@@ -507,19 +603,18 @@ body {
   width: 150%;
   padding-bottom: 150%;
   border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0); /* Arranca invisible en el centro */
+  transform: translate(-50%, -50%) scale(0);
   transition: transform 0.4s ease-out;
   z-index: -1;
 }
 
 .btn-hover-green::after {
   background-color: #16a34a;
-} /* Color Verde */
+}
 .btn-hover-red::after {
   background-color: #dc2626;
-} /* Color Rojo */
+}
 
-/* Efectos al pasar el mouse */
 .btn-hover-green:hover::after,
 .btn-hover-red:hover::after {
   transform: translate(-50%, -50%) scale(1);
@@ -527,8 +622,8 @@ body {
 
 .btn-hover-green:hover,
 .btn-hover-red:hover {
-  color: #ffffff !important; /* El texto se vuelve blanco sobre el color */
-  border-color: transparent !important; /* Se oculta el borde negro */
+  color: #ffffff !important;
+  border-color: transparent !important;
 }
 
 /* =========================================
@@ -536,7 +631,7 @@ body {
    ========================================= */
 .btn-loading {
   color: transparent !important;
-  pointer-events: none; /* Evita que el usuario haga doble clic */
+  pointer-events: none;
   position: relative;
 }
 
@@ -578,7 +673,7 @@ body {
 .toast {
   background-color: var(--bg-card);
   color: var(--text-main);
-  border-left: 4px solid #10b981; /* Verde esmeralda por defecto */
+  border-left: 4px solid #10b981;
   padding: 1rem 1.25rem;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
@@ -587,8 +682,8 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  transform: translateX(120%); /* Arranca oculto a la derecha */
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efecto rebote */
+  transform: translateX(120%);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .toast.show {
@@ -596,7 +691,87 @@ body {
 }
 
 .toast.error {
-  border-left-color: #ef4444; /* Rojo para errores */
+  border-left-color: #ef4444;
+}
+
+/* =========================================
+   CLASES DE REFACTORIZACIÓN (Ficha Cliente)
+   ========================================= */
+.btn-volver {
+  display: inline-block;
+  margin-bottom: 1rem;
+}
+
+/* Forzar que la tarjeta se divida en dos columnas */
+.balance-hero.balance-hero-split {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.balance-col-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.balance-col-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.balance-monto-favor {
+  font-size: 1.75rem;
+  color: var(--favor-text) !important;
+}
+
+.oculto {
+  display: none;
+}
+
+.item-detalles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.item-fecha {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.item-descripcion {
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+/* Diseño del botón Ver Historial */
+.historial-footer {
+  background: var(--bg-main);
+  border-top: 1px solid var(--border-color);
+  width: 100%;
+}
+
+.btn-historial {
+  width: 100%;
+  padding: 0.85rem;
+  text-align: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-historial:hover {
+  background: var(--border-color);
+  color: var(--text-main);
 }
 
 /* =========================================
@@ -609,9 +784,13 @@ body.dark {
   --text-muted: #9ca3af;
   --border-color: #374151;
 
-  --accent: #ffffff;
-  --accent-hover: #e5e7eb;
-  --accent-fg: #000000;
+  --favor-bg: #412402;
+  --favor-text: #fac775;
+  --favor-border: #854f0b;
+
+  --accent: #7f77dd;
+  --accent-hover: #afa9ec;
+  --accent-fg: #26215c;
 
   --debt-bg: #450a0a;
   --debt-text: #fca5a5;

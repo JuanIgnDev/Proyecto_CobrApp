@@ -1,4 +1,21 @@
 {{define "contenido"}}
+
+<div class="resumen" id="resumen">
+  <button type="button" class="resumen-item" data-filter="all">
+    <span class="resumen-label">Total a cobrar</span>
+    <span class="resumen-monto debe">${{printf "%.2f" .TotalACobrar}}</span>
+  </button>
+  <button type="button" class="resumen-item" data-filter="debe">
+    <span class="resumen-label">Clientes en deuda</span>
+    <span class="resumen-monto">{{.ClientesEnDeuda}} de {{.TotalClientes}}</span>
+  </button>
+  <button type="button" class="resumen-item" data-filter="favor">
+    <span class="resumen-label">A favor del cliente</span>
+    <span class="resumen-monto favor">${{printf "%.2f" .TotalAFavor}}</span>
+  </button>
+</div>
+<p class="resumen-hint" id="resumenHint"></p>
+
 <div class="toolbar">
   <div class="search-box">
     <input
@@ -24,14 +41,20 @@
     class="fila-cliente"
     href="/clientes/{{.ID}}"
     data-nombre="{{.ID}}{{.Nombre}} {{.Apellido}}"
+    data-status="{{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}favor{{else}}aldia{{end}}"
   >
     <span class="nombre-cliente">id: {{.ID}} {{.Nombre}} {{.Apellido}}</span>
     <span class="leader"></span>
+    
     {{if gt .Saldo 0.0}}
-    <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
+      <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
+    {{else if lt .Saldo 0.0}}
+      {{$saldoTxt := printf "%.2f" .Saldo}}
+      <span class="saldo a-favor">+${{slice $saldoTxt 1}} A FAVOR</span>
     {{else}}
-    <span class="saldo al-dia">Al día</span>
+      <span class="saldo al-dia">Al día</span>
     {{end}}
+
   </a>
   {{end}}
 </main>
@@ -43,15 +66,10 @@
 
   <script>
     const buscador = document.getElementById("buscador");
-    const lista = document.getElementById("listaClientes");
 
-    if (buscador && lista) {
+    if (buscador) {
       buscador.addEventListener("input", () => {
-        const q = buscador.value.trim().toLowerCase();
-        lista.querySelectorAll(".fila-cliente").forEach((fila) => {
-          const nombre = fila.dataset.nombre.toLowerCase();
-          fila.style.display = nombre.includes(q) ? "" : "none";
-        });
+        window.cobrappFiltroTexto(buscador.value);
       });
     }
   </script>
