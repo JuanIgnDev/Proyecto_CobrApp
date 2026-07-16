@@ -134,7 +134,8 @@ func main() {
 			*Cliente
 			Compras []Compra
 			Pagos   []Pago
-		}{Cliente: cliente, Compras: compras, Pagos: pagos})
+			Error string
+		}{Cliente: cliente, Compras: compras, Pagos: pagos, Error: ""})
 	}))
 
 	// 8. Formulario de venta nueva (mostrar)
@@ -282,6 +283,62 @@ func main() {
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}))
+
+
+
+	mux.HandleFunc("POST /clientes/{id}/eliminar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+
+		cliente, err := ObtenerClientePorID(db, id)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		compras := ObtenerComprasDeCliente(db, id)
+		pagos := ObtenerPagosDeCliente(db, id)
+
+		password := r.FormValue("password")
+
+		if !validarCredenciales("admin", password) {
+			renderizar(w, "clienteDetalle.html", struct {
+				*Cliente
+				Compras []Compra
+				Pagos   []Pago
+				Error   string
+			}{
+				Cliente: cliente,
+				Compras: compras,
+				Pagos:   pagos,
+				Error:   "Contraseña incorrecta.",
+			})
+			return
+		}
+
+		if err := eliminarCliente(db, id); err != nil {
+			renderizar(w, "clienteDetalle.html", struct {
+				*Cliente
+				Compras []Compra
+				Pagos   []Pago
+				Error   string
+			}{
+				Cliente: cliente,
+				Compras: compras,
+				Pagos:   pagos,
+				Error:   "No se pudo eliminar el cliente.",
+			})
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+	}))
+
+
 
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
