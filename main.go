@@ -94,7 +94,7 @@ func main() {
 	mux.HandleFunc("POST /cliente_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		nombre := r.FormValue("nombre")
 		apellido := r.FormValue("apellido")
-		email := r.FormValue("email")
+		email  := r.FormValue("email")
 		telefono := r.FormValue("telefono")
 
 		if nombre == "" || apellido == "" {
