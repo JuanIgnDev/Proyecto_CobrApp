@@ -1,15 +1,16 @@
 {{define "contenido"}}
 
+<!--Resumen de clientes en deudas y a favor-->
 <div class="resumen" id="resumen">
-  <button type="button" class="resumen-item" data-filter="all">
-    <span class="resumen-label">Total a cobrar</span>
-    <span class="resumen-monto debe">${{printf "%.2f" .TotalACobrar}}</span>
-  </button>
   <button type="button" class="resumen-item" data-filter="debe">
     <span class="resumen-label">Clientes en deuda</span>
     <span class="resumen-monto"
       >{{.ClientesEnDeuda}} de {{.TotalClientes}}</span
     >
+  </button>
+  <button type="button" class="resumen-item" data-filter="all">
+    <span class="resumen-label">Total a cobrar</span>
+    <span class="resumen-monto debe">${{printf "%.2f" .TotalACobrar}}</span>
   </button>
   <button type="button" class="resumen-item" data-filter="favor">
     <span class="resumen-label">A favor del cliente</span>
@@ -18,6 +19,7 @@
 </div>
 <p class="resumen-hint" id="resumenHint"></p>
 
+<!--Barra de busqueda y boton donde podemos agregar clientes-->
 <div class="toolbar">
   <div class="search-box">
     <input
@@ -36,6 +38,7 @@
   </button>
 </div>
 
+<!--Seccion de informacion de clientes-->
 {{if .Clientes}}
 <main class="libro" id="listaClientes">
   {{range .Clientes}}
@@ -68,6 +71,7 @@
   {{end}}
 
   <script>
+    //funcion para buscador
     const buscador = document.getElementById("buscador");
 
     if (buscador) {
@@ -76,6 +80,7 @@
       });
     }
 
+    //funcion para agregar los miles a los valores
     const array = [".resumen-monto", ".saldo"];
 
     for (let index = 0; index < array.length; index++) {

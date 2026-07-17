@@ -26,7 +26,9 @@ func main() {
 	// --- Login / logout: NUNCA van envueltas en requiereLogin, si no nadie podría loguearse ---
 
 	mux.HandleFunc("GET /login", func(w http.ResponseWriter, r *http.Request) {
-		renderizar(w, "login.html", struct{ Error string }{})
+		
+		renderizar(w,"baseLogin.html", "login.html", struct{ Error string
+		}{ })
 	})
 
 	mux.HandleFunc("POST /login", func(w http.ResponseWriter, r *http.Request) {
@@ -34,7 +36,7 @@ func main() {
 		password := r.FormValue("password")
 
 		if !validarCredenciales(usuario, password) {
-			renderizar(w, "login.html", struct{ Error string }{Error: "Usuario o contraseña incorrectos."})
+			renderizar(w,"baseLogin.html", "login.html", struct{ Error string }{Error: "Usuario o contraseña incorrectos."})
 			return
 		}
 
@@ -68,7 +70,7 @@ func main() {
 			}
 		}
 
-		renderizar(w, "menuPrincipal.html", struct {
+		renderizar(w,"base.html", "menuPrincipal.html", struct {
 			Clientes         []Cliente
 			TotalACobrar     float64
 			TotalAFavor      float64
@@ -87,7 +89,7 @@ func main() {
 
 	// 4. Formulario de cliente nuevo (mostrar)
 	mux.HandleFunc("GET /cliente_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
-		renderizar(w, "clienteNuevo.html", struct{ Error string }{})
+		renderizar(w,"base.html", "clienteNuevo.html", struct{ Error string}{})
 	}))
 
 	// 5. Formulario de cliente nuevo (guardar)
@@ -98,13 +100,14 @@ func main() {
 		telefono := r.FormValue("telefono")
 
 		if nombre == "" || apellido == "" {
-			renderizar(w, "clienteNuevo.html", struct{ Error string }{Error: "Nombre y apellido son obligatorios."})
+			renderizar(w,"base.html", "clienteNuevo.html", struct{ Error string }{Error: "Nombre y apellido son obligatorios."})
 			return
 		}
 
 		if err := CrearCliente(db, nombre, apellido, email, telefono); err != nil {
 			log.Println("Error creando cliente:", err)
-			renderizar(w, "clienteNuevo.html", struct{ Error string }{Error: "No se pudo guardar el cliente."})
+			renderizar(w,"base.html", "clienteNuevo.html", struct{ Error string
+				 }{Error: "No se pudo guardar el cliente.", })
 			return
 		}
 
@@ -130,12 +133,13 @@ func main() {
 		compras := ObtenerComprasDeCliente(db, id)
 		pagos := ObtenerPagosDeCliente(db, id)
 
-		renderizar(w, "clienteDetalle.html", struct {
+		renderizar(w,"base.html", "clienteDetalle.html", struct {
 			*Cliente
 			Compras []Compra
 			Pagos   []Pago
 			Error string
-		}{Cliente: cliente, Compras: compras, Pagos: pagos, Error: ""})
+			
+		}{Cliente: cliente, Compras: compras, Pagos: pagos, Error: "", })
 	}))
 
 	// 8. Formulario de venta nueva (mostrar)
@@ -151,10 +155,11 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		renderizar(w, "ventaNueva.html", struct {
+		renderizar(w,"base.html", "ventaNueva.html", struct {
 			Cliente *Cliente
 			Error   string
-		}{Cliente: cliente})
+
+		}{Cliente: cliente, })
 	}))
 
 	// 9. Formulario de venta nueva (guardar)
@@ -171,7 +176,7 @@ func main() {
 		total, err := strconv.ParseFloat(totalStr, 64)
 		if err != nil || total <= 0 {
 			cliente, _ := ObtenerClientePorID(db, id)
-			renderizar(w, "ventaNueva.html", struct {
+			renderizar(w,"base.html", "ventaNueva.html", struct {
 				Cliente *Cliente
 				Error   string
 			}{Cliente: cliente, Error: "El total tiene que ser un número mayor a 0."})
@@ -201,10 +206,10 @@ func main() {
 			return
 		}
 
-		renderizar(w, "pagoNuevo.html", struct {
+		renderizar(w,"base.html", "pagoNuevo.html", struct {
 			Cliente *Cliente
 			Error   string
-		}{Cliente: cliente})
+		}{Cliente: cliente,})
 	}))
 
 	// 11. Formulario de pago nuevo (guardar)
@@ -221,7 +226,7 @@ func main() {
 		monto, err := strconv.ParseFloat(montoStr, 64)
 		if err != nil || monto <= 0 {
 			cliente, _ := ObtenerClientePorID(db, id)
-			renderizar(w, "pagoNuevo.html", struct {
+			renderizar(w,"base.html", "pagoNuevo.html", struct {
 				Cliente *Cliente
 				Error   string
 			}{Cliente: cliente, Error: "El monto tiene que ser un número mayor a 0."})
@@ -251,10 +256,10 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		renderizar(w, "modificarCliente.html", struct {
+		renderizar(w,"base.html", "modificarCliente.html", struct {
 			Cliente *Cliente
 			Error   string
-		}{Cliente: cliente})
+		}{Cliente: cliente, })
 	}))
 
 	mux.HandleFunc("POST /clientes/{id}/editar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
@@ -271,13 +276,13 @@ func main() {
 		telefono := r.FormValue("telefono")
 
 		if nombre == "" || apellido == "" {
-			renderizar(w, "clienteNuevo.html", struct{ Error string }{Error: "Nombre y apellido son obligatorios."})
+			renderizar(w,"base.html", "clienteNuevo.html", struct{ Error string }{Error: "Nombre y apellido son obligatorios."})
 			return
 		}
 		
 		if err := ModificarCliente(db, id, nombre, apellido, email, telefono); err != nil {
 			log.Println("Error modificando al cliente:", err)
-			renderizar(w, "clienteNuevo.html", struct{ Error string }{Error: "No se pudo modificar el cliente."})
+			renderizar(w,"base.html", "clienteNuevo.html", struct{ Error string }{Error: "No se pudo modificar el cliente."})
 			return
 		}
 
@@ -306,7 +311,7 @@ func main() {
 		password := r.FormValue("password")
 
 		if !validarCredenciales("admin", password) {
-			renderizar(w, "clienteDetalle.html", struct {
+			renderizar(w,"base.html", "clienteDetalle.html", struct {
 				*Cliente
 				Compras []Compra
 				Pagos   []Pago
@@ -321,7 +326,7 @@ func main() {
 		}
 
 		if err := eliminarCliente(db, id); err != nil {
-			renderizar(w, "clienteDetalle.html", struct {
+			renderizar(w,"base.html", "clienteDetalle.html", struct {
 				*Cliente
 				Compras []Compra
 				Pagos   []Pago
@@ -339,14 +344,32 @@ func main() {
 	}))
 
 
+	//seccion de estadisticas
+	mux.HandleFunc("GET /estadisticas", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		clientes := ObtenerClientes(db)
+
+		renderizar(w,"base.html", "estadisticas.html", struct {
+			Clientes         []Cliente
+		}{
+			Clientes:         clientes,
+		})
+
+	}))
+
+	//seccion de estadisticas
+		mux.HandleFunc("GET /contacto", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+			renderizar(w, "base.html", "contacto.html", nil)
+	}))
+
 
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 
 }
 
-func renderizar(w http.ResponseWriter, pagina string, datos any) {
-    tmpl, err := template.ParseFiles("templates/base.html", "templates/"+pagina)
+func renderizar(w http.ResponseWriter,layout, pagina string, datos any) {
+    tmpl, err := template.ParseFiles("templates/sideBar.html", "templates/"+pagina, "templates/"+layout)
     if err != nil {
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return

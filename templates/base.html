@@ -55,7 +55,10 @@
     </header>
 
     <!-- Acá se inyectan los formularios y tablas -->
-    <main class="libro">{{block "contenido" .}}{{end}}</main>
+    <main class="libro">
+      <div class="div-sideBar">{{template "sideBar" .}}</div>
+      {{block "contenido" .}}{{end}}
+    </main>
 
     <!-- Contenedor para los Toasts -->
     <div id="toast-container"></div>

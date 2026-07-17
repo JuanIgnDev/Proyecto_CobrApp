@@ -1,0 +1,20 @@
+{{define "sideBar"}}
+<!--Slide bar (donde vamos a agregar estadisticas, configuraciones y otras cosas)-->
+<div class="sidebar" id="sidebar">
+  <a href="/">Inicio</a>
+  <a href="/estadisticas">Estadisticas</a>
+  <a href="/contacto">Contacto</a>
+</div>
+
+<button id="btn-menu" class="btn-sideBar">☰</button>
+
+<script>
+  //funcion para slide bar
+  const sidebar = document.getElementById("sidebar");
+  const boton = document.getElementById("btn-menu");
+
+  boton.addEventListener("click", () => {
+    sidebar.classList.toggle("abierta");
+  });
+</script>
+{{end}}
