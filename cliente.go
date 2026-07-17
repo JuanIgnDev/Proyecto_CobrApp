@@ -2,7 +2,9 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"strconv"
 )
 
 type Cliente struct {
@@ -138,4 +140,61 @@ func eliminarCliente(db *sql.DB, id int) error {
 	`, id)
 
 	return err
+}
+
+
+//FUNCION PARA LAS ESTADISTICAS
+func MicroEstadistica(db *sql.DB, periodo string) (int, error) {
+	var formato string
+
+	switch periodo {
+	case "anual":
+		formato = "%Y"
+	case "mensual":
+		formato = "%Y-%m"
+	default:
+		return 0, fmt.Errorf("periodo inválido")
+	}
+
+	var cantidad int
+
+	err := db.QueryRow(`
+		SELECT COUNT(*)
+		FROM cliente
+		WHERE strftime(?, creado_en) = strftime(?, 'now');
+	`, formato, formato).Scan(&cantidad)
+
+	return cantidad, err
+}
+
+func MacroEstadisticaMensualClientes(db *sql.DB) ([13]int, error) {
+	var meses [13]int
+
+	rows, err := db.Query(`
+		SELECT
+			strftime('%m', creado_en) AS mes,
+			COUNT(*) AS cantidad
+		FROM cliente
+		WHERE strftime('%Y', creado_en) = strftime('%Y', 'now')
+		GROUP BY mes
+		ORDER BY mes;
+	`)
+	if err != nil {
+		return meses, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var mes string
+		var cantidad int
+
+		if err := rows.Scan(&mes, &cantidad); err != nil {
+			return meses, err
+		}
+		//ARRANCA DE 1 Y VA HASTA 12
+		nroMes, _ := strconv.Atoi(mes) // "01" -> 1
+		meses[nroMes] = cantidad
+	}
+
+	return meses, rows.Err()
 }

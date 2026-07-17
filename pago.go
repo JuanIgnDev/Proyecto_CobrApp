@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"log"
+	"strconv"
 )
 
 type Pago struct {
@@ -46,4 +47,37 @@ func CrearPago(db *sql.DB, clienteID int, monto float64, observacion string) err
 		VALUES (?, ?, ?)
 	`, clienteID, monto, observacion)
 	return err
+}
+
+
+func MacroEstadisticaMensualCobros(db *sql.DB) ([13]int, error) {
+	var meses [13]int
+
+	rows, err := db.Query(`
+		SELECT
+			strftime('%m', fecha) AS mes,
+			COUNT(*) AS cantidad
+		FROM pago
+		WHERE strftime('%Y', fecha) = strftime('%Y', 'now')
+		GROUP BY mes
+		ORDER BY mes;
+	`)
+	if err != nil {
+		return meses, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var mes string
+		var cantidad int
+
+		if err := rows.Scan(&mes, &cantidad); err != nil {
+			return meses, err
+		}
+		//ARRANCA DE 1 Y VA HASTA 12
+		nroMes, _ := strconv.Atoi(mes) // "01" -> 1
+		meses[nroMes] = cantidad
+	}
+
+	return meses, rows.Err()
 }
