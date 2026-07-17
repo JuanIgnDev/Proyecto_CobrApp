@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -343,22 +344,70 @@ func main() {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}))
 
-
 	//seccion de estadisticas
 	mux.HandleFunc("GET /estadisticas", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
-		clientes := ObtenerClientes(db)
+		TotalClientesUltMes, err := MicroEstadistica(db, "mensual")
+		TotalClientesUltAño, err := MicroEstadistica(db, "anual")
+		CantClientesMensualesUltAño,err := MacroEstadisticaMensualClientes(db)
+		CantVentasMensualesUltAño, err := MacroEstadisticaMensualVentas(db)
+		CantCobrosMensualesUltAño, err := MacroEstadisticaMensualCobros(db)
+
+		if err != nil {
+			http.NotFound(w, r)
+		}
+
+		meses := [13]string{
+			"",
+			"Enero",
+			"Febrero",
+			"Marzo",
+			"Abril",
+			"Mayo",
+			"Junio",
+			"Julio",
+			"Agosto",
+			"Septiembre",
+			"Octubre",
+			"Noviembre",
+			"Diciembre",
+		}
+
+		type DatoGrafico struct {
+			Mes      string `json:"mes"`
+			Clientes int    `json:"clientes"`
+			Ventas int `json:"ventas"`
+			Cobros int `json:"cobros"`
+		}
+
+		datos := make([]DatoGrafico, 0, 12)
+
+		for i := 1; i <= 12; i++ {
+			datos = append(datos, DatoGrafico{
+				Mes:      meses[i],
+				Clientes: CantClientesMensualesUltAño[i],
+				Ventas: CantVentasMensualesUltAño[i],
+				Cobros: CantCobrosMensualesUltAño[i],
+			})
+		}
+
+		jsonDatos, err := json.Marshal(datos)
+		if err != nil {
+			http.NotFound(w, r)
+		}
 
 		renderizar(w,"base.html", "estadisticas.html", struct {
-			Clientes         []Cliente
+			TotalClientesUltMes int
+			TotalClientesUltAño int
+			DatosGraficoJSON template.JS
 		}{
-			Clientes:         clientes,
+			TotalClientesUltMes: TotalClientesUltMes,
+			TotalClientesUltAño: TotalClientesUltAño,
+			DatosGraficoJSON: template.JS(jsonDatos),
 		})
-
 	}))
 
-	//seccion de estadisticas
-		mux.HandleFunc("GET /contacto", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("GET /contacto", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 			renderizar(w, "base.html", "contacto.html", nil)
 	}))
 

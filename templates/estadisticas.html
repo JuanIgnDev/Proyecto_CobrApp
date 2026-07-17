@@ -1,4 +1,200 @@
 <!--IMPLEMENTAR-->
 {{define "contenido"}}
-<div><p>HOLA DESDE ESTADISTICAS</p></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<section class="estadisticas-resumen">
+  <div class="card-estadistica">
+    <h4>Suma de clientes añadidos este mes:</h4>
+    <p>{{.TotalClientesUltMes}}</p>
+  </div>
+
+  <div class="card-estadistica">
+    <h4>Suma de clientes añadidos este año:</h4>
+    <p style="justify-content: center">{{.TotalClientesUltAño}}</p>
+  </div>
+</section>
+
+<section class="card-grafico" style="flex: 1">
+  <h3>Clientes añadidos por mes, este año:</h3>
+  <canvas id="grafico-clientes"></canvas>
+</section>
+
+<section class="graficos-pequenos">
+  <div class="card-grafico">
+    <h3>Ventas realizadas por mes, este año:</h3>
+    <canvas id="grafico-ventas"></canvas>
+  </div>
+
+  <div class="card-grafico">
+    <h3>Cobros realizados por mes, este año:</h3>
+    <canvas id="grafico-cobros"></canvas>
+  </div>
+</section>
+
+<section class="card-grafico">
+  <h3>Comparacion entre ventas y cobros:</h3>
+  <canvas id="grafico-ventas-cobros"></canvas>
+</section>
+
+<script id="datos-grafico" type="application/json">
+  {{ .DatosGraficoJSON }}
+</script>
+
+<script>
+  const datos = JSON.parse(
+    document.getElementById("datos-grafico").textContent,
+  );
+
+  const meses = datos.map((x) => x.mes);
+  const clientes = datos.map((x) => x.clientes);
+  const ventas = datos.map((x) => x.ventas);
+  const cobros = datos.map((x) => x.cobros);
+
+  new Chart(document.getElementById("grafico-clientes"), {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [
+        {
+          label: "Clientes registrados",
+          data: clientes,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white", // color de "Clientes registrados"
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white", // meses
+          },
+        },
+        y: {
+          ticks: {
+            color: "white", // números del eje Y
+          },
+        },
+      },
+    },
+  });
+
+  new Chart(document.getElementById("grafico-ventas"), {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [
+        {
+          label: "Clientes registrados",
+          data: ventas,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white",
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+          },
+        },
+        y: {
+          ticks: {
+            color: "white",
+          },
+        },
+      },
+    },
+  });
+
+  new Chart(document.getElementById("grafico-cobros"), {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [
+        {
+          label: "Clientes registrados",
+          data: ventas,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white",
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+          },
+        },
+        y: {
+          ticks: {
+            color: "white",
+          },
+        },
+      },
+    },
+  });
+
+  new Chart(document.getElementById("grafico-ventas-cobros"), {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [
+        {
+          label: "Ventas",
+          data: ventas,
+          borderColor: "red",
+          backgroundColor: "red",
+          tension: 0.3,
+        },
+        {
+          label: "Cobros",
+          data: cobros,
+          borderColor: "green",
+          backgroundColor: "green",
+          tension: 0.3,
+        },
+      ],
+    },
+    options: {
+      plugins: {
+        legend: {
+          labels: {
+            color: "white",
+          },
+        },
+      },
+      scales: {
+        x: {
+          ticks: {
+            color: "white",
+          },
+        },
+        y: {
+          ticks: {
+            color: "white",
+          },
+        },
+      },
+    },
+  });
+</script>
 {{end}}
