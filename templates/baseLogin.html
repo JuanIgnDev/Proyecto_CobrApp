@@ -1,0 +1,77 @@
+{{define "base"}}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <link rel="icon" type="image/png" href="../static/img/icono.png" />
+    <link rel="shortcut icon" href="../static/img/icono.png" />
+    <title>CobrApp</title>
+
+    <!-- Este script va acá arriba para evitar que la pantalla parpadee en blanco -->
+    <script>
+      if (
+        localStorage.getItem("theme") === "dark" ||
+        (!("theme" in localStorage) &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ) {
+        document.documentElement.classList.add("dark");
+      }
+    </script>
+  </head>
+
+  <body>
+    <header
+      class="cover"
+      style="
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      "
+    >
+      <div>
+        <h1>
+          <a href="/" style="text-decoration: none; color: inherit">CobrApp.</a>
+        </h1>
+      </div>
+
+      <div class="retoque_header_padre">
+        <div class="retoque_header_hijo">
+          <button id="themeToggle" class="btn-theme" title="Cambiar tema">
+            <span id="themeIcon">🌙</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Acá se inyectan los formularios y tablas -->
+    <main class="libro">{{block "contenido" .}}{{end}}</main>
+
+    <!-- TODOS LOS SCRIPTS VAN ACÁ ABAJO, DESPUÉS DE QUE LA PÁGINA YA CARGÓ -->
+    <script>
+      /* --- 0. LÓGICA DEL BOTÓN DE MODO OSCURO --- */
+      const btnTheme = document.getElementById("themeToggle");
+      const iconTheme = document.getElementById("themeIcon");
+
+      if (document.documentElement.classList.contains("dark")) {
+        document.body.classList.add("dark");
+        iconTheme.textContent = "☀️";
+      }
+
+      btnTheme.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        document.documentElement.classList.toggle("dark");
+
+        if (document.body.classList.contains("dark")) {
+          localStorage.setItem("theme", "dark");
+          iconTheme.textContent = "☀️";
+        } else {
+          localStorage.setItem("theme", "light");
+          iconTheme.textContent = "🌙";
+        }
+      });
+    </script>
+  </body>
+</html>
+{{end}}
