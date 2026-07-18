@@ -51,6 +51,8 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
 }
 
 /* =========================================
@@ -594,6 +596,31 @@ body {
   margin: 5px auto 0;
 }
 
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.form-checkbox input[type="checkbox"] {
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  border: 1px solid var(--border-color);
+  box-shadow: none; 
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.form-checkbox label {
+  margin-bottom: 0; 
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 500;
+}
+
 /* --- Botones Hover Animados --- */
 .btn-hover-green,
 .btn-hover-red {
@@ -751,7 +778,56 @@ body {
   color: var(--text-main);
 }
 
-/* Diseño del botón Ver Historial */
+/* =========================================
+   FILTRO DE HISTORIAL (Ficha Cliente)
+   ========================================= */
+.historial-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.historial-titulo {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 0;
+  letter-spacing: -0.025em;
+}
+
+.filtro-mes-container {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filtro-mes-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.input-mes {
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.input-mes:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
 .historial-footer {
   background: var(--bg-main);
   border-top: 1px solid var(--border-color);
@@ -785,6 +861,15 @@ body {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  background-color: rgba(249, 250, 251, 0.8); 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .logo-link {
@@ -871,6 +956,10 @@ body.dark {
   --paid-bg: #052e16;
   --paid-text: #86efac;
   --paid-border: #14532d;
+}
+
+body.dark .cover--header {
+  background-color: rgba(17, 24, 39, 0.8); 
 }
 
 .btn-theme {
@@ -1140,4 +1229,57 @@ body.dark {
   .kpi-grid {
     grid-template-columns: 1fr;
   }
+}
+
+
+/* =========================================
+   FOOTER Y CONTACTO 
+   ========================================= */
+.footer-app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  margin-top: 3rem;
+  background-color: var(--bg-card);
+  border-top: 1px solid var(--border-color);
+  color: var(--text-muted);
+  margin-top: auto;
+}
+
+.footer-app p {
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.footer-logo {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.1rem;
+  letter-spacing: -0.025em;
+}
+
+.footer-copy {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.link-contacto {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s, text-decoration 0.2s;
+  word-break: break-word;
+}
+
+.link-contacto:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.ficha-desarrollador dl {
+  flex-direction: column !important;
+  gap: 1.25rem !important;
 }
