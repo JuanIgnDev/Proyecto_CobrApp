@@ -10,7 +10,7 @@
   --text-muted: #6b7280;
   --border-color: #e5e7eb;
 
-  --favor-bg: #faeeda;
+  --favor-bg: #f5ddb5;
   --favor-text: #854f0b;
   --favor-border: #fac775;
 
@@ -344,11 +344,6 @@ body {
   background: var(--favor-bg);
   color: var(--favor-text);
   border: 1px solid var(--favor-border);
-}
-
-.balance-hero.a-favor {
-  border-color: var(--favor-border);
-  background: var(--favor-bg);
 }
 
 .balance-hero.a-favor .balance-monto {
