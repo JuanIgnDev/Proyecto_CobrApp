@@ -22,10 +22,17 @@
   </head>
 
   <body>
-    <header class="cover cover--header">
+    <header
+      class="cover"
+      style="
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      "
+    >
       <div>
         <h1>
-          <a href="/" class="logo-link">CobrApp.</a>
+          <a href="/" style="text-decoration: none; color: inherit">CobrApp.</a>
         </h1>
       </div>
 
@@ -52,12 +59,6 @@
       <div class="div-sideBar">{{template "sideBar" .}}</div>
       {{block "contenido" .}}{{end}}
     </main>
-    
-    <footer class="footer-app">
-      <span class="footer-logo">CobrApp.</span>
-      <p>Desarrollado por Juan Ignacio Estanguet y Elias Magnoli.</p>
-      <span class="footer-copy">&copy; 2026 Todos los derechos reservados.</span>
-    </footer>
 
     <!-- Contenedor para los Toasts -->
     <div id="toast-container"></div>
@@ -142,16 +143,6 @@
               "toastMsg",
               "La venta se guardó correctamente",
             );
-          } else if (form.action.includes("eliminar")){
-            sessionStorage.setItem(
-              "toastMsg",
-              "El cliente se eliminó correctamente"
-            )
-          } else if (form.action.includes("editar")){
-            sessionStorage.setItem(
-              "toastMsg",
-              "El cliente se modificó correctamente"
-            )
           }
 
           // C. Limpiar la máscara de moneda antes de enviarlo a Go
@@ -220,13 +211,18 @@
         input.addEventListener("input", function (e) {
           // Permitir solo números y comas
           let value = this.value.replace(/[^0-9,]/g, "");
+
+          // Asegurar que solo haya una coma
           const parts = value.split(",");
           if (parts.length > 2) {
             value = parts[0] + "," + parts.slice(1).join("");
           }
+
+          // Formatear los miles con puntos
           if (parts[0]) {
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
           }
+
           this.value = parts.join(",");
         });
       });
