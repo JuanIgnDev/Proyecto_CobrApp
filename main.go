@@ -233,12 +233,10 @@ func main() {
 
 		http.Redirect(w, r, "/clientes/"+strconv.Itoa(id), http.StatusSeeOther)
 	}))
-
 	// 12. Arranca el servidor
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 }
-
 func renderizar(w http.ResponseWriter, pagina string, datos any) {
     tmpl, err := template.ParseFiles("templates/base.html", "templates/"+pagina)
     if err != nil {
