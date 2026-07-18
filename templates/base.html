@@ -22,17 +22,10 @@
   </head>
 
   <body>
-    <header
-      class="cover"
-      style="
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-      "
-    >
+    <header class="cover cover--header">
       <div>
         <h1>
-          <a href="/" style="text-decoration: none; color: inherit">CobrApp.</a>
+          <a href="/" class="logo-link">CobrApp.</a>
         </h1>
       </div>
 
@@ -211,18 +204,13 @@
         input.addEventListener("input", function (e) {
           // Permitir solo números y comas
           let value = this.value.replace(/[^0-9,]/g, "");
-
-          // Asegurar que solo haya una coma
           const parts = value.split(",");
           if (parts.length > 2) {
             value = parts[0] + "," + parts.slice(1).join("");
           }
-
-          // Formatear los miles con puntos
           if (parts[0]) {
             parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
           }
-
           this.value = parts.join(",");
         });
       });

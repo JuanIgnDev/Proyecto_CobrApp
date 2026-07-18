@@ -785,6 +785,47 @@ body {
 }
 
 /* =========================================
+   UTILIDADES (reemplazan estilos inline)
+   ========================================= */
+.cover--header {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.texto-centrado-bold {
+  font-weight: bold;
+  text-align: center;
+}
+
+.mensaje-error {
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.form-contenedor-estrecho {
+  max-width: 520px;
+  margin: 0 auto;
+  padding-top: 2rem;
+}
+
+.form-error-wrap {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.error-pill {
+  padding: 0.5rem 1rem;
+  display: inline-block;
+  border-radius: var(--radius-md);
+}
+
+/* =========================================
    MODO OSCURO
    ========================================= */
 body.dark {
@@ -864,7 +905,6 @@ body.dark {
 /* =========================================
    Seccion de slideBar
    ========================================= */
-/* Contenedor de la sidebar */
 /* Contenedor de la sidebar */
 .sidebar {
   position: fixed;

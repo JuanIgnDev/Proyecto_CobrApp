@@ -1,15 +1,8 @@
 {{define "contenido"}}
-<div style="max-width: 520px; margin: 0 auto; padding-top: 2rem">
+<div class="form-contenedor-estrecho">
   {{if .Error}}
-  <div id="form-error" style="margin-bottom: 1rem; text-align: center">
-    <span
-      class="saldo debe"
-      style="
-        padding: 0.5rem 1rem;
-        display: inline-block;
-        border-radius: var(--radius-md);
-      "
-    >
+  <div id="form-error" class="form-error-wrap">
+    <span class="saldo debe error-pill">
       {{.Error}}
     </span>
   </div>

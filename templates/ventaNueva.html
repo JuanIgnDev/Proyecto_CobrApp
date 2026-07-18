@@ -2,13 +2,12 @@
 <main class="libro">
   <a
     href="/clientes/{{.Cliente.ID}}"
-    class="btn-cancelar"
-    style="display: inline-block; margin-bottom: 1rem"
+    class="btn-cancelar btn-volver"
     >&larr; Volver a la ficha</a
   >
 
   {{if .Error}}
-  <p id="form-error" class="saldo debe" style="display: block; margin-bottom: 1rem">
+  <p id="form-error" class="saldo debe mensaje-error">
     {{.Error}}
   </p>
   {{end}}
