@@ -1,40 +1,50 @@
-<!--IMPLEMENTAR-->
 {{define "contenido"}}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<section class="estadisticas-resumen">
-  <div class="card-estadistica">
-    <h4>Suma de clientes añadidos este mes:</h4>
-    <p>{{.TotalClientesUltMes}}</p>
+<div class="kpi-grid">
+  <div class="card-kpi">
+    <p class="kpi-label">Clientes este año</p>
+    <p class="kpi-valor">{{.TotalClientesUltAño}}</p>
+    <div class="kpi-spark"><canvas id="sparkClientes"></canvas></div>
   </div>
 
-  <div class="card-estadistica">
-    <h4>Suma de clientes añadidos este año:</h4>
-    <p style="justify-content: center">{{.TotalClientesUltAño}}</p>
-  </div>
-</section>
-
-<section class="card-grafico" style="flex: 1">
-  <h3>Clientes añadidos por mes, este año:</h3>
-  <canvas id="grafico-clientes"></canvas>
-</section>
-
-<section class="graficos-pequenos">
-  <div class="card-grafico">
-    <h3>Ventas realizadas por mes, este año:</h3>
-    <canvas id="grafico-ventas"></canvas>
+  <div class="card-kpi">
+    <p class="kpi-label">Ventas este año</p>
+    <p class="kpi-valor" id="totalVentas">-</p>
+    <div class="kpi-spark"><canvas id="sparkVentas"></canvas></div>
   </div>
 
-  <div class="card-grafico">
-    <h3>Cobros realizados por mes, este año:</h3>
-    <canvas id="grafico-cobros"></canvas>
+  <div class="card-kpi">
+    <p class="kpi-label">Cobros este año</p>
+    <p class="kpi-valor" id="totalCobros">-</p>
+    <div class="kpi-spark"><canvas id="sparkCobros"></canvas></div>
   </div>
-</section>
+</div>
 
-<section class="card-grafico">
-  <h3>Comparacion entre ventas y cobros:</h3>
-  <canvas id="grafico-ventas-cobros"></canvas>
+<section class="card-grafico-principal">
+  <div class="grafico-header">
+    <h3>Evolución mensual</h3>
+    <div class="vista-botones" id="botonesVista">
+      <button type="button" data-vista="clientes" class="btn-vista activo">Clientes</button>
+      <button type="button" data-vista="ventas" class="btn-vista">Ventas</button>
+      <button type="button" data-vista="cobros" class="btn-vista">Cobros</button>
+      <button type="button" data-vista="comparacion" class="btn-vista">Ventas vs cobros</button>
+    </div>
+  </div>
+
+  <div class="leyenda-comparacion oculto" id="leyendaComparacion">
+    <span><span class="punto punto-ventas"></span>Ventas</span>
+    <span><span class="punto punto-cobros"></span>Cobros</span>
+  </div>
+
+  <div class="grafico-wrapper">
+    <canvas
+      id="chartPrincipal"
+      role="img"
+      aria-label="Gráfico de línea con selector de vista: clientes, ventas, cobros o comparación entre ventas y cobros"
+    ></canvas>
+  </div>
 </section>
 
 <script id="datos-grafico" type="application/json">
@@ -51,150 +61,215 @@
   const ventas = datos.map((x) => x.ventas);
   const cobros = datos.map((x) => x.cobros);
 
-  new Chart(document.getElementById("grafico-clientes"), {
+  document.getElementById("totalVentas").textContent = ventas.reduce(
+    (a, b) => a + b,
+    0,
+  );
+  document.getElementById("totalCobros").textContent = cobros.reduce(
+    (a, b) => a + b,
+    0,
+  );
+
+  function leerColores() {
+    const estilos = getComputedStyle(document.documentElement);
+    return {
+      principal: estilos.getPropertyValue("--accent").trim(),
+      secundario: estilos.getPropertyValue("--favor-text").trim(),
+      texto: estilos.getPropertyValue("--text-muted").trim(),
+      borde: estilos.getPropertyValue("--border-color").trim(),
+    };
+  }
+
+  let colores = leerColores();
+
+  function opcionesComunes() {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          ticks: { color: colores.texto, font: { size: 11 } },
+          grid: { display: false },
+          border: { color: colores.borde },
+        },
+        y: {
+          ticks: { color: colores.texto, font: { size: 11 } },
+          grid: { color: colores.borde },
+          border: { display: false },
+          beginAtZero: true,
+        },
+      },
+      elements: { point: { radius: 3, hoverRadius: 5 } },
+    };
+  }
+
+  function opcionesSpark() {
+    return {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      scales: { x: { display: false }, y: { display: false } },
+      elements: { point: { radius: 0 } },
+    };
+  }
+
+  // --- Sparklines de las tarjetas KPI ---
+  const sparkClientes = new Chart(document.getElementById("sparkClientes"), {
     type: "line",
     data: {
       labels: meses,
       datasets: [
         {
-          label: "Clientes registrados",
           data: clientes,
-        },
-      ],
-    },
-    options: {
-      plugins: {
-        legend: {
-          labels: {
-            color: "white", // color de "Clientes registrados"
-          },
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: "white", // meses
-          },
-        },
-        y: {
-          ticks: {
-            color: "white", // números del eje Y
-          },
-        },
-      },
-    },
-  });
-
-  new Chart(document.getElementById("grafico-ventas"), {
-    type: "line",
-    data: {
-      labels: meses,
-      datasets: [
-        {
-          label: "Clientes registrados",
-          data: ventas,
-        },
-      ],
-    },
-    options: {
-      plugins: {
-        legend: {
-          labels: {
-            color: "white",
-          },
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: "white",
-          },
-        },
-        y: {
-          ticks: {
-            color: "white",
-          },
-        },
-      },
-    },
-  });
-
-  new Chart(document.getElementById("grafico-cobros"), {
-    type: "line",
-    data: {
-      labels: meses,
-      datasets: [
-        {
-          label: "Clientes registrados",
-          data: ventas,
-        },
-      ],
-    },
-    options: {
-      plugins: {
-        legend: {
-          labels: {
-            color: "white",
-          },
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: "white",
-          },
-        },
-        y: {
-          ticks: {
-            color: "white",
-          },
-        },
-      },
-    },
-  });
-
-  new Chart(document.getElementById("grafico-ventas-cobros"), {
-    type: "line",
-    data: {
-      labels: meses,
-      datasets: [
-        {
-          label: "Ventas",
-          data: ventas,
-          borderColor: "red",
-          backgroundColor: "red",
+          borderColor: colores.principal,
+          borderWidth: 2,
           tension: 0.3,
+          fill: false,
         },
+      ],
+    },
+    options: opcionesSpark(),
+  });
+
+  const sparkVentas = new Chart(document.getElementById("sparkVentas"), {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [
         {
-          label: "Cobros",
+          data: ventas,
+          borderColor: colores.principal,
+          borderWidth: 2,
+          tension: 0.3,
+          fill: false,
+        },
+      ],
+    },
+    options: opcionesSpark(),
+  });
+
+  const sparkCobros = new Chart(document.getElementById("sparkCobros"), {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [
+        {
           data: cobros,
-          borderColor: "green",
-          backgroundColor: "green",
+          borderColor: colores.secundario,
+          borderWidth: 2,
+          tension: 0.3,
+          fill: false,
+        },
+      ],
+    },
+    options: opcionesSpark(),
+  });
+
+  // --- Gráfico principal con selector de vista ---
+  const series = { clientes, ventas, cobros };
+
+  const chartPrincipal = new Chart(document.getElementById("chartPrincipal"), {
+    type: "line",
+    data: {
+      labels: meses,
+      datasets: [
+        {
+          label: "Clientes",
+          data: clientes,
+          borderColor: colores.principal,
+          backgroundColor: colores.principal,
+          borderWidth: 2,
           tension: 0.3,
         },
       ],
     },
-    options: {
-      plugins: {
-        legend: {
-          labels: {
-            color: "white",
-          },
-        },
-      },
-      scales: {
-        x: {
-          ticks: {
-            color: "white",
-          },
-        },
-        y: {
-          ticks: {
-            color: "white",
-          },
-        },
-      },
-    },
+    options: opcionesComunes(),
   });
+
+  const leyenda = document.getElementById("leyendaComparacion");
+  const botones = document.querySelectorAll(".btn-vista");
+
+  botones.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      botones.forEach((b) => b.classList.remove("activo"));
+      btn.classList.add("activo");
+      const vista = btn.dataset.vista;
+
+      if (vista === "comparacion") {
+        leyenda.classList.remove("oculto");
+        chartPrincipal.data.datasets = [
+          {
+            label: "Ventas",
+            data: series.ventas,
+            borderColor: colores.principal,
+            backgroundColor: colores.principal,
+            borderWidth: 2,
+            tension: 0.3,
+          },
+          {
+            label: "Cobros",
+            data: series.cobros,
+            borderColor: colores.secundario,
+            backgroundColor: colores.secundario,
+            borderWidth: 2,
+            borderDash: [5, 3],
+            tension: 0.3,
+          },
+        ];
+      } else {
+        leyenda.classList.add("oculto");
+        const etiqueta = vista.charAt(0).toUpperCase() + vista.slice(1);
+        const color = vista === "cobros" ? colores.secundario : colores.principal;
+        chartPrincipal.data.datasets = [
+          {
+            label: etiqueta,
+            data: series[vista],
+            borderColor: color,
+            backgroundColor: color,
+            borderWidth: 2,
+            tension: 0.3,
+          },
+        ];
+      }
+      chartPrincipal.update();
+    });
+  });
+
+  // --- Si el usuario cambia de modo claro/oscuro, recoloreamos todo ---
+  // Escuchamos cambios de clase en <html> (el botón de tema en base.html
+  // togglea la clase "dark" ahí) y volvemos a leer las variables CSS.
+  function actualizarColoresGraficos() {
+    colores = leerColores();
+
+    const graficos = [sparkClientes, sparkVentas, sparkCobros, chartPrincipal];
+
+    graficos.forEach((chart) => {
+      const escalaX = chart.options.scales.x;
+      const escalaY = chart.options.scales.y;
+
+      if (escalaX && escalaX.ticks) escalaX.ticks.color = colores.texto;
+      if (escalaY && escalaY.ticks) escalaY.ticks.color = colores.texto;
+      if (escalaX && escalaX.border) escalaX.border.color = colores.borde;
+      if (escalaY && escalaY.grid) escalaY.grid.color = colores.borde;
+    });
+
+    sparkClientes.data.datasets[0].borderColor = colores.principal;
+    sparkVentas.data.datasets[0].borderColor = colores.principal;
+    sparkCobros.data.datasets[0].borderColor = colores.secundario;
+
+    chartPrincipal.data.datasets.forEach((ds) => {
+      const esCobros = ds.label === "Cobros";
+      ds.borderColor = esCobros ? colores.secundario : colores.principal;
+      ds.backgroundColor = esCobros ? colores.secundario : colores.principal;
+    });
+
+    graficos.forEach((chart) => chart.update());
+  }
+
+  new MutationObserver(actualizarColoresGraficos).observe(
+    document.documentElement,
+    { attributes: true, attributeFilter: ["class"] },
+  );
 </script>
 {{end}}

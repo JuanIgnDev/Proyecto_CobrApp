@@ -4,16 +4,15 @@
 <div class="login-wrap">
   {{if .Error}}
   <p
-    class="saldo debe"
+    class="saldo debe mensaje-error"
     id="error-login"
-    style="display: block; margin-bottom: 1rem"
   >
     {{.Error}}
   </p>
   {{end}}
 
   <form method="POST" action="/login" class="form-cliente">
-    <p style="font-weight: bold; text-align: center">INICIAR SESION</p>
+    <p class="texto-centrado-bold">INICIAR SESION</p>
 
     <input
       type="text"
