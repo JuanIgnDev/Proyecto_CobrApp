@@ -2,17 +2,18 @@
 <main class="libro">
   <a
     href="/clientes/{{.Cliente.ID}}"
-    class="btn-cancelar btn-volver"
+    class="btn-cancelar"
+    style="display: inline-block; margin-bottom: 1rem"
     >&larr; Volver a la ficha</a
   >
 
   {{if gt .Cliente.Saldo 0.0}}
-  <div class="balance-hero debe">
+  <div class="balance-hero debe" style="margin-bottom: 1.4rem">
     <span class="balance-label">Saldo antes de este pago</span>
     <span class="balance-monto">${{printf "%.2f" .Cliente.Saldo}}</span>
   </div>
   {{end}} {{if .Error}}
-  <p id="form-error" class="saldo debe mensaje-error">
+  <p id="form-error" class="saldo debe" style="display: block; margin-bottom: 1rem">
     {{.Error}}
   </p>
   {{end}}
