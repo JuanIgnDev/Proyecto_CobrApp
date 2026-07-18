@@ -348,13 +348,33 @@ func main() {
 	mux.HandleFunc("GET /estadisticas", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
 		TotalClientesUltMes, err := MicroEstadistica(db, "mensual")
-		TotalClientesUltAño, err := MicroEstadistica(db, "anual")
-		CantClientesMensualesUltAño,err := MacroEstadisticaMensualClientes(db)
-		CantVentasMensualesUltAño, err := MacroEstadisticaMensualVentas(db)
-		CantCobrosMensualesUltAño, err := MacroEstadisticaMensualCobros(db)
-
 		if err != nil {
 			http.NotFound(w, r)
+			return
+		}
+
+		TotalClientesUltAño, err := MicroEstadistica(db, "anual")
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		CantClientesMensualesUltAño, err := MacroEstadisticaMensualClientes(db)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		CantVentasMensualesUltAño, err := MacroEstadisticaMensualVentas(db)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		CantCobrosMensualesUltAño, err := MacroEstadisticaMensualCobros(db)
+		if err != nil {
+			http.NotFound(w, r)
+			return
 		}
 
 		meses := [13]string{
@@ -394,6 +414,7 @@ func main() {
 		jsonDatos, err := json.Marshal(datos)
 		if err != nil {
 			http.NotFound(w, r)
+			return
 		}
 
 		renderizar(w,"base.html", "estadisticas.html", struct {

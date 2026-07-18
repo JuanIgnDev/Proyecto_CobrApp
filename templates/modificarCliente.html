@@ -1,11 +1,9 @@
 {{define "contenido"}}
 <div class="form-contenedor-estrecho">
   {{if .Error}}
-  <div id="form-error" class="form-error-wrap">
-    <span class="saldo debe error-pill">
-      {{.Error}}
-    </span>
-  </div>
+  <p id="form-error" class="saldo debe mensaje-error">
+    {{.Error}}
+  </p>
   {{end}}
 
   <form

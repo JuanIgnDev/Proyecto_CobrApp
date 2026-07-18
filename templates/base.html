@@ -136,6 +136,16 @@
               "toastMsg",
               "La venta se guardó correctamente",
             );
+          } else if (form.action.includes("eliminar")){
+            sessionStorage.setItem(
+              "toastMsg",
+              "El cliente se eliminó correctamente"
+            )
+          } else if (form.action.includes("editar")){
+            sessionStorage.setItem(
+              "toastMsg",
+              "El cliente se modificó correctamente"
+            )
           }
 
           // C. Limpiar la máscara de moneda antes de enviarlo a Go

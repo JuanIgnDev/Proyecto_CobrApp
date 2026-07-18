@@ -3,28 +3,16 @@
   <a href="/" class="btn-cancelar btn-volver">&larr; Volver al inicio</a>
 
   <!-- Balance: el dato principal, arriba de todo -->
-  <section
-    class="balance-hero balance-hero-split {{if gt .Saldo 0.0}}debe{{else}}al-dia{{end}}"
-  >
-    <!-- Columna Izquierda: Saldo normal o Al día -->
-    <div class="balance-col-left">
-      {{if gt .Saldo 0.0}}
-      <span class="balance-label">Debe:</span>
-      <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
-      {{else}}
-      <span class="balance-label">Saldo actual</span>
-      <span class="balance-monto">Al día</span>
-      {{end}}
-    </div>
-
-    <!-- Columna Derecha: Monto a favor (Solo si es menor a 0) -->
-    {{if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
-    <div class="balance-col-right">
-      <span class="balance-label">A favor</span>
-      <span class="balance-monto balance-monto-favor"
-        >+${{slice $saldoTxt 1}}</span
-      >
-    </div>
+  <section class="balance-hero {{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}a-favor{{else}}al-dia{{end}}">
+    {{if gt .Saldo 0.0}}
+    <span class="balance-label">Debe:</span>
+    <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
+    {{else if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
+    <span class="balance-label">A favor</span>
+    <span class="balance-monto balance-monto-favor">+${{slice $saldoTxt 1}}</span>
+    {{else}}
+    <span class="balance-label">Saldo actual</span>
+    <span class="balance-monto">Al día</span>
     {{end}}
   </section>
 
@@ -71,35 +59,39 @@
   </p>
   {{end}}
 
-  <div class="login-wrap oculto" id="confirmacion">
-    <form
-      method="POST"
-      action="/clientes/{{.ID}}/eliminar"
-      class="form-cliente"
-    >
-      <p class="texto-centrado-bold">
-        Ingrese la contraseña para eliminar el cliente!
-      </p>
-
-      <input
-        type="password"
-        id="password"
-        name="password"
-        placeholder="Contraseña"
-        required
-      />
-
-      <button type="submit" class="btn-nuevo btn-ingresar">
-        Confirmar eliminación
-      </button>
-      <button
-        type="button"
-        class="btn-nuevo btn-ingresar"
-        onclick="dejarDeMostrarConfirmacion()"
+  <div class="modal-overlay oculto" id="confirmacion">
+    <div class="modal-card">
+      <form
+        method="POST"
+        action="/clientes/{{.ID}}/eliminar"
+        class="form-cliente"
       >
-        Cancelar
-      </button>
-    </form>
+        <p class="texto-centrado-bold">
+          Ingrese la contraseña para eliminar al cliente
+        </p>
+
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Contraseña"
+          required
+        />
+        <div class="modal-buttons">
+          <button
+            type="button"
+            class="btn-nuevo btn-ingresar"
+            onclick="dejarDeMostrarConfirmacion()"
+            >
+            Cancelar
+          </button>
+          <button type="submit" class="btn-nuevo btn-confirmar-elim btn-ingresar">
+            Confirmar eliminación 
+          </button>
+        </div>
+        
+      </form>
+    </div>
   </div>
 
   <!-- Acciones principales -->
@@ -200,20 +192,27 @@
 </main>
 
 <script>
-  //esto se va a ejecutar y va a mostrar el div de abajo
-  const eliminarCliente = document.getElementById("confirmacion");
+  const overlay = document.getElementById("confirmacion");
+  const modalCard = overlay.querySelector(".modal-card");
 
   function mostrarConfirmacion() {
-    eliminarCliente.classList.remove("oculto");
-
-    setTimeout(() => {
-      dejarDeMostrarConfirmacion();
-    }, 5000);
+    overlay.classList.remove("oculto");
+    document.body.classList.add("modal-abierto")
   }
 
   function dejarDeMostrarConfirmacion() {
-    document.getElementById("confirmacion").classList.add("oculto");
+    overlay.classList.add("oculto");
+    document.body.classList.add("modal-abierto")
   }
+
+  overlay.addEventListener("click", dejarDeMostrarConfirmacion);
+  modalCard.addEventListener("click", (e) => e.stopPropagation());
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !overlay.classList.contains("oculto")) {
+      dejarDeMostrarConfirmacion();
+    }
+  });
 
   document
     .getElementById("btn-ver-compras")
