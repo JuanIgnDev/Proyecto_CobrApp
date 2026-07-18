@@ -3,16 +3,28 @@
   <a href="/" class="btn-cancelar btn-volver">&larr; Volver al inicio</a>
 
   <!-- Balance: el dato principal, arriba de todo -->
-  <section class="balance-hero {{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}a-favor{{else}}al-dia{{end}}">
-    {{if gt .Saldo 0.0}}
-    <span class="balance-label">Debe:</span>
-    <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
-    {{else if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
-    <span class="balance-label">A favor</span>
-    <span class="balance-monto balance-monto-favor">+${{slice $saldoTxt 1}}</span>
-    {{else}}
-    <span class="balance-label">Saldo actual</span>
-    <span class="balance-monto">Al día</span>
+  <section
+    class="balance-hero balance-hero-split {{if gt .Saldo 0.0}}debe{{else}}al-dia{{end}}"
+  >
+    <!-- Columna Izquierda: Saldo normal o Al día -->
+    <div class="balance-col-left">
+      {{if gt .Saldo 0.0}}
+      <span class="balance-label">Debe:</span>
+      <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
+      {{else}}
+      <span class="balance-label">Saldo actual</span>
+      <span class="balance-monto">Al día</span>
+      {{end}}
+    </div>
+
+    <!-- Columna Derecha: Monto a favor (Solo si es menor a 0) -->
+    {{if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
+    <div class="balance-col-right">
+      <span class="balance-label">A favor</span>
+      <span class="balance-monto balance-monto-favor"
+        >+${{slice $saldoTxt 1}}</span
+      >
+    </div>
     {{end}}
   </section>
 
@@ -49,44 +61,46 @@
   </section>
 
   <!-- LO QUE VA A MOSTRAR CUANDO SE INTENTE ELIMINAR -->
+
   {{if .Error}}
-  <p class="saldo debe mensaje-error" id="error-login">
+  <p
+    class="saldo debe"
+    id="error-login"
+    style="display: block; margin-bottom: 1rem"
+  >
     {{.Error}}
   </p>
   {{end}}
 
-  <div class="modal-overlay oculto" id="confirmacion">
-    <div class="modal-card">
-      <form
-        method="POST"
-        action="/clientes/{{.ID}}/eliminar"
-        class="form-cliente"
-      >
-        <p class="texto-centrado-bold">
-          Ingrese la contraseña para eliminar al cliente
-        </p>
+  <div class="login-wrap" id="confirmacion" style="display: none">
+    <form
+      method="POST"
+      action="/clientes/{{.ID}}/eliminar"
+      class="form-cliente"
+    >
+      <p style="font-weight: bold; text-align: center">
+        Ingrese la contraseña para eliminar el cliente!
+      </p>
 
-        <input
-          type="password"
-          id="password"
-          name="password"
-          placeholder="Contraseña"
-          required
-        />
-        <div class="modal-buttons">
-          <button
-            type="button"
-            class="btn-nuevo btn-ingresar"
-            onclick="dejarDeMostrarConfirmacion()"
-            >
-            Cancelar
-          </button>
-          <button type="submit" class="btn-nuevo btn-confirmar-elim btn-ingresar">
-            Confirmar eliminación 
-          </button>
-        </div>
-      </form>
-    </div>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Contraseña"
+        required
+      />
+
+      <button type="submit" class="btn-nuevo btn-ingresar">
+        Confirmar eliminación
+      </button>
+      <button
+        type="button"
+        class="btn-nuevo btn-ingresar"
+        onclick="dejarDeMostrarConfirmacion()"
+      >
+        Cancelar
+      </button>
+    </form>
   </div>
 
   <!-- Acciones principales -->
@@ -106,17 +120,7 @@
       + Registrar Pago
     </button>
   </div>
-<!-- Cabecera de Historial con Filtro Dinámico -->
-  <div class="historial-header">
-    <h2 class="historial-titulo">Historial de Movimientos</h2>
-    
-    <div class="filtro-mes-container">
-      <label for="filtro-mes" class="filtro-mes-label">Filtrar por mes:</label>
-      <select id="filtro-mes" class="input-mes">
-        <option value="">Todos los meses</option>
-      </select>
-    </div>
-  </div>
+
   <div class="contenedor-tablas">
     <section class="ficha-seccion">
       <h3>Compras</h3>
@@ -171,6 +175,24 @@
           Ver historial completo ({{len .Pagos}}) ↓
         </button>
       </div>
+      <script>
+        document
+          .getElementById("btn-ver-pagos")
+          .addEventListener("click", function () {
+            const items = document.querySelectorAll(".pago-item");
+            const expandir = this.innerText.includes("completo");
+
+            items.forEach((item, index) => {
+              if (index >= 3) {
+                item.style.display = expandir ? "flex" : "none";
+              }
+            });
+
+            this.innerText = expandir
+              ? "Ocultar historial ↑"
+              : "Ver historial completo ({{len .Pagos}}) ↓";
+          });
+      </script>
       {{end}} {{else}}
       <p class="vacio-inline">Todavía no hay pagos cargados.</p>
       {{end}}
@@ -179,33 +201,24 @@
 </main>
 
 <script>
-  // LÓGICA DEL MODAL DE CONFIRMACIÓN
-  const overlay = document.getElementById("confirmacion");
-  const modalCard = overlay.querySelector(".modal-card");
+  //esto se va a ejecutar y va a mostrar el div de abajo
+  const eliminarCliente = document.getElementById("confirmacion");
 
   function mostrarConfirmacion() {
-    overlay.classList.remove("oculto");
-    document.body.classList.add("modal-abierto");
+    eliminarCliente.style.display = "block";
+
+    setTimeout(() => {
+      dejarDeMostrarConfirmacion();
+    }, 5000);
   }
 
   function dejarDeMostrarConfirmacion() {
-    overlay.classList.add("oculto");
-    document.body.classList.remove("modal-abierto");
+    document.getElementById("confirmacion").style.display = "none";
   }
 
-  overlay.addEventListener("click", dejarDeMostrarConfirmacion);
-  modalCard.addEventListener("click", (e) => e.stopPropagation());
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !overlay.classList.contains("oculto")) {
-      dejarDeMostrarConfirmacion();
-    }
-  });
-
-  // LÓGICA DE HISTORIAL DESPLEGABLE (COMPRAS)
-  const btnVerCompras = document.getElementById("btn-ver-compras");
-  if (btnVerCompras) {
-    btnVerCompras.addEventListener("click", function () {
+  document
+    .getElementById("btn-ver-compras")
+    .addEventListener("click", function () {
       const items = document.querySelectorAll(".compra-item");
       const expandir = this.innerText.includes("completo");
 
@@ -217,120 +230,7 @@
 
       this.innerText = expandir
         ? "Ocultar historial ↑"
-        : "Ver historial completo (" + items.length + ") ↓";
+        : "Ver historial completo ({{len .Compras}}) ↓";
     });
-  }
-
-  // LÓGICA DE HISTORIAL DESPLEGABLE (PAGOS)
-  const btnVerPagos = document.getElementById("btn-ver-pagos");
-  if (btnVerPagos) {
-    btnVerPagos.addEventListener("click", function () {
-      const items = document.querySelectorAll(".pago-item");
-      const expandir = this.innerText.includes("completo");
-
-      items.forEach((item, index) => {
-        if (index >= 3) {
-          item.style.display = expandir ? "flex" : "none";
-        }
-      });
-
-      this.innerText = expandir
-        ? "Ocultar historial ↑"
-        : "Ver historial completo (" + items.length + ") ↓";
-    });
-  }
-
-  // LÓGICA DE FORMATEO DE MONEDA
-  document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".balance-monto, .saldo").forEach((el) => {
-      let texto = el.textContent;
-      
-      // Busca números con decimales (ej: 89361.00)
-      let numero = texto.match(/[\d.]+/); 
-      
-      if (numero && texto.includes("$")) {
-        let valor = parseFloat(numero[0]);
-        
-        // Reemplaza el texto crudo por el formateado (ej: 89.361,00)
-        let formateado = valor.toLocaleString("es-AR", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
-        
-        el.textContent = texto.replace(numero[0], formateado);
-      }
-    });
-  });
-  // LÓGICA DE FILTRO MENSUAL
-  const selectMes = document.getElementById("filtro-mes");
-
-  if (selectMes) {
-    const compras = document.querySelectorAll(".compra-item");
-    const pagos = document.querySelectorAll(".pago-item");
-    const mesesSet = new Set(); // Usamos un Set para no tener meses repetidos
-
-    // 1. Recolectar todos los meses únicos que existen en el historial del cliente
-    const extraerMes = (item) => {
-      const textoFecha = item.querySelector(".item-fecha").textContent.trim();
-      const partes = textoFecha.split("-"); // Ej: ["2026", "07", "18..."]
-      if (partes.length >= 2) {
-        mesesSet.add(partes[0] + "-" + partes[1]); // Guardamos "2026-07"
-      }
-    };
-
-    compras.forEach(extraerMes);
-    pagos.forEach(extraerMes);
-
-    // 2. Ordenar las fechas de más nuevas a más viejas y crear las opciones
-    const mesesArray = Array.from(mesesSet).sort().reverse();
-    const nombresMeses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
-    mesesArray.forEach(mesStr => {
-      const [year, month] = mesStr.split("-");
-      // Convertimos el "07" a número para buscar "Julio" en el array
-      const nombreFormateado = nombresMeses[parseInt(month, 10)] + " " + year;
-
-      const option = document.createElement("option");
-      option.value = mesStr; // El valor oculto sigue siendo "2026-07" para que filtre bien
-      option.textContent = nombreFormateado; // El usuario lee "Julio 2026"
-      selectMes.appendChild(option);
-    });
-
-    // 3. Filtrar las tablas cuando el usuario elige un mes de la lista
-    selectMes.addEventListener("change", function() {
-      const mesBuscado = this.value;
-
-      const footerCompras = document.getElementById("btn-ver-compras") ? document.getElementById("btn-ver-compras").parentElement : null;
-      const footerPagos = document.getElementById("btn-ver-pagos") ? document.getElementById("btn-ver-pagos").parentElement : null;
-
-      if (mesBuscado !== "") {
-        // MODO FILTRADO: Ocultar expansores y mostrar solo coincidencias del mes
-        if (footerCompras) footerCompras.classList.add("oculto");
-        if (footerPagos) footerPagos.classList.add("oculto");
-
-        compras.forEach(item => {
-          const fecha = item.querySelector(".item-fecha").textContent.trim();
-          item.style.display = fecha.startsWith(mesBuscado) ? "flex" : "none";
-        });
-
-        pagos.forEach(item => {
-          const fecha = item.querySelector(".item-fecha").textContent.trim();
-          item.style.display = fecha.startsWith(mesBuscado) ? "flex" : "none";
-        });
-
-      } else {
-        // MODO NORMAL (Todos los meses): Mostrar máximo 3 y botones expansores
-        if (footerCompras) footerCompras.classList.remove("oculto");
-        if (footerPagos) footerPagos.classList.remove("oculto");
-
-        compras.forEach((item, index) => {
-          item.style.display = index < 3 ? "flex" : "none";
-        });
-        pagos.forEach((item, index) => {
-          item.style.display = index < 3 ? "flex" : "none";
-        });
-      }
-    });
-  }
 </script>
 {{end}}

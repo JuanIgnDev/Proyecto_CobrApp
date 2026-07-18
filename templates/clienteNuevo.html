@@ -1,9 +1,18 @@
 {{define "contenido"}}
-<div class="form-contenedor-estrecho">
+<div style="max-width: 520px; margin: 0 auto; padding-top: 2rem">
   {{if .Error}}
-  <p id="form-error" class="saldo debe mensaje-error">
-    {{.Error}}
-  </p>
+  <div id="form-error" style="margin-bottom: 1rem; text-align: center">
+    <span
+      class="saldo debe"
+      style="
+        padding: 0.5rem 1rem;
+        display: inline-block;
+        border-radius: var(--radius-md);
+      "
+    >
+      {{.Error}}
+    </span>
+  </div>
   {{end}}
 
   <form method="POST" action="/cliente_nuevo" class="form-cliente form-grid">
