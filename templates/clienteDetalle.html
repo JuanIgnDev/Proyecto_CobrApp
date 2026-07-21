@@ -137,7 +137,7 @@
             {{end}}
           </div>
           <span class="saldo debe">${{printf "%.2f" .Total}}</span>
-          <a href="/venta/{.ID}/modificar">
+          <a href="/venta/{{.ID}}/modificar" title="Editar">
             <img
               class="icono-editar"
               src="/static/img/editar.webp"
@@ -173,7 +173,7 @@
             </span>
           </div>
           <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
-          <a href="/pago/{{.ID}}/modificar">
+          <a href="/pago/{{.ID}}/modificar" title="Editar">
             <img class="icono-editar" src="/static/img/editar.webp" />
           </a>
         </div>

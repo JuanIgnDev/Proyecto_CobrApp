@@ -81,3 +81,33 @@ func MacroEstadisticaMensualVentas(db *sql.DB) ([13]int, error) {
 
 	return meses, rows.Err()
 }
+
+
+func ObtenerVentaPorId(db *sql.DB, compraId int) (*Compra, error){
+
+	var compra Compra
+
+	err := db.QueryRow(`
+		SELECT id, cliente_id, total, descripcion, fecha
+		FROM compra
+		WHERE id = ?
+	`, compraId).Scan(&compra.ID, &compra.ClienteID, &compra.Total, &compra.Descripcion,&compra.Fecha)
+	
+	if err != nil {
+		return nil, err
+	}
+
+	return &compra, nil
+}
+
+func ModificarVenta(db *sql.DB, id int, total float64, descripcion string) error{
+
+	_, err := db.Exec(`
+		UPDATE compra
+		SET total = ?,
+			descripcion = ?
+		WHERE id = ?
+	`, total, descripcion, id)
+
+	return err
+}

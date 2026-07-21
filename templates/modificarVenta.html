@@ -1,6 +1,6 @@
 {{define "contenido"}}
 <main class="libro">
-  <a href="/clientes/{{.Pago.ClienteID}}" class="btn-cancelar btn-volver"
+  <a href="/clientes/{{.Compra.ClienteID}}" class="btn-cancelar btn-volver"
     >&larr; Volver a la ficha</a
   >
 
@@ -10,38 +10,38 @@
 
   <form
     method="POST"
-    action="/pago/{{.Pago.ID}}/modificar"
+    action="/venta/{{.Compra.ID}}/modificar"
     class="form-cliente"
   >
-    <label for="monto">Total</label>
+    <label for="total">Total</label>
     <input
       type="text"
       inputmode="decimal"
-      id="monto"
-      name="monto"
+      id="total"
+      name="total"
       class="input-moneda"
       placeholder="0,00"
       autocomplete="off"
-      value="{{.Pago.Monto}}"
+      value="{{.Compra.Total}}"
       required
       autofocus
     />
 
-    <label for="observacion">Observación</label>
+    <label for="descripcion">Descripción</label>
     <input
       type="text"
-      id="observacion"
-      name="observacion"
-      placeholder="Ej: Pago parcial en efectivo"
-      value="{{.Pago.Observacion}}"
+      id="descripcion"
+      name="descripcion"
+      placeholder="Ej: 2 kg de harina"
+      value="{{.Compra.Descripcion}}"
     />
 
     <div class="form-acciones">
-      <button type="submit" class="btn-nuevo btn-pagar">Modificar cobro</button>
+      <button type="submit" class="btn-nuevo btn-pagar">Modificar venta</button>
       <button
         class="btn-nuevo"
         type="button"
-        onclick="location.href = '/clientes/{{.Pago.ClienteID}}'"
+        onclick="location.href = '/clientes/{{.Compra.ClienteID}}'"
       >
         Cancelar
       </button>
