@@ -3,13 +3,17 @@
   <a href="/" class="btn-cancelar btn-volver">&larr; Volver al inicio</a>
 
   <!-- Balance: el dato principal, arriba de todo -->
-  <section class="balance-hero {{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}a-favor{{else}}al-dia{{end}}">
+  <section
+    class="balance-hero {{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}a-favor{{else}}al-dia{{end}}"
+  >
     {{if gt .Saldo 0.0}}
     <span class="balance-label">Debe:</span>
     <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
     {{else if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
     <span class="balance-label">A favor</span>
-    <span class="balance-monto balance-monto-favor">+${{slice $saldoTxt 1}}</span>
+    <span class="balance-monto balance-monto-favor"
+      >+${{slice $saldoTxt 1}}</span
+    >
     {{else}}
     <span class="balance-label">Saldo actual</span>
     <span class="balance-monto">Al día</span>
@@ -50,9 +54,7 @@
 
   <!-- LO QUE VA A MOSTRAR CUANDO SE INTENTE ELIMINAR -->
   {{if .Error}}
-  <p class="saldo debe mensaje-error" id="error-login">
-    {{.Error}}
-  </p>
+  <p class="saldo debe mensaje-error" id="error-login">{{.Error}}</p>
   {{end}}
 
   <div class="modal-overlay oculto" id="confirmacion">
@@ -78,11 +80,14 @@
             type="button"
             class="btn-nuevo btn-ingresar"
             onclick="dejarDeMostrarConfirmacion()"
-            >
+          >
             Cancelar
           </button>
-          <button type="submit" class="btn-nuevo btn-confirmar-elim btn-ingresar">
-            Confirmar eliminación 
+          <button
+            type="submit"
+            class="btn-nuevo btn-confirmar-elim btn-ingresar"
+          >
+            Confirmar eliminación
           </button>
         </div>
       </form>
@@ -101,15 +106,15 @@
     <button
       class="btn-nuevo btn-pagar"
       type="button"
-      onclick="location.href='/clientes/{{.ID}}/pago_nuevo'"
+      onclick="location.href='/clientes/{{.ID}}/cobro_nuevo'"
     >
-      + Registrar Pago
+      + Registrar Cobro
     </button>
   </div>
-<!-- Cabecera de Historial con Filtro Dinámico -->
+  <!-- Cabecera de Historial con Filtro Dinámico -->
   <div class="historial-header">
     <h2 class="historial-titulo">Historial de Movimientos</h2>
-    
+
     <div class="filtro-mes-container">
       <label for="filtro-mes" class="filtro-mes-label">Filtrar por mes:</label>
       <select id="filtro-mes" class="input-mes">
@@ -119,12 +124,12 @@
   </div>
   <div class="contenedor-tablas">
     <section class="ficha-seccion">
-      <h3>Compras</h3>
+      <h3>Ventas</h3>
 
-      {{if .Compras}}
-      <div id="lista-compras">
-        {{range $index, $compra := .Compras}}
-        <div class="fila-cliente compra-item {{if ge $index 3}}oculto{{end}}">
+      {{if .Ventas}}
+      <div id="lista-ventas">
+        {{range $index, $venta := .Ventas}}
+        <div class="fila-cliente venta-item {{if ge $index 3}}oculto{{end}}">
           <div class="item-detalles">
             <span class="item-fecha">{{.Fecha}}</span>
             {{if .Descripcion}}
@@ -132,47 +137,57 @@
             {{end}}
           </div>
           <span class="saldo debe">${{printf "%.2f" .Total}}</span>
+          <a href="/venta/{{.ID}}/modificar" title="Editar">
+            <img
+              class="icono-editar"
+              src="/static/img/editar.webp"
+              alt="Editar"
+            />
+          </a>
         </div>
         {{end}}
       </div>
 
-      {{if gt (len .Compras) 3}}
+      {{if gt (len .Ventas) 3}}
       <div class="historial-footer">
-        <button id="btn-ver-compras" type="button" class="btn-historial">
-          Ver historial completo ({{len .Compras}}) ↓
+        <button id="btn-ver-ventas" type="button" class="btn-historial">
+          Ver historial completo ({{len .Ventas}}) ↓
         </button>
       </div>
       {{end}} {{else}}
-      <p class="vacio-inline">Todavía no hay compras cargadas.</p>
+      <p class="vacio-inline">Todavía no hay ventas cargadas.</p>
       {{end}}
     </section>
 
     <section class="ficha-seccion">
-      <h3>Pagos</h3>
+      <h3>Cobros</h3>
 
-      {{if .Pagos}}
-      <div id="lista-pagos">
-        {{range $index, $pago := .Pagos}}
-        <div class="fila-cliente pago-item {{if ge $index 3}}oculto{{end}}">
+      {{if .Cobros}}
+      <div id="lista-cobros">
+        {{range $index, $cobro := .Cobros}}
+        <div class="fila-cliente cobro-item {{if ge $index 3}}oculto{{end}}">
           <div class="item-detalles">
             <span class="item-fecha">{{.Fecha}}</span>
             <span class="item-descripcion">
-              {{if .Observacion}}{{.Observacion}}{{else}}PAGO{{end}}
+              {{if .Observacion}}{{.Observacion}}{{else}}Pagó{{end}}
             </span>
           </div>
           <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
+          <a href="/cobro/{{.ID}}/modificar" title="Editar">
+            <img class="icono-editar" src="/static/img/editar.webp" />
+          </a>
         </div>
         {{end}}
       </div>
 
-      {{if gt (len .Pagos) 3}}
+      {{if gt (len .Cobros) 3}}
       <div class="historial-footer">
-        <button id="btn-ver-pagos" type="button" class="btn-historial">
-          Ver historial completo ({{len .Pagos}}) ↓
+        <button id="btn-ver-cobros" type="button" class="btn-historial">
+          Ver historial completo ({{len .Cobros}}) ↓
         </button>
       </div>
       {{end}} {{else}}
-      <p class="vacio-inline">Todavía no hay pagos cargados.</p>
+      <p class="vacio-inline">Todavía no hay cobros cargados.</p>
       {{end}}
     </section>
   </div>
@@ -202,11 +217,11 @@
     }
   });
 
-  // LÓGICA DE HISTORIAL DESPLEGABLE (COMPRAS)
-  const btnVerCompras = document.getElementById("btn-ver-compras");
-  if (btnVerCompras) {
-    btnVerCompras.addEventListener("click", function () {
-      const items = document.querySelectorAll(".compra-item");
+  // LÓGICA DE HISTORIAL DESPLEGABLE (VENTAS)
+  const btnVerVentas = document.getElementById("btn-ver-ventas");
+  if (btnVerVentas) {
+    btnVerVentas.addEventListener("click", function () {
+      const items = document.querySelectorAll(".venta-item");
       const expandir = this.innerText.includes("completo");
 
       items.forEach((item, index) => {
@@ -221,11 +236,11 @@
     });
   }
 
-  // LÓGICA DE HISTORIAL DESPLEGABLE (PAGOS)
-  const btnVerPagos = document.getElementById("btn-ver-pagos");
-  if (btnVerPagos) {
-    btnVerPagos.addEventListener("click", function () {
-      const items = document.querySelectorAll(".pago-item");
+  // LÓGICA DE HISTORIAL DESPLEGABLE (COBROS)
+  const btnVerCobros = document.getElementById("btn-ver-cobros");
+  if (btnVerCobros) {
+    btnVerCobros.addEventListener("click", function () {
+      const items = document.querySelectorAll(".cobro-item");
       const expandir = this.innerText.includes("completo");
 
       items.forEach((item, index) => {
@@ -244,19 +259,19 @@
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".balance-monto, .saldo").forEach((el) => {
       let texto = el.textContent;
-      
+
       // Busca números con decimales (ej: 89361.00)
-      let numero = texto.match(/[\d.]+/); 
-      
+      let numero = texto.match(/[\d.]+/);
+
       if (numero && texto.includes("$")) {
         let valor = parseFloat(numero[0]);
-        
+
         // Reemplaza el texto crudo por el formateado (ej: 89.361,00)
         let formateado = valor.toLocaleString("es-AR", {
           minimumFractionDigits: 2,
-          maximumFractionDigits: 2
+          maximumFractionDigits: 2,
         });
-        
+
         el.textContent = texto.replace(numero[0], formateado);
       }
     });
@@ -265,8 +280,8 @@
   const selectMes = document.getElementById("filtro-mes");
 
   if (selectMes) {
-    const compras = document.querySelectorAll(".compra-item");
-    const pagos = document.querySelectorAll(".pago-item");
+    const ventas = document.querySelectorAll(".venta-item");
+    const cobros = document.querySelectorAll(".cobro-item");
     const mesesSet = new Set(); // Usamos un Set para no tener meses repetidos
 
     // 1. Recolectar todos los meses únicos que existen en el historial del cliente
@@ -278,14 +293,28 @@
       }
     };
 
-    compras.forEach(extraerMes);
-    pagos.forEach(extraerMes);
+    ventas.forEach(extraerMes);
+    cobros.forEach(extraerMes);
 
     // 2. Ordenar las fechas de más nuevas a más viejas y crear las opciones
     const mesesArray = Array.from(mesesSet).sort().reverse();
-    const nombresMeses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    const nombresMeses = [
+      "",
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
 
-    mesesArray.forEach(mesStr => {
+    mesesArray.forEach((mesStr) => {
       const [year, month] = mesStr.split("-");
       // Convertimos el "07" a número para buscar "Julio" en el array
       const nombreFormateado = nombresMeses[parseInt(month, 10)] + " " + year;
@@ -297,36 +326,39 @@
     });
 
     // 3. Filtrar las tablas cuando el usuario elige un mes de la lista
-    selectMes.addEventListener("change", function() {
+    selectMes.addEventListener("change", function () {
       const mesBuscado = this.value;
 
-      const footerCompras = document.getElementById("btn-ver-compras") ? document.getElementById("btn-ver-compras").parentElement : null;
-      const footerPagos = document.getElementById("btn-ver-pagos") ? document.getElementById("btn-ver-pagos").parentElement : null;
+      const footerVentas = document.getElementById("btn-ver-ventas")
+        ? document.getElementById("btn-ver-ventas").parentElement
+        : null;
+      const footerCobros = document.getElementById("btn-ver-cobros")
+        ? document.getElementById("btn-ver-cobros").parentElement
+        : null;
 
       if (mesBuscado !== "") {
         // MODO FILTRADO: Ocultar expansores y mostrar solo coincidencias del mes
-        if (footerCompras) footerCompras.classList.add("oculto");
-        if (footerPagos) footerPagos.classList.add("oculto");
+        if (footerVentas) footerVentas.classList.add("oculto");
+        if (footerCobros) footerCobros.classList.add("oculto");
 
-        compras.forEach(item => {
+        ventas.forEach((item) => {
           const fecha = item.querySelector(".item-fecha").textContent.trim();
           item.style.display = fecha.startsWith(mesBuscado) ? "flex" : "none";
         });
 
-        pagos.forEach(item => {
+        cobros.forEach((item) => {
           const fecha = item.querySelector(".item-fecha").textContent.trim();
           item.style.display = fecha.startsWith(mesBuscado) ? "flex" : "none";
         });
-
       } else {
         // MODO NORMAL (Todos los meses): Mostrar máximo 3 y botones expansores
-        if (footerCompras) footerCompras.classList.remove("oculto");
-        if (footerPagos) footerPagos.classList.remove("oculto");
+        if (footerVentas) footerVentas.classList.remove("oculto");
+        if (footerCobros) footerCobros.classList.remove("oculto");
 
-        compras.forEach((item, index) => {
+        ventas.forEach((item, index) => {
           item.style.display = index < 3 ? "flex" : "none";
         });
-        pagos.forEach((item, index) => {
+        cobros.forEach((item, index) => {
           item.style.display = index < 3 ? "flex" : "none";
         });
       }

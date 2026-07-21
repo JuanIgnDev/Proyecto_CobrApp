@@ -1,25 +1,16 @@
 {{define "contenido"}}
 <main class="libro">
-  <a
-    href="/clientes/{{.Cliente.ID}}"
-    class="btn-cancelar btn-volver"
+  <a href="/clientes/{{.Cobro.ClienteID}}" class="btn-cancelar btn-volver"
     >&larr; Volver a la ficha</a
   >
 
-  {{if gt .Cliente.Saldo 0.0}}
-  <div class="balance-hero debe">
-    <span class="balance-label">Saldo antes de este pago</span>
-    <span class="balance-monto">${{printf "%.2f" .Cliente.Saldo}}</span>
-  </div>
-  {{end}} {{if .Error}}
-  <p id="form-error" class="saldo debe mensaje-error">
-    {{.Error}}
-  </p>
+  {{if .Error}}
+  <p id="form-error" class="saldo debe mensaje-error">{{.Error}}</p>
   {{end}}
 
   <form
     method="POST"
-    action="/clientes/{{.Cliente.ID}}/pago_nuevo"
+    action="/cobro/{{.Cobro.ID}}/modificar"
     class="form-cliente"
   >
     <label for="monto">Total</label>
@@ -31,6 +22,7 @@
       class="input-moneda"
       placeholder="0,00"
       autocomplete="off"
+      value="{{.Cobro.Monto}}"
       required
       autofocus
     />
@@ -40,15 +32,19 @@
       type="text"
       id="observacion"
       name="observacion"
-      placeholder="Ej: Pago parcial en efectivo"
+      placeholder="Ej: Cobro parcial en efectivo"
+      value="{{.Cobro.Observacion}}"
     />
 
+    <label for="fecha">Fecha (si se deja vacío, se usa la fecha de hoy)</label>
+    <input type="date" id="fecha" name="fecha" value="{{slice .Cobro.Fecha 0 10}}" />
+
     <div class="form-acciones">
-      <button type="submit" class="btn-nuevo btn-pagar">Registrar cobro</button>
+      <button type="submit" class="btn-nuevo btn-pagar">Modificar cobro</button>
       <button
         class="btn-nuevo"
         type="button"
-        onclick="location.href = '/clientes/{{.Cliente.ID}}'"
+        onclick="location.href = '/clientes/{{.Cobro.ClienteID}}'"
       >
         Cancelar
       </button>

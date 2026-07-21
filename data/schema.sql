@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS cliente (
     creado_en   TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Compra: cada cliente puede tener muchas compras (1..N)
-CREATE TABLE IF NOT EXISTS compra (
+-- Venta: cada cliente puede tener muchas ventas (1..N)
+CREATE TABLE IF NOT EXISTS venta (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     cliente_id   INTEGER NOT NULL,
     total        REAL NOT NULL CHECK (total >= 0),
@@ -23,10 +23,10 @@ CREATE TABLE IF NOT EXISTS compra (
     FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE
 );
 
--- Pago: cada cliente puede tener muchos pagos (1..N)
--- OJO: en el diagrama el pago se asocia a la CUENTA del cliente,
--- no a una compra específica (modelo de cuenta corriente).
-CREATE TABLE IF NOT EXISTS pago (
+-- Cobro: cada cliente puede tener muchos cobros (1..N)
+-- OJO: en el diagrama el cobro se asocia a la CUENTA del cliente,
+-- no a una venta específica (modelo de cuenta corriente).
+CREATE TABLE IF NOT EXISTS cobro (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     cliente_id   INTEGER NOT NULL,
     monto        REAL NOT NULL CHECK (monto > 0),
@@ -36,10 +36,10 @@ CREATE TABLE IF NOT EXISTS pago (
 );
 
 -- Índices para consultas frecuentes (historial por cliente)
-CREATE INDEX IF NOT EXISTS idx_compra_cliente ON compra(cliente_id);
-CREATE INDEX IF NOT EXISTS idx_pago_cliente ON pago(cliente_id);
+CREATE INDEX IF NOT EXISTS idx_venta_cliente ON venta(cliente_id);
+CREATE INDEX IF NOT EXISTS idx_cobro_cliente ON cobro(cliente_id);
 
--- Vista de saldo/deuda por cliente: total comprado - total pagado
+-- Vista de saldo/deuda por cliente: total vendido - total cobrado
 CREATE VIEW IF NOT EXISTS vista_saldo_cliente AS
 SELECT
     c.id AS cliente_id,
@@ -47,8 +47,8 @@ SELECT
     c.apellido,
     c.email,
     c.telefono,
-    COALESCE((SELECT SUM(total) FROM compra WHERE compra.cliente_id = c.id), 0) AS total_comprado,
-    COALESCE((SELECT SUM(monto) FROM pago WHERE pago.cliente_id = c.id), 0) AS total_pagado,
-    COALESCE((SELECT SUM(total) FROM compra WHERE compra.cliente_id = c.id), 0)
-      - COALESCE((SELECT SUM(monto) FROM pago WHERE pago.cliente_id = c.id), 0) AS saldo_pendiente
+    COALESCE((SELECT SUM(total) FROM venta WHERE venta.cliente_id = c.id), 0) AS total_vendido,
+    COALESCE((SELECT SUM(monto) FROM cobro WHERE cobro.cliente_id = c.id), 0) AS total_cobrado,
+    COALESCE((SELECT SUM(total) FROM venta WHERE venta.cliente_id = c.id), 0)
+      - COALESCE((SELECT SUM(monto) FROM cobro WHERE cobro.cliente_id = c.id), 0) AS saldo_pendiente
 FROM cliente c;

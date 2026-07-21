@@ -1,20 +1,16 @@
 {{define "contenido"}}
 <main class="libro">
-  <a
-    href="/clientes/{{.Cliente.ID}}"
-    class="btn-cancelar btn-volver"
+  <a href="/clientes/{{.Venta.ClienteID}}" class="btn-cancelar btn-volver"
     >&larr; Volver a la ficha</a
   >
 
   {{if .Error}}
-  <p id="form-error" class="saldo debe mensaje-error">
-    {{.Error}}
-  </p>
+  <p id="form-error" class="saldo debe mensaje-error">{{.Error}}</p>
   {{end}}
 
   <form
     method="POST"
-    action="/clientes/{{.Cliente.ID}}/venta_nueva"
+    action="/venta/{{.Venta.ID}}/modificar"
     class="form-cliente"
   >
     <label for="total">Total</label>
@@ -26,6 +22,7 @@
       class="input-moneda"
       placeholder="0,00"
       autocomplete="off"
+      value="{{.Venta.Total}}"
       required
       autofocus
     />
@@ -36,17 +33,18 @@
       id="descripcion"
       name="descripcion"
       placeholder="Ej: 2 kg de harina"
+      value="{{.Venta.Descripcion}}"
     />
 
-    <label for="fecha">Fecha (opcional, si no se completa se usa hoy)</label>
-    <input type="date" id="fecha" name="fecha" />
+    <label for="fecha">Fecha (si se deja vacío, se usa la fecha de hoy)</label>
+    <input type="date" id="fecha" name="fecha" value="{{slice .Venta.Fecha 0 10}}" />
 
     <div class="form-acciones">
-      <button type="submit" class="btn-nuevo btn-pagar">Registrar venta</button>
+      <button type="submit" class="btn-nuevo btn-pagar">Modificar venta</button>
       <button
         class="btn-nuevo"
         type="button"
-        onclick="location.href = '/clientes/{{.Cliente.ID}}'"
+        onclick="location.href = '/clientes/{{.Venta.ClienteID}}'"
       >
         Cancelar
       </button>

@@ -6,7 +6,12 @@
     >&larr; Volver a la ficha</a
   >
 
-  {{if .Error}}
+  {{if gt .Cliente.Saldo 0.0}}
+  <div class="balance-hero debe">
+    <span class="balance-label">Saldo antes de este cobro</span>
+    <span class="balance-monto">${{printf "%.2f" .Cliente.Saldo}}</span>
+  </div>
+  {{end}} {{if .Error}}
   <p id="form-error" class="saldo debe mensaje-error">
     {{.Error}}
   </p>
@@ -14,15 +19,15 @@
 
   <form
     method="POST"
-    action="/clientes/{{.Cliente.ID}}/venta_nueva"
+    action="/clientes/{{.Cliente.ID}}/cobro_nuevo"
     class="form-cliente"
   >
-    <label for="total">Total</label>
+    <label for="monto">Total</label>
     <input
       type="text"
       inputmode="decimal"
-      id="total"
-      name="total"
+      id="monto"
+      name="monto"
       class="input-moneda"
       placeholder="0,00"
       autocomplete="off"
@@ -30,19 +35,19 @@
       autofocus
     />
 
-    <label for="descripcion">Descripción</label>
+    <label for="observacion">Observación</label>
     <input
       type="text"
-      id="descripcion"
-      name="descripcion"
-      placeholder="Ej: 2 kg de harina"
+      id="observacion"
+      name="observacion"
+      placeholder="Ej: Cobro parcial en efectivo"
     />
 
     <label for="fecha">Fecha (opcional, si no se completa se usa hoy)</label>
     <input type="date" id="fecha" name="fecha" />
 
     <div class="form-acciones">
-      <button type="submit" class="btn-nuevo btn-pagar">Registrar venta</button>
+      <button type="submit" class="btn-nuevo btn-pagar">Registrar cobro</button>
       <button
         class="btn-nuevo"
         type="button"
