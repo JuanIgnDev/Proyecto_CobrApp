@@ -37,8 +37,12 @@
         </div>
 
         <div class="retoque_header_hijo">
+          <!--Aca agrego la bandeja de notificaciones en caso de estar la seision iniciada-->
+          {{template "bandejaDeEntrada" .}}
+        </div>
+        <div class="retoque_header_hijo">
           <!--Aca agrego boton de cerrar sesion en caso de estar la seision iniciada-->
-          {{block "acciones-header" .}}
+          {{block "acciones-header-cerrarSesion" .}}
           <form method="POST" action="/logout">
             <button type="submit" class="btn-nuevo">Cerrar sesión</button>
           </form>
@@ -52,11 +56,13 @@
       <div class="div-sideBar">{{template "sideBar" .}}</div>
       {{block "contenido" .}}{{end}}
     </main>
-    
+
     <footer class="footer-app">
       <span class="footer-logo">CobrApp.</span>
       <p>Desarrollado por Juan Ignacio Estanguet y Elias Magnoli.</p>
-      <span class="footer-copy">&copy; 2026 Todos los derechos reservados.</span>
+      <span class="footer-copy"
+        >&copy; 2026 Todos los derechos reservados.</span
+      >
     </footer>
 
     <!-- Contenedor para los Toasts -->
@@ -142,16 +148,16 @@
               "toastMsg",
               "La venta se guardó correctamente",
             );
-          } else if (form.action.includes("eliminar")){
+          } else if (form.action.includes("eliminar")) {
             sessionStorage.setItem(
               "toastMsg",
-              "El cliente se eliminó correctamente"
-            )
-          } else if (form.action.includes("editar")){
+              "El cliente se eliminó correctamente",
+            );
+          } else if (form.action.includes("editar")) {
             sessionStorage.setItem(
               "toastMsg",
-              "El cliente se modificó correctamente"
-            )
+              "El cliente se modificó correctamente",
+            );
           }
 
           // C. Limpiar la máscara de moneda antes de enviarlo a Go

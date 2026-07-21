@@ -1289,3 +1289,81 @@ body.dark .cover--header {
 .icono-editar {
   width: 30px;
 }
+
+/* TODO SOBRE BANDEJA DE ENTRADA */
+/* CONTENEDOR PRINCIPAL */
+.contenedor-bandejaEntrada {
+  position: relative;
+}
+
+/* BOTÓN */
+.btn-bandejaEntrada {
+  padding: 0.25rem;
+}
+
+.btn-bandejaEntrada img {
+  width: 25px;
+  height: 25px;
+  display: block;
+}
+
+/* BANDEJA DESPLEGABLE */
+.bandejaDeEntrada {
+  position: absolute;
+
+  top: calc(100% + 10px);
+  right: 0;
+
+  width: 320px;
+  max-height: 400px;
+
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+
+  box-shadow: var(--shadow-md);
+  background: var(--accent);
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+/* OCULTAR BANDEJA */
+.bandejaDeEntrada.oculto {
+  display: none;
+}
+
+/* CABECERA */
+.bandejaDeEntrada-header {
+  padding: 1rem;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.bandejaDeEntrada-header h3 {
+  text-align: center;
+  margin: 0;
+  color: black;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* CONTENIDO */
+.bandejaDeEntrada-contenido {
+  padding: 1rem;
+}
+
+.bandejaDeEntrada-contenido p {
+  text-align: center;
+  color: black;
+  padding: 0 0 1rem;
+}
+
+/* NOTIFICACIÓN INDIVIDUAL */
+.notificacion {
+  padding: 0.75rem;
+
+  border-bottom: 1px solid var(--border);
+}
+
+.notificacion:last-child {
+  border-bottom: none;
+}
