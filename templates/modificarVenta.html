@@ -1,6 +1,6 @@
 {{define "contenido"}}
 <main class="libro">
-  <a href="/clientes/{{.Compra.ClienteID}}" class="btn-cancelar btn-volver"
+  <a href="/clientes/{{.Venta.ClienteID}}" class="btn-cancelar btn-volver"
     >&larr; Volver a la ficha</a
   >
 
@@ -10,7 +10,7 @@
 
   <form
     method="POST"
-    action="/venta/{{.Compra.ID}}/modificar"
+    action="/venta/{{.Venta.ID}}/modificar"
     class="form-cliente"
   >
     <label for="total">Total</label>
@@ -22,7 +22,7 @@
       class="input-moneda"
       placeholder="0,00"
       autocomplete="off"
-      value="{{.Compra.Total}}"
+      value="{{.Venta.Total}}"
       required
       autofocus
     />
@@ -33,15 +33,18 @@
       id="descripcion"
       name="descripcion"
       placeholder="Ej: 2 kg de harina"
-      value="{{.Compra.Descripcion}}"
+      value="{{.Venta.Descripcion}}"
     />
+
+    <label for="fecha">Fecha (si se deja vacío, se usa la fecha de hoy)</label>
+    <input type="date" id="fecha" name="fecha" value="{{slice .Venta.Fecha 0 10}}" />
 
     <div class="form-acciones">
       <button type="submit" class="btn-nuevo btn-pagar">Modificar venta</button>
       <button
         class="btn-nuevo"
         type="button"
-        onclick="location.href = '/clientes/{{.Compra.ClienteID}}'"
+        onclick="location.href = '/clientes/{{.Venta.ClienteID}}'"
       >
         Cancelar
       </button>

@@ -85,12 +85,12 @@ func main() {
 		})
 	}))
 
-	// 4. Formulario de cliente nuevo (mostrar)
+	// Formulario de cliente nuevo (mostrar)
 	mux.HandleFunc("GET /cliente_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		renderizar(w, "base.html", "clienteNuevo.html", struct{ Error string }{})
 	}))
 
-	// 5. Formulario de cliente nuevo (guardar)
+	// Formulario de cliente nuevo (guardar)
 	mux.HandleFunc("POST /cliente_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		nombre := r.FormValue("nombre")
 		apellido := r.FormValue("apellido")
@@ -111,7 +111,7 @@ func main() {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}))
 
-	// 6. Detalle de un cliente puntual
+	// Detalle de un cliente puntual
 	mux.HandleFunc("GET /clientes/{id}", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 
@@ -127,18 +127,18 @@ func main() {
 			return
 		}
 
-		compras := ObtenerComprasDeCliente(db, id)
-		pagos := ObtenerPagosDeCliente(db, id)
+		ventas := ObtenerVentasDeCliente(db, id)
+		cobros := ObtenerCobrosDeCliente(db, id)
 
 		renderizar(w, "base.html", "clienteDetalle.html", struct {
 			*Cliente
-			Compras []Compra
-			Pagos   []Pago
-			Error   string
-		}{Cliente: cliente, Compras: compras, Pagos: pagos, Error: ""})
+			Ventas []Venta
+			Cobros []Cobro
+			Error  string
+		}{Cliente: cliente, Ventas: ventas, Cobros: cobros, Error: ""})
 	}))
 
-	// 8. Formulario de venta nueva (mostrar)
+	// Formulario de venta nueva (mostrar)
 	mux.HandleFunc("GET /clientes/{id}/venta_nueva", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -157,7 +157,7 @@ func main() {
 		}{Cliente: cliente})
 	}))
 
-	// 9. Formulario de venta nueva (guardar)
+	// Formulario de venta nueva (guardar)
 	mux.HandleFunc("POST /clientes/{id}/venta_nueva", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -167,6 +167,7 @@ func main() {
 
 		totalStr := r.FormValue("total")
 		descripcion := r.FormValue("descripcion")
+		fechaForm := r.FormValue("fecha")
 
 		total, err := strconv.ParseFloat(totalStr, 64)
 		if err != nil || total <= 0 {
@@ -178,8 +179,18 @@ func main() {
 			return
 		}
 
-		if err := CrearCompra(db, id, total, descripcion); err != nil {
-			log.Println("Error creando compra:", err)
+		fecha, err := normalizarFecha(fechaForm)
+		if err != nil {
+			cliente, _ := ObtenerClientePorID(db, id)
+			renderizar(w, "base.html", "ventaNueva.html", struct {
+				Cliente *Cliente
+				Error   string
+			}{Cliente: cliente, Error: "La fecha ingresada no es válida."})
+			return
+		}
+
+		if err := CrearVenta(db, id, total, descripcion, fecha); err != nil {
+			log.Println("Error creando venta:", err)
 			http.Error(w, "No se pudo guardar la venta", http.StatusInternalServerError)
 			return
 		}
@@ -187,8 +198,8 @@ func main() {
 		http.Redirect(w, r, "/clientes/"+strconv.Itoa(id), http.StatusSeeOther)
 	}))
 
-	// 10. Formulario de pago nuevo (mostrar)
-	mux.HandleFunc("GET /clientes/{id}/pago_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+	// Formulario de cobro nuevo (mostrar)
+	mux.HandleFunc("GET /clientes/{id}/cobro_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -201,14 +212,14 @@ func main() {
 			return
 		}
 
-		renderizar(w, "base.html", "pagoNuevo.html", struct {
+		renderizar(w, "base.html", "cobroNuevo.html", struct {
 			Cliente *Cliente
 			Error   string
 		}{Cliente: cliente})
 	}))
 
-	// 11. Formulario de pago nuevo (guardar)
-	mux.HandleFunc("POST /clientes/{id}/pago_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+	// Formulario de cobro nuevo (guardar)
+	mux.HandleFunc("POST /clientes/{id}/cobro_nuevo", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			http.Error(w, "ID inválido", http.StatusBadRequest)
@@ -217,20 +228,31 @@ func main() {
 
 		montoStr := r.FormValue("monto")
 		observacion := r.FormValue("observacion")
+		fechaForm := r.FormValue("fecha")
 
 		monto, err := strconv.ParseFloat(montoStr, 64)
 		if err != nil || monto <= 0 {
 			cliente, _ := ObtenerClientePorID(db, id)
-			renderizar(w, "base.html", "pagoNuevo.html", struct {
+			renderizar(w, "base.html", "cobroNuevo.html", struct {
 				Cliente *Cliente
 				Error   string
 			}{Cliente: cliente, Error: "El monto tiene que ser un número mayor a 0."})
 			return
 		}
 
-		if err := CrearPago(db, id, monto, observacion); err != nil {
-			log.Println("Error creando pago:", err)
-			http.Error(w, "No se pudo guardar el pago", http.StatusInternalServerError)
+		fecha, err := normalizarFecha(fechaForm)
+		if err != nil {
+			cliente, _ := ObtenerClientePorID(db, id)
+			renderizar(w, "base.html", "cobroNuevo.html", struct {
+				Cliente *Cliente
+				Error   string
+			}{Cliente: cliente, Error: "La fecha ingresada no es válida."})
+			return
+		}
+
+		if err := CrearCobro(db, id, monto, observacion, fecha); err != nil {
+			log.Println("Error creando cobro:", err)
+			http.Error(w, "No se pudo guardar el cobro", http.StatusInternalServerError)
 			return
 		}
 
@@ -299,21 +321,21 @@ func main() {
 			return
 		}
 
-		compras := ObtenerComprasDeCliente(db, id)
-		pagos := ObtenerPagosDeCliente(db, id)
+		ventas := ObtenerVentasDeCliente(db, id)
+		cobros := ObtenerCobrosDeCliente(db, id)
 
 		password := r.FormValue("password")
 
 		if !validarCredenciales("admin", password) {
 			renderizar(w, "base.html", "clienteDetalle.html", struct {
 				*Cliente
-				Compras []Compra
-				Pagos   []Pago
-				Error   string
+				Ventas []Venta
+				Cobros []Cobro
+				Error  string
 			}{
 				Cliente: cliente,
-				Compras: compras,
-				Pagos:   pagos,
+				Ventas:  ventas,
+				Cobros:  cobros,
 				Error:   "Contraseña incorrecta.",
 			})
 			return
@@ -322,13 +344,13 @@ func main() {
 		if err := eliminarCliente(db, id); err != nil {
 			renderizar(w, "base.html", "clienteDetalle.html", struct {
 				*Cliente
-				Compras []Compra
-				Pagos   []Pago
-				Error   string
+				Ventas []Venta
+				Cobros []Cobro
+				Error  string
 			}{
 				Cliente: cliente,
-				Compras: compras,
-				Pagos:   pagos,
+				Ventas:  ventas,
+				Cobros:  cobros,
 				Error:   "No se pudo eliminar el cliente.",
 			})
 			return
@@ -425,9 +447,8 @@ func main() {
 		renderizar(w, "base.html", "contacto.html", nil)
 	}))
 
-
-	// Modificar Cobros
-	mux.HandleFunc("GET /pago/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+	// Modificar cobros
+	mux.HandleFunc("GET /cobro/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
 		id, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
@@ -435,56 +456,69 @@ func main() {
 			return
 		}
 
-		pago, err := ObtenerPagoPorId(db, id)
+		cobro, err := ObtenerCobroPorID(db, id)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
-		renderizar(w, "base.html", "modificarPago.html", struct {
-			Pago *Pago
-			Error   string
-		}{Pago: pago})
+		renderizar(w, "base.html", "modificarCobro.html", struct {
+			Cobro *Cobro
+			Error string
+		}{Cobro: cobro})
 	}))
 
+	mux.HandleFunc("POST /cobro/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
-	mux.HandleFunc("POST /pago/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
-
-		pagoId, err := strconv.Atoi(r.PathValue("id"))
-
+		cobroID, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			http.Error(w, "ID inválido", http.StatusBadRequest)
 			return
 		}
-		monto := r.FormValue("monto")
 
-		montoFloat, err := strconv.ParseFloat(monto, 64)
+		montoStr := r.FormValue("monto")
+		montoFloat, err := strconv.ParseFloat(montoStr, 64)
 		if err != nil {
-			renderizar(w, "base.html", "modificarPago.html", struct{ Error string }{Error: "Monto invalido."})
+			cobro, _ := ObtenerCobroPorID(db, cobroID)
+			renderizar(w, "base.html", "modificarCobro.html", struct {
+				Cobro *Cobro
+				Error string
+			}{Cobro: cobro, Error: "Monto inválido."})
 			return
 		}
+
 		observacion := r.FormValue("observacion")
-		//aca agregar fecha
+		fechaForm := r.FormValue("fecha")
 
-		if err := ModificarPago(db,pagoId, montoFloat, observacion); err != nil {
-			log.Println("Error modificando el pago:", err)
-			renderizar(w, "base.html", "modificarPago.html", struct{ Error string }{Error: "No se pudo modificar el cobro."})
+		fecha, err := normalizarFecha(fechaForm)
+		if err != nil {
+			cobro, _ := ObtenerCobroPorID(db, cobroID)
+			renderizar(w, "base.html", "modificarCobro.html", struct {
+				Cobro *Cobro
+				Error string
+			}{Cobro: cobro, Error: "La fecha ingresada no es válida."})
 			return
 		}
 
+		if err := ModificarCobro(db, cobroID, montoFloat, observacion, fecha); err != nil {
+			log.Println("Error modificando el cobro:", err)
+			cobro, _ := ObtenerCobroPorID(db, cobroID)
+			renderizar(w, "base.html", "modificarCobro.html", struct {
+				Cobro *Cobro
+				Error string
+			}{Cobro: cobro, Error: "No se pudo modificar el cobro."})
+			return
+		}
 
-		pago, err := ObtenerPagoPorId(db, pagoId)
+		cobro, err := ObtenerCobroPorID(db, cobroID)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 
-		idCliente := pago.ClienteID
-		http.Redirect(w, r, "/clientes/"+strconv.Itoa(idCliente), http.StatusSeeOther)
+		http.Redirect(w, r, "/clientes/"+strconv.Itoa(cobro.ClienteID), http.StatusSeeOther)
 	}))
 
-
-
-	// Modificar Ventas
+	// Modificar ventas
 	mux.HandleFunc("GET /venta/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
 		id, err := strconv.Atoi(r.PathValue("id"))
@@ -493,53 +527,67 @@ func main() {
 			return
 		}
 
-		compra, err := ObtenerVentaPorId(db, id)
+		venta, err := ObtenerVentaPorID(db, id)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 		renderizar(w, "base.html", "modificarVenta.html", struct {
-			Compra *Compra
-			Error   string
-		}{Compra: compra})
+			Venta *Venta
+			Error string
+		}{Venta: venta})
 	}))
-
 
 	mux.HandleFunc("POST /venta/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
-		ventaId, err := strconv.Atoi(r.PathValue("id"))
-
+		ventaID, err := strconv.Atoi(r.PathValue("id"))
 		if err != nil {
 			http.Error(w, "ID inválido", http.StatusBadRequest)
 			return
 		}
-		total := r.FormValue("total")
 
-		totalFloat, err := strconv.ParseFloat(total, 64)
+		totalStr := r.FormValue("total")
+		totalFloat, err := strconv.ParseFloat(totalStr, 64)
 		if err != nil {
-			renderizar(w, "base.html", "modificarVenta.html", struct{ Error string }{Error: "Total invalido."})
+			venta, _ := ObtenerVentaPorID(db, ventaID)
+			renderizar(w, "base.html", "modificarVenta.html", struct {
+				Venta *Venta
+				Error string
+			}{Venta: venta, Error: "Total inválido."})
 			return
 		}
+
 		descripcion := r.FormValue("descripcion")
-		//aca agregar fecha
+		fechaForm := r.FormValue("fecha")
 
-		if err := ModificarVenta(db,ventaId, totalFloat, descripcion); err != nil {
-			log.Println("Error modificando la venta:", err)
-			renderizar(w, "base.html", "modificarVenta.html", struct{ Error string }{Error: "No se pudo modificar la venta!."})
+		fecha, err := normalizarFecha(fechaForm)
+		if err != nil {
+			venta, _ := ObtenerVentaPorID(db, ventaID)
+			renderizar(w, "base.html", "modificarVenta.html", struct {
+				Venta *Venta
+				Error string
+			}{Venta: venta, Error: "La fecha ingresada no es válida."})
 			return
 		}
 
+		if err := ModificarVenta(db, ventaID, totalFloat, descripcion, fecha); err != nil {
+			log.Println("Error modificando la venta:", err)
+			venta, _ := ObtenerVentaPorID(db, ventaID)
+			renderizar(w, "base.html", "modificarVenta.html", struct {
+				Venta *Venta
+				Error string
+			}{Venta: venta, Error: "No se pudo modificar la venta."})
+			return
+		}
 
-		compra, err := ObtenerVentaPorId(db, ventaId)
+		venta, err := ObtenerVentaPorID(db, ventaID)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 
-		idCliente := compra.ClienteID
-		http.Redirect(w, r, "/clientes/"+strconv.Itoa(idCliente), http.StatusSeeOther)
+		http.Redirect(w, r, "/clientes/"+strconv.Itoa(venta.ClienteID), http.StatusSeeOther)
 	}))
-
 
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))

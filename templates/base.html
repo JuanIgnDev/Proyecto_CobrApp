@@ -132,10 +132,10 @@
           // B. Configurar el Toast para cuando la página recargue con éxito
           if (form.action.includes("cliente_nuevo")) {
             sessionStorage.setItem("toastMsg", "Cliente creado exitosamente");
-          } else if (form.action.includes("pago_nuevo")) {
+          } else if (form.action.includes("cobro_nuevo")) {
             sessionStorage.setItem(
               "toastMsg",
-              "El pago se registró correctamente",
+              "El cobro se registró correctamente",
             );
           } else if (form.action.includes("venta_nueva")) {
             sessionStorage.setItem(
