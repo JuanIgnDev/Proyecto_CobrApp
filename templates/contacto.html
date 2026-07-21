@@ -1,46 +1,84 @@
 {{define "contenido"}}
 <main class="libro">
-  <div class="balance-hero al-dia">
+  <!-- Le sacamos la clase "al-dia" para que sea gris neutral -->
+  <div class="balance-hero">
     <span class="balance-label">Soporte y Consultas</span>
     <span class="balance-monto">Contacto</span>
   </div>
 
   <div class="contenedor-tablas">
     <!-- Tarjeta Juani -->
-    <section class="ficha-contacto ficha-desarrollador">
+    <section class="ficha-contacto">
       <h2>Juan Ignacio Estanguet</h2>
-      <dl style="margin-top: 1rem;">
-        <div>
-          <dt>WhatsApp</dt>
-          <dd><a href="https://wa.me/549XXXXXXXXX" target="_blank" class="link-contacto">+54 9 XXXX-XXXXXX</a></dd>
+      
+      <div class="contacto-lista">
+        <div class="contacto-item">
+          <div class="contacto-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="contacto-info">
+            <span class="contacto-label">WhatsApp</span>
+            <a href="https://wa.me/549XXXXXXXXX" target="_blank" class="contacto-valor">+54 9 XXXX-XXXXXX</a>
+          </div>
         </div>
-        <div>
-          <dt>Email</dt>
-          <dd><a href="mailto:juan@ejemplo.com" class="link-contacto">juan@ejemplo.com</a></dd>
+
+        <div class="contacto-item">
+          <div class="contacto-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
+          <div class="contacto-info">
+            <span class="contacto-label">Email</span>
+            <a href="mailto:juan@ejemplo.com" class="contacto-valor">juan@ejemplo.com</a>
+          </div>
         </div>
-        <div>
-          <dt>LinkedIn</dt>
-          <dd><a href="#" target="_blank" class="link-contacto">/in/juanestanguet</a></dd>
+
+        <div class="contacto-item">
+          <div class="contacto-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+          </div>
+          <div class="contacto-info">
+            <span class="contacto-label">LinkedIn</span>
+            <a href="#" target="_blank" class="contacto-valor">/in/juanestanguet</a>
+          </div>
         </div>
-      </dl>
+      </div>
     </section>
+    
     <!-- Tarjeta Elias -->
-    <section class="ficha-contacto ficha-desarrollador">
+    <section class="ficha-contacto">
       <h2>Elias Magnoli</h2>
-      <dl style="margin-top: 1rem;">
-        <div>
-          <dt>WhatsApp</dt>
-          <dd><a href="https://wa.me/549XXXXXXXXX" target="_blank" class="link-contacto">+54 9 XXXX-XXXXXX</a></dd>
+      
+      <div class="contacto-lista">
+        <div class="contacto-item">
+          <div class="contacto-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <div class="contacto-info">
+            <span class="contacto-label">WhatsApp</span>
+            <a href="https://wa.me/549XXXXXXXXX" target="_blank" class="contacto-valor">+54 9 XXXX-XXXXXX</a>
+          </div>
         </div>
-        <div>
-          <dt>Email</dt>
-          <dd><a href="mailto:elias@ejemplo.com" class="link-contacto">elias@ejemplo.com</a></dd>
+
+        <div class="contacto-item">
+          <div class="contacto-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </div>
+          <div class="contacto-info">
+            <span class="contacto-label">Email</span>
+            <a href="mailto:elias@ejemplo.com" class="contacto-valor">elias@ejemplo.com</a>
+          </div>
         </div>
-        <div>
-          <dt>LinkedIn</dt>
-          <dd><a href="#" target="_blank" class="link-contacto">/in/eliasmagnoli</a></dd>
+
+        <div class="contacto-item">
+          <div class="contacto-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+          </div>
+          <div class="contacto-info">
+            <span class="contacto-label">LinkedIn</span>
+            <a href="#" target="_blank" class="contacto-valor">/in/eliasmagnoli</a>
+          </div>
         </div>
-      </dl>
+      </div>
     </section>
   </div>
 </main>

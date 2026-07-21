@@ -1,6 +1,9 @@
 {{define "contenido"}}
 <main class="libro">
-  <a href="/" class="btn-cancelar btn-volver">&larr; Volver al inicio</a>
+  <a href="/" class="link-volver">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+    Volver al inicio
+  </a>
 
   <!-- Balance: el dato principal, arriba de todo -->
   <section
@@ -20,21 +23,29 @@
     {{end}}
   </section>
 
-  <!-- Datos de contacto -->
+  <!-- Datos de contacto con botones flotantes -->
   <section class="ficha-contacto">
+    <!-- BOTONES FLOTANTES EN EL BORDE -->
+    <div class="acciones-flotantes">
+      <button
+        class="btn-flotante editar"
+        onclick="location.href='/clientes/{{.ID}}/editar'"
+        title="Editar cliente"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+      </button>
+      <button
+        type="button"
+        class="btn-flotante eliminar"
+        onclick="mostrarConfirmacion()"
+        title="Eliminar cliente"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+      </button>
+    </div>
+
     <div class="cabecera-contacto">
       <h2>{{.Nombre}} {{.Apellido}}</h2>
-      <div>
-        <button
-          class="btn-nuevo"
-          onclick="location.href='/clientes/{{.ID}}/editar'"
-        >
-          Editar
-        </button>
-        <button type="button" onclick="mostrarConfirmacion()" class="btn-nuevo">
-          Eliminar
-        </button>
-      </div>
     </div>
 
     <dl>
@@ -52,7 +63,7 @@
     </dl>
   </section>
 
-  <!-- LO QUE VA A MOSTRAR CUANDO SE INTENTE ELIMINAR -->
+  <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
   {{if .Error}}
   <p class="saldo debe mensaje-error" id="error-login">{{.Error}}</p>
   {{end}}
@@ -78,14 +89,15 @@
         <div class="modal-buttons">
           <button
             type="button"
-            class="btn-nuevo btn-ingresar"
-            onclick="dejarDeMostrarConfirmacion()"
+            class="btn-secundario"
+            id="btn-cancelar-eliminar"
+            onclick="window.dejarDeMostrarConfirmacion()"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            class="btn-nuevo btn-confirmar-elim btn-ingresar"
+            class="btn-destructivo"
           >
             Confirmar eliminación
           </button>
@@ -111,6 +123,7 @@
       + Registrar Cobro
     </button>
   </div>
+  
   <!-- Cabecera de Historial con Filtro Dinámico -->
   <div class="historial-header">
     <h2 class="historial-titulo">Historial de Movimientos</h2>
@@ -131,18 +144,14 @@
         {{range $index, $venta := .Ventas}}
         <div class="fila-cliente venta-item {{if ge $index 3}}oculto{{end}}">
           <div class="item-detalles">
-            <span class="item-fecha">{{.Fecha}}</span>
+            <span class="item-fecha">{{slice .Fecha 0 10}}</span>
             {{if .Descripcion}}
             <span class="item-descripcion">{{.Descripcion}}</span>
             {{end}}
           </div>
           <span class="saldo debe">${{printf "%.2f" .Total}}</span>
           <a href="/venta/{{.ID}}/modificar" title="Editar">
-            <img
-              class="icono-editar"
-              src="/static/img/editar.webp"
-              alt="Editar"
-            />
+            <svg class="icono-editar" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
           </a>
         </div>
         {{end}}
@@ -167,14 +176,14 @@
         {{range $index, $cobro := .Cobros}}
         <div class="fila-cliente cobro-item {{if ge $index 3}}oculto{{end}}">
           <div class="item-detalles">
-            <span class="item-fecha">{{.Fecha}}</span>
+            <span class="item-fecha">{{slice .Fecha 0 10}}</span>
             <span class="item-descripcion">
               {{if .Observacion}}{{.Observacion}}{{else}}Pagó{{end}}
             </span>
           </div>
           <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
           <a href="/cobro/{{.ID}}/modificar" title="Editar">
-            <img class="icono-editar" src="/static/img/editar.webp" />
+            <svg class="icono-editar" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
           </a>
         </div>
         {{end}}
@@ -194,30 +203,45 @@
 </main>
 
 <script>
-  // LÓGICA DEL MODAL DE CONFIRMACIÓN
-  const overlay = document.getElementById("confirmacion");
-  const modalCard = overlay.querySelector(".modal-card");
+  /* ==================================================
+     1. LÓGICA DEL MODAL DE CONFIRMACIÓN (BLINDADA)
+     ================================================== */
+  window.mostrarConfirmacion = function() {
+    const overlay = document.getElementById("confirmacion");
+    if(overlay) {
+      overlay.classList.remove("oculto");
+      document.body.classList.add("modal-abierto");
+    }
+  };
 
-  function mostrarConfirmacion() {
-    overlay.classList.remove("oculto");
-    document.body.classList.add("modal-abierto");
+  window.dejarDeMostrarConfirmacion = function() {
+    const overlay = document.getElementById("confirmacion");
+    if(overlay) {
+      overlay.classList.add("oculto");
+      document.body.classList.remove("modal-abierto");
+    }
+  };
+
+  // Cerrar al tocar afuera de la tarjeta
+  const overlayElem = document.getElementById("confirmacion");
+  if(overlayElem) {
+    const modalCard = overlayElem.querySelector(".modal-card");
+    overlayElem.addEventListener("click", window.dejarDeMostrarConfirmacion);
+    if(modalCard) {
+      modalCard.addEventListener("click", (e) => e.stopPropagation());
+    }
   }
 
-  function dejarDeMostrarConfirmacion() {
-    overlay.classList.add("oculto");
-    document.body.classList.remove("modal-abierto");
-  }
-
-  overlay.addEventListener("click", dejarDeMostrarConfirmacion);
-  modalCard.addEventListener("click", (e) => e.stopPropagation());
-
+  // Cerrar con Escape
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !overlay.classList.contains("oculto")) {
-      dejarDeMostrarConfirmacion();
+    if (e.key === "Escape") {
+      window.dejarDeMostrarConfirmacion();
     }
   });
 
-  // LÓGICA DE HISTORIAL DESPLEGABLE (VENTAS)
+  /* ==================================================
+     2. LÓGICA DE HISTORIAL DESPLEGABLE
+     ================================================== */
   const btnVerVentas = document.getElementById("btn-ver-ventas");
   if (btnVerVentas) {
     btnVerVentas.addEventListener("click", function () {
@@ -225,18 +249,12 @@
       const expandir = this.innerText.includes("completo");
 
       items.forEach((item, index) => {
-        if (index >= 3) {
-          item.style.display = expandir ? "flex" : "none";
-        }
+        if (index >= 3) item.style.display = expandir ? "flex" : "none";
       });
-
-      this.innerText = expandir
-        ? "Ocultar historial ↑"
-        : "Ver historial completo (" + items.length + ") ↓";
+      this.innerText = expandir ? "Ocultar historial ↑" : "Ver historial completo (" + items.length + ") ↓";
     });
   }
 
-  // LÓGICA DE HISTORIAL DESPLEGABLE (COBROS)
   const btnVerCobros = document.getElementById("btn-ver-cobros");
   if (btnVerCobros) {
     btnVerCobros.addEventListener("click", function () {
@@ -244,100 +262,71 @@
       const expandir = this.innerText.includes("completo");
 
       items.forEach((item, index) => {
-        if (index >= 3) {
-          item.style.display = expandir ? "flex" : "none";
-        }
+        if (index >= 3) item.style.display = expandir ? "flex" : "none";
       });
-
-      this.innerText = expandir
-        ? "Ocultar historial ↑"
-        : "Ver historial completo (" + items.length + ") ↓";
+      this.innerText = expandir ? "Ocultar historial ↑" : "Ver historial completo (" + items.length + ") ↓";
     });
   }
 
-  // LÓGICA DE FORMATEO DE MONEDA
+  /* ==================================================
+     3. LÓGICA DE FORMATEO DE MONEDA
+     ================================================== */
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".balance-monto, .saldo").forEach((el) => {
       let texto = el.textContent;
-
-      // Busca números con decimales (ej: 89361.00)
       let numero = texto.match(/[\d.]+/);
-
       if (numero && texto.includes("$")) {
         let valor = parseFloat(numero[0]);
-
-        // Reemplaza el texto crudo por el formateado (ej: 89.361,00)
         let formateado = valor.toLocaleString("es-AR", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         });
-
         el.textContent = texto.replace(numero[0], formateado);
       }
     });
   });
-  // LÓGICA DE FILTRO MENSUAL
-  const selectMes = document.getElementById("filtro-mes");
 
+  /* ==================================================
+     4. LÓGICA DE FILTRO MENSUAL
+     ================================================== */
+  const selectMes = document.getElementById("filtro-mes");
   if (selectMes) {
     const ventas = document.querySelectorAll(".venta-item");
     const cobros = document.querySelectorAll(".cobro-item");
-    const mesesSet = new Set(); // Usamos un Set para no tener meses repetidos
+    const mesesSet = new Set(); 
 
-    // 1. Recolectar todos los meses únicos que existen en el historial del cliente
     const extraerMes = (item) => {
-      const textoFecha = item.querySelector(".item-fecha").textContent.trim();
-      const partes = textoFecha.split("-"); // Ej: ["2026", "07", "18..."]
-      if (partes.length >= 2) {
-        mesesSet.add(partes[0] + "-" + partes[1]); // Guardamos "2026-07"
+      const textoFechaElem = item.querySelector(".item-fecha");
+      if(textoFechaElem) {
+        const partes = textoFechaElem.textContent.trim().split("-");
+        if (partes.length >= 2) mesesSet.add(partes[0] + "-" + partes[1]); 
       }
     };
 
     ventas.forEach(extraerMes);
     cobros.forEach(extraerMes);
 
-    // 2. Ordenar las fechas de más nuevas a más viejas y crear las opciones
     const mesesArray = Array.from(mesesSet).sort().reverse();
-    const nombresMeses = [
-      "",
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre",
-    ];
+    const nombresMeses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
     mesesArray.forEach((mesStr) => {
       const [year, month] = mesStr.split("-");
-      // Convertimos el "07" a número para buscar "Julio" en el array
       const nombreFormateado = nombresMeses[parseInt(month, 10)] + " " + year;
-
       const option = document.createElement("option");
-      option.value = mesStr; // El valor oculto sigue siendo "2026-07" para que filtre bien
-      option.textContent = nombreFormateado; // El usuario lee "Julio 2026"
+      option.value = mesStr; 
+      option.textContent = nombreFormateado; 
       selectMes.appendChild(option);
     });
 
-    // 3. Filtrar las tablas cuando el usuario elige un mes de la lista
     selectMes.addEventListener("change", function () {
       const mesBuscado = this.value;
-
-      const footerVentas = document.getElementById("btn-ver-ventas")
-        ? document.getElementById("btn-ver-ventas").parentElement
-        : null;
-      const footerCobros = document.getElementById("btn-ver-cobros")
-        ? document.getElementById("btn-ver-cobros").parentElement
-        : null;
+      const footerVentasElem = document.getElementById("btn-ver-ventas");
+      const footerCobrosElem = document.getElementById("btn-ver-cobros");
+      
+      const footerVentas = footerVentasElem ? footerVentasElem.parentElement : null;
+      const footerCobros = footerCobrosElem ? footerCobrosElem.parentElement : null;
 
       if (mesBuscado !== "") {
-        // MODO FILTRADO: Ocultar expansores y mostrar solo coincidencias del mes
         if (footerVentas) footerVentas.classList.add("oculto");
         if (footerCobros) footerCobros.classList.add("oculto");
 
@@ -345,22 +334,16 @@
           const fecha = item.querySelector(".item-fecha").textContent.trim();
           item.style.display = fecha.startsWith(mesBuscado) ? "flex" : "none";
         });
-
         cobros.forEach((item) => {
           const fecha = item.querySelector(".item-fecha").textContent.trim();
           item.style.display = fecha.startsWith(mesBuscado) ? "flex" : "none";
         });
       } else {
-        // MODO NORMAL (Todos los meses): Mostrar máximo 3 y botones expansores
         if (footerVentas) footerVentas.classList.remove("oculto");
         if (footerCobros) footerCobros.classList.remove("oculto");
 
-        ventas.forEach((item, index) => {
-          item.style.display = index < 3 ? "flex" : "none";
-        });
-        cobros.forEach((item, index) => {
-          item.style.display = index < 3 ? "flex" : "none";
-        });
+        ventas.forEach((item, index) => item.style.display = index < 3 ? "flex" : "none");
+        cobros.forEach((item, index) => item.style.display = index < 3 ? "flex" : "none");
       }
     });
   }

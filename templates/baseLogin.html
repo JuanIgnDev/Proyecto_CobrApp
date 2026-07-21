@@ -9,7 +9,6 @@
     <link rel="shortcut icon" href="../static/img/icono.png" />
     <title>CobrApp</title>
 
-    <!-- Este script va acá arriba para evitar que la pantalla parpadee en blanco -->
     <script>
       if (
         localStorage.getItem("theme") === "dark" ||
@@ -23,37 +22,39 @@
 
   <body>
     <header class="cover cover--header">
-      <div>
+      <div class="header-izq">
         <h1>
           <a href="/" class="logo-link">CobrApp.</a>
         </h1>
       </div>
 
-      <div class="retoque_header_padre">
-        <div class="retoque_header_hijo">
-          <button id="themeToggle" class="btn-theme" title="Cambiar tema">
-            <span id="themeIcon">🌙</span>
-          </button>
-        </div>
+      <div class="header-der">
+        <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+          <span id="themeIcon"></span>
+        </button>
       </div>
     </header>
 
-    <!-- Acá se inyectan los formularios y tablas -->
     <main class="libro">{{block "contenido" .}}{{end}}</main>
+    
     <footer class="footer-app">
       <span class="footer-logo">CobrApp.</span>
       <p>Desarrollado por Juan Ignacio Estanguet y Elias Magnoli.</p>
       <span class="footer-copy">&copy; 2026 Todos los derechos reservados.</span>
     </footer>
-    <!-- TODOS LOS SCRIPTS VAN ACÁ ABAJO, DESPUÉS DE QUE LA PÁGINA YA CARGÓ -->
+
     <script>
-      /* --- 0. LÓGICA DEL BOTÓN DE MODO OSCURO --- */
       const btnTheme = document.getElementById("themeToggle");
       const iconTheme = document.getElementById("themeIcon");
 
+      const iconMoon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+      const iconSun = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+
       if (document.documentElement.classList.contains("dark")) {
         document.body.classList.add("dark");
-        iconTheme.textContent = "☀️";
+        iconTheme.innerHTML = iconSun;
+      } else {
+        iconTheme.innerHTML = iconMoon;
       }
 
       btnTheme.addEventListener("click", () => {
@@ -62,10 +63,10 @@
 
         if (document.body.classList.contains("dark")) {
           localStorage.setItem("theme", "dark");
-          iconTheme.textContent = "☀️";
+          iconTheme.innerHTML = iconSun;
         } else {
           localStorage.setItem("theme", "light");
-          iconTheme.textContent = "🌙";
+          iconTheme.innerHTML = iconMoon;
         }
       });
     </script>
