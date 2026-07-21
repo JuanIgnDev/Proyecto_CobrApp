@@ -1,20 +1,32 @@
 {{define "sideBar"}}
-<!--Slide bar (donde vamos a agregar estadisticas, configuraciones y otras cosas)-->
+<!-- Overlay oscuro que se activa al abrir el menú -->
+<div id="sidebar-overlay" class="sidebar-overlay"></div>
+
 <div class="sidebar" id="sidebar">
   <a href="/">Inicio</a>
   <a href="/estadisticas">Estadisticas</a>
   <a href="/contacto">Contacto</a>
 </div>
 
-<button id="btn-menu" class="btn-sideBar">☰</button>
-
 <script>
-  //funcion para slide bar
+  //funcion para slide bar (el boton btn-menu ahora está en base.html)
   const sidebar = document.getElementById("sidebar");
   const botonSideBar = document.getElementById("btn-menu");
+  const overlay = document.getElementById("sidebar-overlay");
 
-  botonSideBar.addEventListener("click", () => {
-    sidebar.classList.toggle("abierta");
-  });
+  if(botonSideBar) {
+    botonSideBar.addEventListener("click", () => {
+      sidebar.classList.add("abierta");
+      overlay.classList.add("activa");
+    });
+  }
+
+  // Si tocás la parte oscura, se cierra el menú
+  if(overlay) {
+    overlay.addEventListener("click", () => {
+      sidebar.classList.remove("abierta");
+      overlay.classList.remove("activa");
+    });
+  }
 </script>
 {{end}}

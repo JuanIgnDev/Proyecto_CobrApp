@@ -9,7 +9,6 @@
     <link rel="shortcut icon" href="../static/img/icono.png" />
     <title>CobrApp</title>
 
-    <!-- Este script va acá arriba para evitar que la pantalla parpadee en blanco -->
     <script>
       if (
         localStorage.getItem("theme") === "dark" ||
@@ -22,36 +21,37 @@
   </head>
 
   <body>
+    <!-- HEADER MODERNIZADO CON ICONOS SVG -->
     <header class="cover cover--header">
-      <div>
+      <div class="header-izq">
+        {{block "btn-menu" .}}
+        <!-- El botón del menú lateral ahora vive de forma natural en el header -->
+        <button id="btn-menu" class="btn-icon" aria-label="Abrir menú" title="Menú">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        </button>
+        {{end}}
         <h1>
           <a href="/" class="logo-link">CobrApp.</a>
         </h1>
       </div>
 
-      <div class="retoque_header_padre">
-        <div class="retoque_header_hijo">
-          <button id="themeToggle" class="btn-theme" title="Cambiar tema">
-            <span id="themeIcon">🌙</span>
-          </button>
-        </div>
+      <div class="header-der">
+        <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+          <span id="themeIcon"></span>
+        </button>
 
-        <div class="retoque_header_hijo">
-          <!--Aca agrego la bandeja de notificaciones en caso de estar la seision iniciada-->
-          {{template "bandejaDeEntrada" .}}
-        </div>
-        <div class="retoque_header_hijo">
-          <!--Aca agrego boton de cerrar sesion en caso de estar la seision iniciada-->
-          {{block "acciones-header-cerrarSesion" .}}
-          <form method="POST" action="/logout">
-            <button type="submit" class="btn-nuevo">Cerrar sesión</button>
-          </form>
-          {{end}}
-        </div>
+        {{template "bandejaDeEntrada" .}}
+
+        {{block "acciones-header-cerrarSesion" .}}
+        <form method="POST" action="/logout" style="margin: 0; display: flex;">
+          <button type="submit" class="btn-icon" title="Cerrar sesión">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+          </button>
+        </form>
+        {{end}}
       </div>
     </header>
 
-    <!-- Acá se inyectan los formularios y tablas -->
     <main class="libro">
       <div class="div-sideBar">{{template "sideBar" .}}</div>
       {{block "contenido" .}}{{end}}
@@ -60,23 +60,24 @@
     <footer class="footer-app">
       <span class="footer-logo">CobrApp.</span>
       <p>Desarrollado por Juan Ignacio Estanguet y Elias Magnoli.</p>
-      <span class="footer-copy"
-        >&copy; 2026 Todos los derechos reservados.</span
-      >
+      <span class="footer-copy">&copy; 2026 Todos los derechos reservados.</span>
     </footer>
 
-    <!-- Contenedor para los Toasts -->
     <div id="toast-container"></div>
 
-    <!-- TODOS LOS SCRIPTS VAN ACÁ ABAJO, DESPUÉS DE QUE LA PÁGINA YA CARGÓ -->
     <script>
-      /* --- 0. LÓGICA DEL BOTÓN DE MODO OSCURO --- */
+      /* --- 0. LÓGICA DEL BOTÓN DE MODO OSCURO (CON SVG) --- */
       const btnTheme = document.getElementById("themeToggle");
       const iconTheme = document.getElementById("themeIcon");
 
+      const iconMoon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`;
+      const iconSun = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`;
+
       if (document.documentElement.classList.contains("dark")) {
         document.body.classList.add("dark");
-        iconTheme.textContent = "☀️";
+        iconTheme.innerHTML = iconSun;
+      } else {
+        iconTheme.innerHTML = iconMoon;
       }
 
       btnTheme.addEventListener("click", () => {
@@ -85,10 +86,10 @@
 
         if (document.body.classList.contains("dark")) {
           localStorage.setItem("theme", "dark");
-          iconTheme.textContent = "☀️";
+          iconTheme.innerHTML = iconSun;
         } else {
           localStorage.setItem("theme", "light");
-          iconTheme.textContent = "🌙";
+          iconTheme.innerHTML = iconMoon;
         }
       });
 
@@ -100,67 +101,41 @@
         const toast = document.createElement("div");
         toast.className = `toast ${isError ? "error" : ""}`;
         toast.innerHTML = `<span>${isError ? "❌" : "✅"}</span> <span>${message}</span>`;
-
         container.appendChild(toast);
-
-        // Animación de entrada
         setTimeout(() => toast.classList.add("show"), 10);
-
-        // Remover después de 3.5 segundos
         setTimeout(() => {
           toast.classList.remove("show");
-          setTimeout(() => toast.remove(), 400); // Esperar que termine la animación
+          setTimeout(() => toast.remove(), 400);
         }, 3500);
       }
 
-      // Leer si hay un toast pendiente guardado antes de que la página recargara.
-      // Si la página recargó mostrando un error (id="form-error"), el toast
-      // pendiente se descarta en vez de mostrarse como si hubiese salido bien.
       document.addEventListener("DOMContentLoaded", () => {
         const pendingToast = sessionStorage.getItem("toastMsg");
         const hayError = document.getElementById("form-error");
-
         if (pendingToast && !hayError) {
           showToast(pendingToast);
         }
-        sessionStorage.removeItem("toastMsg"); // Limpiarlo siempre, haya error o no
+        sessionStorage.removeItem("toastMsg");
       });
 
       /* --- 2. LÓGICA GLOBAL DE FORMULARIOS --- */
       document.querySelectorAll("form").forEach((form) => {
         form.addEventListener("submit", function (e) {
-          // A. Spinner en el botón
           const btnSubmit = form.querySelector('button[type="submit"]');
-          if (btnSubmit) {
-            btnSubmit.classList.add("btn-loading");
-          }
+          if (btnSubmit) btnSubmit.classList.add("btn-loading");
 
-          // B. Configurar el Toast para cuando la página recargue con éxito
           if (form.action.includes("cliente_nuevo")) {
             sessionStorage.setItem("toastMsg", "Cliente creado exitosamente");
           } else if (form.action.includes("cobro_nuevo")) {
-            sessionStorage.setItem(
-              "toastMsg",
-              "El cobro se registró correctamente",
-            );
+            sessionStorage.setItem("toastMsg", "El cobro se registró correctamente");
           } else if (form.action.includes("venta_nueva")) {
-            sessionStorage.setItem(
-              "toastMsg",
-              "La venta se guardó correctamente",
-            );
+            sessionStorage.setItem("toastMsg", "La venta se guardó correctamente");
           } else if (form.action.includes("eliminar")) {
-            sessionStorage.setItem(
-              "toastMsg",
-              "El cliente se eliminó correctamente",
-            );
+            sessionStorage.setItem("toastMsg", "El cliente se eliminó correctamente");
           } else if (form.action.includes("editar")) {
-            sessionStorage.setItem(
-              "toastMsg",
-              "El cliente se modificó correctamente",
-            );
+            sessionStorage.setItem("toastMsg", "El cliente se modificó correctamente");
           }
 
-          // C. Limpiar la máscara de moneda antes de enviarlo a Go
           const currencyInputs = form.querySelectorAll(".input-moneda");
           currencyInputs.forEach((input) => {
             let val = input.value;
@@ -171,31 +146,24 @@
         });
       });
 
-      /* --- 2.5. LÓGICA DE FILTROS (RESUMEN + BUSCADOR) --- */
+      /* --- 2.5. LÓGICA DE FILTROS --- */
       const resumen = document.getElementById("resumen");
       const resumenHint = document.getElementById("resumenHint");
       const filasCliente = document.querySelectorAll(".fila-cliente");
-
       const filtros = { texto: "", estado: "all" };
 
       function actualizarListado() {
         filasCliente.forEach((fila) => {
           const nombre = (fila.dataset.nombre || "").toLowerCase();
           const coincideTexto = nombre.includes(filtros.texto);
-          const coincideEstado =
-            filtros.estado === "all" || fila.dataset.status === filtros.estado;
+          const coincideEstado = filtros.estado === "all" || fila.dataset.status === filtros.estado;
           fila.style.display = coincideTexto && coincideEstado ? "" : "none";
         });
-
         if (resumenHint) {
-          resumenHint.textContent =
-            filtros.estado === "all"
-              ? ""
-              : "Mostrando solo clientes filtrados. Tocá la tarjeta de nuevo para ver todos.";
+          resumenHint.textContent = filtros.estado === "all" ? "" : "Mostrando solo clientes filtrados. Tocá la tarjeta de nuevo para ver todos.";
         }
       }
 
-      // Se expone para que el buscador de menuPrincipal.html la reutilice
       window.cobrappFiltroTexto = function (texto) {
         filtros.texto = texto.trim().toLowerCase();
         actualizarListado();
@@ -203,36 +171,25 @@
 
       if (resumen) {
         const botonesResumen = resumen.querySelectorAll(".resumen-item");
-
         botonesResumen.forEach((btn) => {
           btn.addEventListener("click", () => {
             const filtro = btn.dataset.filter;
             filtros.estado = filtros.estado === filtro ? "all" : filtro;
-
             botonesResumen.forEach((b) => {
-              b.classList.toggle(
-                "activo",
-                b.dataset.filter === filtros.estado && filtros.estado !== "all",
-              );
+              b.classList.toggle("activo", b.dataset.filter === filtros.estado && filtros.estado !== "all");
             });
-
             actualizarListado();
           });
         });
       }
 
-      /* --- 3. MÁSCARA DE MONEDA EN VIVO --- */
+      /* --- 3. MÁSCARA DE MONEDA --- */
       document.querySelectorAll(".input-moneda").forEach((input) => {
         input.addEventListener("input", function (e) {
-          // Permitir solo números y comas
           let value = this.value.replace(/[^0-9,]/g, "");
           const parts = value.split(",");
-          if (parts.length > 2) {
-            value = parts[0] + "," + parts.slice(1).join("");
-          }
-          if (parts[0]) {
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-          }
+          if (parts.length > 2) value = parts[0] + "," + parts.slice(1).join("");
+          if (parts[0]) parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
           this.value = parts.join(",");
         });
       });

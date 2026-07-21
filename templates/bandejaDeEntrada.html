@@ -3,11 +3,15 @@
 <div class="contenedor-bandejaEntrada">
   <button
     type="button"
-    class="btn-nuevo btn-bandejaEntrada"
-    title="Bandeja de entrada"
+    class="btn-icon"
+    title="Notificaciones"
     id="botonBandejaEntrada"
   >
-    <img src="/static/img/bandejaDeEntrada.webp" alt="Bandeja de entrada" />
+    <div class="icon-indicator">
+      <!-- Este span rojo podés mostrarlo u ocultarlo desde Go si hay notificaciones de verdad -->
+      <span class="indicator-dot"></span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+    </div>
   </button>
 
   <div class="bandejaDeEntrada oculto" id="bandejaEntrada">
@@ -16,7 +20,6 @@
     </div>
 
     <div class="bandejaDeEntrada-contenido">
-      <!-- Acá después van las notificaciones de la BD -->
       <p>No hay notificaciones nuevas</p>
     </div>
   </div>
@@ -26,8 +29,16 @@
   const botonBandejaEntrada = document.getElementById("botonBandejaEntrada");
   const bandejaDeEntrada = document.getElementById("bandejaEntrada");
 
-  botonBandejaEntrada.addEventListener("click", () => {
+  botonBandejaEntrada.addEventListener("click", (e) => {
+    e.stopPropagation(); // Evita que se cierre instantáneamente si hacés clic afuera
     bandejaDeEntrada.classList.toggle("oculto");
+  });
+
+  // Cerrar bandeja si tocás afuera
+  document.addEventListener("click", (e) => {
+    if (!bandejaDeEntrada.contains(e.target) && !botonBandejaEntrada.contains(e.target)) {
+      bandejaDeEntrada.classList.add("oculto");
+    }
   });
 </script>
 

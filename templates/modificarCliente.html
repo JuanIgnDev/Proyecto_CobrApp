@@ -45,16 +45,16 @@
       autocomplete="off"
     />
 
-    <div class="form-acciones-grid">
-      <button class="btn-nuevo btn-hover-green" type="submit">
-        + Modificar Cliente
-      </button>
+    <div class="form-acciones">
       <button
-        class="btn-nuevo btn-hover-red"
+        class="btn-cancelar"
         type="button"
         onclick="location.href = '/clientes/{{.Cliente.ID}}'"
       >
-        - Cancelar
+        Cancelar
+      </button>
+      <button class="btn-nuevo" type="submit">
+        Guardar Cambios
       </button>
     </div>
   </form>
