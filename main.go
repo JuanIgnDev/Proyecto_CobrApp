@@ -595,7 +595,7 @@ func main() {
 }
 
 func renderizar(w http.ResponseWriter, layout, pagina string, datos any) {
-	tmpl, err := template.ParseFiles("templates/sideBar.html", "templates/"+pagina, "templates/"+layout)
+	tmpl, err := template.ParseFiles("templates/sideBar.html","templates/bandejaDeEntrada.html", "templates/"+pagina, "templates/"+layout)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
