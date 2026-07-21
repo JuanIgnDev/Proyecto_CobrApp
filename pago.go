@@ -81,3 +81,32 @@ func MacroEstadisticaMensualCobros(db *sql.DB) ([13]int, error) {
 
 	return meses, rows.Err()
 }
+
+func ObtenerPagoPorId(db *sql.DB, pagoId int) (*Pago, error){
+
+	var pago Pago
+
+	err := db.QueryRow(`
+		SELECT id, cliente_id, monto, observacion, fecha
+		FROM pago
+		WHERE id = ?
+	`, pagoId).Scan(&pago.ID, &pago.ClienteID, &pago.Monto, &pago.Observacion,&pago.Fecha)
+	
+	if err != nil {
+		return nil, err
+	}
+
+	return &pago, nil
+}
+
+func ModificarPago(db *sql.DB, id int, monto float64, observacion string) error{
+
+	_, err := db.Exec(`
+		UPDATE pago
+		SET monto = ?,
+			observacion = ?
+		WHERE id = ?
+	`, monto, observacion, id)
+
+	return err
+}

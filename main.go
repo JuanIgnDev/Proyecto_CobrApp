@@ -425,6 +425,64 @@ func main() {
 		renderizar(w, "base.html", "contacto.html", nil)
 	}))
 
+
+	// Modificar Cobros
+	mux.HandleFunc("GET /pago/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+
+		pago, err := ObtenerPagoPorId(db, id)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		renderizar(w, "base.html", "modificarPago.html", struct {
+			Pago *Pago
+			Error   string
+		}{Pago: pago})
+	}))
+
+
+	mux.HandleFunc("POST /pago/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		pagoId, err := strconv.Atoi(r.PathValue("id"))
+
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+		monto := r.FormValue("monto")
+
+		montoFloat, err := strconv.ParseFloat(monto, 64)
+		if err != nil {
+			renderizar(w, "base.html", "modificarPago.html", struct{ Error string }{Error: "Monto invalido."})
+			return
+		}
+		observacion := r.FormValue("observacion")
+		//aca agregar fecha
+
+		if err := ModificarPago(db,pagoId, montoFloat, observacion); err != nil {
+			log.Println("Error modificando el pago:", err)
+			renderizar(w, "base.html", "modificarPago.html", struct{ Error string }{Error: "No se pudo modificar el cliente."})
+			return
+		}
+
+
+		pago, err := ObtenerPagoPorId(db, pagoId)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		idCliente := pago.ClienteID
+		http.Redirect(w, r, "/clientes/"+strconv.Itoa(idCliente), http.StatusSeeOther)
+	}))
+
+
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 
