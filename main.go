@@ -467,7 +467,7 @@ func main() {
 
 		if err := ModificarPago(db,pagoId, montoFloat, observacion); err != nil {
 			log.Println("Error modificando el pago:", err)
-			renderizar(w, "base.html", "modificarPago.html", struct{ Error string }{Error: "No se pudo modificar el cliente."})
+			renderizar(w, "base.html", "modificarPago.html", struct{ Error string }{Error: "No se pudo modificar el cobro."})
 			return
 		}
 
@@ -479,6 +479,64 @@ func main() {
 		}
 
 		idCliente := pago.ClienteID
+		http.Redirect(w, r, "/clientes/"+strconv.Itoa(idCliente), http.StatusSeeOther)
+	}))
+
+
+
+	// Modificar Ventas
+	mux.HandleFunc("GET /venta/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+
+		compra, err := ObtenerVentaPorId(db, id)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+		renderizar(w, "base.html", "modificarVenta.html", struct {
+			Compra *Compra
+			Error   string
+		}{Compra: compra})
+	}))
+
+
+	mux.HandleFunc("POST /venta/{id}/modificar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		ventaId, err := strconv.Atoi(r.PathValue("id"))
+
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+		total := r.FormValue("total")
+
+		totalFloat, err := strconv.ParseFloat(total, 64)
+		if err != nil {
+			renderizar(w, "base.html", "modificarVenta.html", struct{ Error string }{Error: "Total invalido."})
+			return
+		}
+		descripcion := r.FormValue("descripcion")
+		//aca agregar fecha
+
+		if err := ModificarVenta(db,ventaId, totalFloat, descripcion); err != nil {
+			log.Println("Error modificando la venta:", err)
+			renderizar(w, "base.html", "modificarVenta.html", struct{ Error string }{Error: "No se pudo modificar la venta!."})
+			return
+		}
+
+
+		compra, err := ObtenerVentaPorId(db, ventaId)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		idCliente := compra.ClienteID
 		http.Redirect(w, r, "/clientes/"+strconv.Itoa(idCliente), http.StatusSeeOther)
 	}))
 
