@@ -89,6 +89,15 @@ func SincronizarNotificaciones(db *sql.DB) error {
 	return nil
 }
  
+func marcarNotificacionComoVista(db *sql.DB) error{
+	_, err := db.Exec(`
+		UPDATE notificacion
+		SET estado = 'vista'
+		WHERE estado = 'pendiente'
+	`)
+	return err
+}
+
 func ObtenerFechaReferencia(db *sql.DB, clienteId int) (string, error) {
 
 	var fechaRef string
@@ -222,7 +231,8 @@ func ObtenerNotificacionesPendientes(
 		SELECT id, cliente_id, tipo, titulo,
 		       fecha_referencia, estado, fecha_creacion
 		FROM notificacion
-		WHERE estado = 'pendiente'
+		WHERE estado IN ('pendiente', 'vista')
+		ORDER BY estado ASC, id DESC
 	`)
 
 	if err != nil {

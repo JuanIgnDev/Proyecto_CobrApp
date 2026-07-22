@@ -1,0 +1,54 @@
+{{define "contenido"}}
+<main class="libro">
+  <!-- Cabecera igual a las otras vistas -->
+  <div class="balance-hero">
+    <span class="balance-label">Ajustes Globales</span>
+    <span class="balance-monto">Configuración</span>
+  </div>
+
+  <div class="form-contenedor-estrecho contenedor-config">
+    <!-- Bloque para mostrar errores o mensajes de éxito -->
+    {{if .Error}}
+    <p class="saldo debe mensaje-error">{{.Error}}</p>
+    {{end}}
+    {{if .Exito}}
+    <p class="saldo al-dia mensaje-exito">{{.Exito}}</p>
+    {{end}}
+
+    <form method="POST" action="/configuracion" class="form-cliente form-config">
+      
+      <!-- TARJETA 1: Alertas -->
+      <div class="ficha-seccion config-tarjeta">
+        <h3>Alertas de deudores</h3>
+        <div class="config-body">
+          <label for="dias_alerta" class="config-label">¿Cuándo se considera deuda vencida?</label>
+          <span class="config-label-desc">El circulito rojo de notificaciones se encenderá cuando pasen esta cantidad de días sin registrar un cobro.</span>
+          
+          <div class="config-input-group">
+            <input type="number" id="dias_alerta" name="dias_alerta" class="input-numero" value="{{if .Config.DiasAlerta}}{{.Config.DiasAlerta}}{{else}}45{{end}}" min="1" max="365">
+            <span class="config-unidad">días</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TARJETA 2: WhatsApp -->
+      <div class="ficha-seccion config-tarjeta">
+        <h3>Integración con WhatsApp</h3>
+        <div class="config-body">
+          <label for="mensaje_wp" class="config-label">Plantilla de mensaje predeterminado</label>
+          <span class="config-label-desc">Escribí <b>{nombre}</b> y <b>{saldo}</b> para que la app los reemplace automáticamente al abrir el chat.</span>
+          
+          <textarea id="mensaje_wp" name="mensaje_wp" class="input-texto" rows="4">{{if .Config.MensajeWP}}{{.Config.MensajeWP}}{{else}}Hola {nombre}, te escribo para recordarte que tenés un saldo pendiente de ${saldo}. Avisame cuando puedas regularizarlo. ¡Saludos!{{end}}</textarea>
+        </div>
+      </div>
+
+      <!-- BOTONES -->
+      <div class="form-acciones config-acciones">
+        <button class="btn-secundario" type="button" onclick="location.href = '/'">Cancelar</button>
+        <button class="btn-primario" type="submit">Guardar Configuración</button>
+      </div>
+
+    </form>
+  </div>
+</main>
+{{end}}
