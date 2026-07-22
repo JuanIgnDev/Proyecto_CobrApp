@@ -589,6 +589,82 @@ func main() {
 		http.Redirect(w, r, "/clientes/"+strconv.Itoa(venta.ClienteID), http.StatusSeeOther)
 	}))
 
+
+mux.HandleFunc(
+	"GET /api/notificaciones",
+	requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		err := SincronizarNotificaciones(db)
+
+		if err != nil {
+			http.Error(
+				w,
+				"Error al sincronizar notificaciones",
+				http.StatusInternalServerError,
+			)
+			return
+		}
+
+		notificaciones, err := ObtenerNotificacionesValidas(db)
+
+		if err != nil {
+			http.Error(
+				w,
+				"Error al obtener notificaciones",
+				http.StatusInternalServerError,
+			)
+			return
+		}
+
+		type NotificacionConCliente struct {
+			Cliente      Cliente      `json:"cliente"`
+			Notificacion Notificacion `json:"notificacion"`
+		}
+
+		var notificacionesConClientes []NotificacionConCliente
+
+		for _, notificacion := range notificaciones {
+
+			cliente, err := ObtenerClientePorID(
+				db,
+				notificacion.Cliente_id,
+			)
+
+			if err != nil {
+				http.Error(
+					w,
+					"Error al obtener cliente",
+					http.StatusInternalServerError,
+				)
+				return
+			} else {
+				notificacionesConClientes = append(
+					notificacionesConClientes,
+					NotificacionConCliente{
+						Notificacion: notificacion,
+						Cliente:      *cliente,
+					},
+				)
+			}
+		}
+
+		type RespuestaNotificaciones struct {
+			Notificaciones []NotificacionConCliente `json:"notificaciones"`
+		}
+
+		w.Header().Set(
+			"Content-Type",
+			"application/json",
+		)
+
+		json.NewEncoder(w).Encode(
+			RespuestaNotificaciones{
+				Notificaciones: notificacionesConClientes,
+			},
+		)
+	}),
+)
+
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 

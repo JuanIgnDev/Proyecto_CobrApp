@@ -26,8 +26,26 @@
       <div class="header-izq">
         {{block "btn-menu" .}}
         <!-- El botón del menú lateral ahora vive de forma natural en el header -->
-        <button id="btn-menu" class="btn-icon" aria-label="Abrir menú" title="Menú">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+        <button
+          id="btn-menu"
+          class="btn-icon"
+          aria-label="Abrir menú"
+          title="Menú"
+        >
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="4" x2="20" y1="12" y2="12" />
+            <line x1="4" x2="20" y1="6" y2="6" />
+            <line x1="4" x2="20" y1="18" y2="18" />
+          </svg>
         </button>
         {{end}}
         <h1>
@@ -40,12 +58,24 @@
           <span id="themeIcon"></span>
         </button>
 
-        {{template "bandejaDeEntrada" .}}
-
-        {{block "acciones-header-cerrarSesion" .}}
-        <form method="POST" action="/logout" style="margin: 0; display: flex;">
+        {{template "bandejaDeEntrada" .}} {{block "acciones-header-cerrarSesion"
+        .}}
+        <form method="POST" action="/logout" style="margin: 0; display: flex">
           <button type="submit" class="btn-icon" title="Cerrar sesión">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
           </button>
         </form>
         {{end}}
@@ -60,7 +90,9 @@
     <footer class="footer-app">
       <span class="footer-logo">CobrApp.</span>
       <p>Desarrollado por Juan Ignacio Estanguet y Elias Magnoli.</p>
-      <span class="footer-copy">&copy; 2026 Todos los derechos reservados.</span>
+      <span class="footer-copy"
+        >&copy; 2026 Todos los derechos reservados.</span
+      >
     </footer>
 
     <div id="toast-container"></div>
@@ -127,13 +159,25 @@
           if (form.action.includes("cliente_nuevo")) {
             sessionStorage.setItem("toastMsg", "Cliente creado exitosamente");
           } else if (form.action.includes("cobro_nuevo")) {
-            sessionStorage.setItem("toastMsg", "El cobro se registró correctamente");
+            sessionStorage.setItem(
+              "toastMsg",
+              "El cobro se registró correctamente",
+            );
           } else if (form.action.includes("venta_nueva")) {
-            sessionStorage.setItem("toastMsg", "La venta se guardó correctamente");
+            sessionStorage.setItem(
+              "toastMsg",
+              "La venta se guardó correctamente",
+            );
           } else if (form.action.includes("eliminar")) {
-            sessionStorage.setItem("toastMsg", "El cliente se eliminó correctamente");
+            sessionStorage.setItem(
+              "toastMsg",
+              "El cliente se eliminó correctamente",
+            );
           } else if (form.action.includes("editar")) {
-            sessionStorage.setItem("toastMsg", "El cliente se modificó correctamente");
+            sessionStorage.setItem(
+              "toastMsg",
+              "El cliente se modificó correctamente",
+            );
           }
 
           const currencyInputs = form.querySelectorAll(".input-moneda");
@@ -156,11 +200,15 @@
         filasCliente.forEach((fila) => {
           const nombre = (fila.dataset.nombre || "").toLowerCase();
           const coincideTexto = nombre.includes(filtros.texto);
-          const coincideEstado = filtros.estado === "all" || fila.dataset.status === filtros.estado;
+          const coincideEstado =
+            filtros.estado === "all" || fila.dataset.status === filtros.estado;
           fila.style.display = coincideTexto && coincideEstado ? "" : "none";
         });
         if (resumenHint) {
-          resumenHint.textContent = filtros.estado === "all" ? "" : "Mostrando solo clientes filtrados. Tocá la tarjeta de nuevo para ver todos.";
+          resumenHint.textContent =
+            filtros.estado === "all"
+              ? ""
+              : "Mostrando solo clientes filtrados. Tocá la tarjeta de nuevo para ver todos.";
         }
       }
 
@@ -176,7 +224,10 @@
             const filtro = btn.dataset.filter;
             filtros.estado = filtros.estado === filtro ? "all" : filtro;
             botonesResumen.forEach((b) => {
-              b.classList.toggle("activo", b.dataset.filter === filtros.estado && filtros.estado !== "all");
+              b.classList.toggle(
+                "activo",
+                b.dataset.filter === filtros.estado && filtros.estado !== "all",
+              );
             });
             actualizarListado();
           });
@@ -188,8 +239,10 @@
         input.addEventListener("input", function (e) {
           let value = this.value.replace(/[^0-9,]/g, "");
           const parts = value.split(",");
-          if (parts.length > 2) value = parts[0] + "," + parts.slice(1).join("");
-          if (parts[0]) parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+          if (parts.length > 2)
+            value = parts[0] + "," + parts.slice(1).join("");
+          if (parts[0])
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ".");
           this.value = parts.join(",");
         });
       });
