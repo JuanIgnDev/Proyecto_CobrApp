@@ -1,5 +1,4 @@
 {{define "bandejaDeEntrada"}}
-
 <div class="contenedor-bandejaEntrada">
   <button
     type="button"
@@ -9,17 +8,7 @@
   >
     <div class="icon-indicator">
       <span class="indicator-dot oculto" id="indicadorNotificaciones"></span>
-
-      <svg
-        width="20"
-        height="20"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
         <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
       </svg>
@@ -29,106 +18,138 @@
   <div class="bandejaDeEntrada oculto" id="bandejaEntrada">
     <div class="bandejaDeEntrada-header">
       <h3>Notificaciones</h3>
+      <button type="button" class="btn-link oculto" id="btnMarcarVistas">Marcar como vistas</button>
     </div>
 
     <div class="bandejaDeEntrada-contenido" id="contenidoBandejaEntrada">
-      <p>No hay notificaciones nuevas</p>
+      <!-- Se llena por JS -->
     </div>
   </div>
 </div>
 
 <script>
   const botonBandejaEntrada = document.getElementById("botonBandejaEntrada");
-
   const bandejaDeEntrada = document.getElementById("bandejaEntrada");
+  const contenidoBandejaEntrada = document.getElementById("contenidoBandejaEntrada");
+  const indicadorNotificaciones = document.getElementById("indicadorNotificaciones");
+  const btnMarcarVistas = document.getElementById("btnMarcarVistas");
 
-  const contenidoBandejaEntrada = document.getElementById(
-    "contenidoBandejaEntrada",
-  );
+  const formatearDinero = (monto) => {
+    return parseFloat(monto).toLocaleString("es-AR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
 
-  const indicadorNotificaciones = document.getElementById(
-    "indicadorNotificaciones",
-  );
+  const svgAlerta = `
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--debt-text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 0.1rem;">
+      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>`;
 
-  botonBandejaEntrada.addEventListener("click", async (e) => {
-    e.stopPropagation();
-
-    bandejaDeEntrada.classList.toggle("oculto");
-
+  async function cargarNotificaciones() {
     try {
       const respuesta = await fetch("/api/notificaciones");
-
-      if (!respuesta.ok) {
-        throw new Error("Error al obtener notificaciones");
-      }
-
+      if (!respuesta.ok) throw new Error("Error al obtener notificaciones");
+      
       const datos = await respuesta.json();
+      const todas = datos.notificaciones || [];
 
-      const notificaciones = datos.notificaciones;
+      // Dividimos las notificaciones en dos grupos
+      const pendientes = todas.filter(n => n.notificacion.Estado === "pendiente");
+      const vistas = todas.filter(n => n.notificacion.Estado === "vista");
 
       contenidoBandejaEntrada.innerHTML = "";
 
-      if (!notificaciones || notificaciones.length === 0) {
-        contenidoBandejaEntrada.innerHTML = `
-            <p>
-              No hay notificaciones nuevas
-            </p>
-          `;
-
+      // 1. LÓGICA DEL INDICADOR ROJO (Solo cuenta las pendientes)
+      if (pendientes.length > 0) {
+        const cantidad = pendientes.length;
+        indicadorNotificaciones.textContent = cantidad > 10 ? "10+" : cantidad;
+        indicadorNotificaciones.classList.remove("oculto");
+        btnMarcarVistas.classList.remove("oculto");
+      } else {
         indicadorNotificaciones.classList.add("oculto");
+        indicadorNotificaciones.textContent = "";
+        btnMarcarVistas.classList.add("oculto");
+      }
 
+      // Si no hay absolutamente nada
+      if (pendientes.length === 0 && vistas.length === 0) {
+        contenidoBandejaEntrada.innerHTML = `<p class="vacio-inline" style="padding: 1.5rem; margin: 0;">No hay notificaciones</p>`;
         return;
       }
 
-      indicadorNotificaciones.classList.remove("oculto");
-
-      for (const elemento of notificaciones) {
-        const cliente = elemento.cliente;
-
-        const notificacion = elemento.notificacion;
-
-        contenidoBandejaEntrada.innerHTML += `
-
-            <div class="notificacion">
-
-              <h4>
-                ${notificacion.Titulo}
-              </h4>
-
-              <p>
-                Cliente:
-                ${cliente.Nombre}
-                ${cliente.Apellido}
-              </p>
-
-              <p>
-                Saldo pendiente:
-                $${cliente.Saldo}
-              </p>
-
-            </div>
-
+      // 2. RENDERIZAR PENDIENTES
+      if (pendientes.length > 0) {
+        for (const elemento of pendientes) {
+          const cliente = elemento.cliente;
+          contenidoBandejaEntrada.innerHTML += `
+            <a href="/clientes/${cliente.ID}" class="notificacion-item">
+              <div class="notificacion-titulo">
+                ${svgAlerta} <span>${elemento.notificacion.Titulo}</span>
+              </div>
+              <div class="notificacion-detalle">
+                <span>${cliente.Nombre} ${cliente.Apellido}</span>
+                <span class="notificacion-monto">$${formatearDinero(cliente.Saldo)}</span>
+              </div>
+            </a>
           `;
+        }
+      } else if (vistas.length > 0) {
+        // Mensaje amigable si solo hay vistas
+        contenidoBandejaEntrada.innerHTML += `<p class="vacio-inline" style="padding: 1rem; margin: 0; font-size: 0.8rem;">Estás al día. No hay alertas nuevas.</p>`;
       }
+
+      // 3. RENDERIZAR VISTAS (Con diseño apagado)
+      if (vistas.length > 0) {
+        contenidoBandejaEntrada.innerHTML += `<div class="bandeja-separador">Vistas anteriormente</div>`;
+        for (const elemento of vistas) {
+          const cliente = elemento.cliente;
+          // Le agregamos la clase "vista" que le da el estilo gris y opaco
+          contenidoBandejaEntrada.innerHTML += `
+            <a href="/clientes/${cliente.ID}" class="notificacion-item vista">
+              <div class="notificacion-titulo">
+                ${svgAlerta} <span>${elemento.notificacion.Titulo}</span>
+              </div>
+              <div class="notificacion-detalle">
+                <span>${cliente.Nombre} ${cliente.Apellido}</span>
+                <span class="notificacion-monto">$${formatearDinero(cliente.Saldo)}</span>
+              </div>
+            </a>
+          `;
+        }
+      }
+
     } catch (error) {
       console.error(error);
+      contenidoBandejaEntrada.innerHTML = `<p class="vacio-inline" style="padding: 1.5rem; margin: 0;">Error al cargar las notificaciones</p>`;
+    }
+  }
 
-      contenidoBandejaEntrada.innerHTML = `
-          <p>
-            Error al cargar las notificaciones
-          </p>
-        `;
+  document.addEventListener("DOMContentLoaded", cargarNotificaciones);
+
+  botonBandejaEntrada.addEventListener("click", (e) => {
+    e.stopPropagation();
+    bandejaDeEntrada.classList.toggle("oculto");
+  });
+
+  btnMarcarVistas.addEventListener("click", async (e) => {
+    e.stopPropagation();
+    try {
+      await fetch("/api/notificaciones/marcar-vistas", { method: "POST" });
+      // Recargamos las notificaciones en vez de vaciar el HTML, 
+      // así pasan automáticamente a la sección de abajo
+      cargarNotificaciones(); 
+    } catch (error) {
+      console.error("Error al marcar como vistas:", error);
     }
   });
 
   document.addEventListener("click", (e) => {
-    if (
-      !bandejaDeEntrada.contains(e.target) &&
-      !botonBandejaEntrada.contains(e.target)
-    ) {
+    if (!bandejaDeEntrada.contains(e.target) && !botonBandejaEntrada.contains(e.target)) {
       bandejaDeEntrada.classList.add("oculto");
     }
   });
 </script>
-
 {{end}}

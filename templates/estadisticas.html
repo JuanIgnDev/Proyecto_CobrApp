@@ -47,6 +47,29 @@
   </div>
 </section>
 
+<section class="card-grafico-principal" style="margin-top: 1.5rem;">
+  <div class="grafico-header" style="margin-bottom: 0;">
+    <h3>Top 10 Clientes Deudores</h3>
+  </div>
+  
+  {{if .TopDeudores}}
+  <div class="ranking-lista">
+    {{range .TopDeudores}}
+    <!-- Cada fila es clickeable y lleva directo al cliente -->
+    <a href="/clientes/{{.ID}}" class="ranking-item">
+      <div class="ranking-izq">
+        <span class="ranking-nombre">{{.Nombre}} {{.Apellido}}</span>
+      </div>
+      <!-- Usamos la clase saldo debe para heredar el rojo y el formato -->
+      <span class="saldo debe">${{printf "%.2f" .Saldo}}</span>
+    </a>
+    {{end}}
+  </div>
+  {{else}}
+  <p class="vacio-inline" style="padding: 1.5rem 0 0.5rem;">¡Excelente! No hay clientes con deudas pendientes.</p>
+  {{end}}
+</section>
+
 <script id="datos-grafico" type="application/json">
   {{ .DatosGraficoJSON }}
 </script>

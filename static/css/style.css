@@ -142,13 +142,21 @@ body {
 
 .indicator-dot {
   position: absolute;
-  top: 0;
-  right: 2px;
-  width: 8px;
-  height: 8px;
+  top: -4px;
+  right: -6px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
   background-color: #ef4444;
-  border-radius: 50%;
+  border-radius: 12px;
   border: 2px solid var(--bg-main);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 
 /* =========================================
@@ -849,7 +857,7 @@ body.modal-abierto {
 
 .link-volver:hover {
   color: var(--text-main);
-  transform: translateX(-4px); /* Efectito sutil de retroceso al pasar el mouse */
+  transform: translateX(-4px);
 }
 
 .balance-monto-favor {
@@ -1308,6 +1316,9 @@ body.dark .contacto-icon {
   color: var(--accent);
 }
 
+/* =========================================
+   DISEÑO DE NOTIFICACIONES
+   ========================================= */
 .contenedor-bandejaEntrada {
   position: relative;
 }
@@ -1317,12 +1328,10 @@ body.dark .contacto-icon {
   top: calc(100% + 10px);
   right: 0;
   width: 320px;
-  max-height: 400px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   background: var(--bg-card);
-  overflow-y: auto;
   z-index: 1000;
 }
 
@@ -1331,33 +1340,266 @@ body.dark .contacto-icon {
 }
 
 .bandejaDeEntrada-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 1rem;
   border-bottom: 1px solid var(--border-color);
 }
 
 .bandejaDeEntrada-header h3 {
-  text-align: center;
   margin: 0;
   color: var(--text-main);
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-link {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+  color: var(--accent-hover);
 }
 
 .bandejaDeEntrada-contenido {
+  padding: 0;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.notificacion-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
+  text-decoration: none;
+  color: inherit;
 }
 
-.bandejaDeEntrada-contenido p {
-  text-align: center;
+.notificacion-item:last-child {
+  border-bottom: none;
+}
+
+.notificacion-item:hover {
+  background-color: var(--bg-main);
+}
+
+.notificacion-titulo {
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--text-main);
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.notificacion-detalle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
   color: var(--text-muted);
-  padding: 0 0 1rem;
+  padding-left: 1.6rem;
 }
 
-.notificacion {
-  padding: 0.75rem;
+.notificacion-monto {
+  font-weight: 700;
+  color: var(--debt-text);
+}
+
+/* Separador de notificaciones vistas */
+.bandeja-separador {
+  padding: 0.5rem 1rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background-color: var(--bg-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
 }
 
-.notificacion:last-child {
-  border-bottom: none;
+/* Estética "apagada" para las notificaciones vistas */
+.notificacion-item.vista {
+  opacity: 0.6;
+  filter: grayscale(100%);
+}
+
+.notificacion-item.vista:hover {
+  opacity: 1;
+  filter: grayscale(0%);
+}
+
+/* =========================================
+   RANKING DEUDORES (ESTADISTICAS)
+   ========================================= */
+.ranking-lista {
+  counter-reset: ranking;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.ranking-item {
+  counter-increment: ranking;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background-color: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.ranking-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--debt-border);
+}
+
+.ranking-izq {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* El número automático del puesto */
+.ranking-item::before {
+  content: counter(ranking);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  width: 20px;
+  text-align: center;
+}
+
+/* Destacamos el Top 3 con colores de alerta */
+.ranking-item:nth-child(1)::before { color: var(--debt-text); font-size: 1.1rem; }
+.ranking-item:nth-child(2)::before { color: #f97316; font-size: 1rem; }
+.ranking-item:nth-child(3)::before { color: #eab308; font-size: 1rem; }
+
+.ranking-nombre {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* =========================================
+   TEXTAREAS Y CONFIGURACIÓN
+   ========================================= */
+textarea.input-texto {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  resize: vertical;
+  min-height: 100px;
+}
+
+textarea.input-texto:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.config-label-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+.contenedor-config {
+  max-width: 100%;
+  padding-top: 0;
+}
+
+.form-config {
+  max-width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.config-tarjeta {
+  margin-bottom: 1.5rem;
+}
+
+.config-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.config-label {
+  margin-bottom: 0;
+}
+
+.config-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.input-numero {
+  width: 100px;
+  padding: 0.65rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 1rem;
+  text-align: center;
+  background: var(--bg-card);
+  color: var(--text-main);
+  transition: all 0.2s ease;
+}
+
+.input-numero:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.config-unidad {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.config-acciones {
+  border-top: none;
+  padding-top: 0;
+}
+
+.mensaje-exito {
+  display: block;
+  margin-bottom: 1rem;
+  border-color: var(--paid-border);
+  background: var(--paid-bg);
+  color: var(--paid-text);
 }

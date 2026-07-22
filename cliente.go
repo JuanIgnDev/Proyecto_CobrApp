@@ -198,3 +198,37 @@ func MacroEstadisticaMensualClientes(db *sql.DB) ([13]int, error) {
 
 	return meses, rows.Err()
 }
+
+func ObtenerTopDeudores(db *sql.DB, limite int)[]Cliente {
+	rows, err := db.Query(`
+		SELECT cliente_id, nombre, apellido, email, telefono, saldo_pendiente
+		FROM vista_saldo_cliente
+		WHERE saldo_pendiente > 0
+		ORDER BY saldo_pendiente DESC
+		LIMIT ?
+	`, limite)
+	if err != nil {
+		log.Println("Error consultando top deudores:", err)
+		return nil
+	}
+	defer rows.Close()
+
+	var clientes []Cliente
+	for rows.Next() {
+		var c Cliente
+		var emailDB sql.NullString
+		var telefonoDB sql.NullString
+		if err := rows.Scan(&c.ID, &c.Nombre, &c.Apellido, &emailDB, &telefonoDB, &c.Saldo); err != nil {
+			log.Println("Error leyendo fila de cliente:", err)
+			continue
+		}
+		if telefonoDB.Valid {
+			c.Telefono = telefonoDB.String
+		}
+		if emailDB.Valid {
+			c.Email = emailDB.String
+		}
+		clientes = append(clientes, c)
+	}
+	return clientes
+}

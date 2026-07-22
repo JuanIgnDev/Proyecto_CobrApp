@@ -392,6 +392,8 @@ func main() {
 			return
 		}
 
+		TopDeudores := ObtenerTopDeudores(db, 10)
+
 		meses := [13]string{
 			"",
 			"Enero",
@@ -436,15 +438,64 @@ func main() {
 			TotalClientesUltMes int
 			TotalClientesUltAño int
 			DatosGraficoJSON    template.JS
+			TopDeudores			[]Cliente
 		}{
 			TotalClientesUltMes: TotalClientesUltMes,
 			TotalClientesUltAño: TotalClientesUltAño,
 			DatosGraficoJSON:    template.JS(jsonDatos),
+			TopDeudores:		TopDeudores,
 		})
 	}))
 
 	mux.HandleFunc("GET /contacto", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		renderizar(w, "base.html", "contacto.html", nil)
+	}))
+
+	//nuevo esto tambien juani
+	// MOSTRAR la pantalla de configuración
+	mux.HandleFunc("GET /configuracion", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+		config := ObtenerConfiguracion(db)
+		
+		renderizar(w, "base.html", "configuracion.html", struct {
+			Config Configuracion
+			Error  string
+			Exito  string
+		}{Config: config})
+	}))
+
+	// GUARDAR los cambios cuando tocan el botón
+	mux.HandleFunc("POST /configuracion", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+		diasStr := r.FormValue("dias_alerta")
+		mensaje := r.FormValue("mensaje_wp")
+
+		dias, err := strconv.Atoi(diasStr)
+		if err != nil || dias < 1 {
+			config := ObtenerConfiguracion(db)
+			renderizar(w, "base.html", "configuracion.html", struct {
+				Config Configuracion
+				Error  string
+				Exito  string
+			}{Config: config, Error: "La cantidad de días debe ser un número válido mayor a 0."})
+			return
+		}
+
+		if err := GuardarConfiguracion(db, dias, mensaje); err != nil {
+			config := ObtenerConfiguracion(db)
+			renderizar(w, "base.html", "configuracion.html", struct {
+				Config Configuracion
+				Error  string
+				Exito  string
+			}{Config: config, Error: "No se pudo guardar la configuración."})
+			return
+		}
+
+		// Volvemos a pedir la configuración actualizada para mandarla a la vista
+		configActualizada := ObtenerConfiguracion(db)
+		renderizar(w, "base.html", "configuracion.html", struct {
+			Config Configuracion
+			Error  string
+			Exito  string
+		}{Config: configActualizada, Exito: "¡Configuración guardada con éxito!"})
 	}))
 
 	// Modificar cobros
@@ -589,81 +640,77 @@ func main() {
 		http.Redirect(w, r, "/clientes/"+strconv.Itoa(venta.ClienteID), http.StatusSeeOther)
 	}))
 
+	// 1. Ruta para OBTENER las notificaciones (La que alimenta la bandeja)
+	mux.HandleFunc(
+		"GET /api/notificaciones",
+		requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
-mux.HandleFunc(
-	"GET /api/notificaciones",
-	requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+			err := SincronizarNotificaciones(db)
+			if err != nil {
+				http.Error(w, "Error al sincronizar notificaciones", http.StatusInternalServerError)
+				return
+			}
 
-		err := SincronizarNotificaciones(db)
+			notificaciones, err := ObtenerNotificacionesValidas(db)
+			if err != nil {
+				http.Error(w, "Error al obtener notificaciones", http.StatusInternalServerError)
+				return
+			}
 
-		if err != nil {
-			http.Error(
-				w,
-				"Error al sincronizar notificaciones",
-				http.StatusInternalServerError,
+			type NotificacionConCliente struct {
+				Cliente      Cliente      `json:"cliente"`
+				Notificacion Notificacion `json:"notificacion"`
+			}
+
+			var notificacionesConClientes []NotificacionConCliente
+
+			for _, notificacion := range notificaciones {
+				cliente, err := ObtenerClientePorID(db, notificacion.Cliente_id)
+
+				if err != nil {
+					http.Error(w, "Error al obtener cliente", http.StatusInternalServerError)
+					return
+				} else {
+					notificacionesConClientes = append(
+						notificacionesConClientes,
+						NotificacionConCliente{
+							Notificacion: notificacion,
+							Cliente:      *cliente,
+						},
+					)
+				}
+			}
+
+			type RespuestaNotificaciones struct {
+				Notificaciones []NotificacionConCliente `json:"notificaciones"`
+			}
+
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(
+				RespuestaNotificaciones{
+					Notificaciones: notificacionesConClientes,
+				},
 			)
-			return
-		}
+		}),
+	)
 
-		notificaciones, err := ObtenerNotificacionesValidas(db)
+	// 2. Ruta nueva para MARCAR las notificaciones como vistas (La que se ejecuta al tocar el botón)
+	mux.HandleFunc(
+		"POST /api/notificaciones/marcar-vistas",
+		requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
-		if err != nil {
-			http.Error(
-				w,
-				"Error al obtener notificaciones",
-				http.StatusInternalServerError,
-			)
-			return
-		}
-
-		type NotificacionConCliente struct {
-			Cliente      Cliente      `json:"cliente"`
-			Notificacion Notificacion `json:"notificacion"`
-		}
-
-		var notificacionesConClientes []NotificacionConCliente
-
-		for _, notificacion := range notificaciones {
-
-			cliente, err := ObtenerClientePorID(
-				db,
-				notificacion.Cliente_id,
-			)
+			// Llamamos a la función de la base de datos
+			err := marcarNotificacionComoVista(db)
 
 			if err != nil {
-				http.Error(
-					w,
-					"Error al obtener cliente",
-					http.StatusInternalServerError,
-				)
+				http.Error(w, "Error al actualizar notificaciones", http.StatusInternalServerError)
 				return
-			} else {
-				notificacionesConClientes = append(
-					notificacionesConClientes,
-					NotificacionConCliente{
-						Notificacion: notificacion,
-						Cliente:      *cliente,
-					},
-				)
 			}
-		}
 
-		type RespuestaNotificaciones struct {
-			Notificaciones []NotificacionConCliente `json:"notificaciones"`
-		}
-
-		w.Header().Set(
-			"Content-Type",
-			"application/json",
-		)
-
-		json.NewEncoder(w).Encode(
-			RespuestaNotificaciones{
-				Notificaciones: notificacionesConClientes,
-			},
-		)
-	}),
-)
+			// Le respondemos al frontend que todo salió bien (Status 200 OK)
+			w.WriteHeader(http.StatusOK)
+		}),
+	)
 
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
@@ -671,7 +718,7 @@ mux.HandleFunc(
 }
 
 func renderizar(w http.ResponseWriter, layout, pagina string, datos any) {
-	tmpl, err := template.ParseFiles("templates/sideBar.html","templates/bandejaDeEntrada.html", "templates/"+pagina, "templates/"+layout)
+	tmpl, err := template.ParseFiles("templates/sideBar.html", "templates/bandejaDeEntrada.html", "templates/"+pagina, "templates/"+layout)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
