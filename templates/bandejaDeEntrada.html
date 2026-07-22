@@ -8,9 +8,21 @@
     id="botonBandejaEntrada"
   >
     <div class="icon-indicator">
-      <!-- Este span rojo podés mostrarlo u ocultarlo desde Go si hay notificaciones de verdad -->
-      <span class="indicator-dot"></span>
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <span class="indicator-dot oculto" id="indicadorNotificaciones"></span>
+
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" />
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      </svg>
     </div>
   </button>
 
@@ -19,7 +31,7 @@
       <h3>Notificaciones</h3>
     </div>
 
-    <div class="bandejaDeEntrada-contenido">
+    <div class="bandejaDeEntrada-contenido" id="contenidoBandejaEntrada">
       <p>No hay notificaciones nuevas</p>
     </div>
   </div>
@@ -27,16 +39,93 @@
 
 <script>
   const botonBandejaEntrada = document.getElementById("botonBandejaEntrada");
+
   const bandejaDeEntrada = document.getElementById("bandejaEntrada");
 
-  botonBandejaEntrada.addEventListener("click", (e) => {
-    e.stopPropagation(); // Evita que se cierre instantáneamente si hacés clic afuera
+  const contenidoBandejaEntrada = document.getElementById(
+    "contenidoBandejaEntrada",
+  );
+
+  const indicadorNotificaciones = document.getElementById(
+    "indicadorNotificaciones",
+  );
+
+  botonBandejaEntrada.addEventListener("click", async (e) => {
+    e.stopPropagation();
+
     bandejaDeEntrada.classList.toggle("oculto");
+
+    try {
+      const respuesta = await fetch("/api/notificaciones");
+
+      if (!respuesta.ok) {
+        throw new Error("Error al obtener notificaciones");
+      }
+
+      const datos = await respuesta.json();
+
+      const notificaciones = datos.notificaciones;
+
+      contenidoBandejaEntrada.innerHTML = "";
+
+      if (!notificaciones || notificaciones.length === 0) {
+        contenidoBandejaEntrada.innerHTML = `
+            <p>
+              No hay notificaciones nuevas
+            </p>
+          `;
+
+        indicadorNotificaciones.classList.add("oculto");
+
+        return;
+      }
+
+      indicadorNotificaciones.classList.remove("oculto");
+
+      for (const elemento of notificaciones) {
+        const cliente = elemento.cliente;
+
+        const notificacion = elemento.notificacion;
+
+        contenidoBandejaEntrada.innerHTML += `
+
+            <div class="notificacion">
+
+              <h4>
+                ${notificacion.Titulo}
+              </h4>
+
+              <p>
+                Cliente:
+                ${cliente.Nombre}
+                ${cliente.Apellido}
+              </p>
+
+              <p>
+                Saldo pendiente:
+                $${cliente.Saldo}
+              </p>
+
+            </div>
+
+          `;
+      }
+    } catch (error) {
+      console.error(error);
+
+      contenidoBandejaEntrada.innerHTML = `
+          <p>
+            Error al cargar las notificaciones
+          </p>
+        `;
+    }
   });
 
-  // Cerrar bandeja si tocás afuera
   document.addEventListener("click", (e) => {
-    if (!bandejaDeEntrada.contains(e.target) && !botonBandejaEntrada.contains(e.target)) {
+    if (
+      !bandejaDeEntrada.contains(e.target) &&
+      !botonBandejaEntrada.contains(e.target)
+    ) {
       bandejaDeEntrada.classList.add("oculto");
     }
   });

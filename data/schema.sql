@@ -35,6 +35,27 @@ CREATE TABLE IF NOT EXISTS cobro (
     FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE
 );
 
+--Notificacion
+CREATE TABLE IF NOT EXISTS notificacion (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    cliente_id INTEGER NOT NULL,
+
+    tipo TEXT NOT NULL,
+
+    titulo TEXT NOT NULL,
+
+    fecha_referencia TEXT NOT NULL,
+
+    estado TEXT NOT NULL DEFAULT 'pendiente',
+
+    fecha_creacion TEXT NOT NULL DEFAULT (datetime('now')),
+
+    FOREIGN KEY (cliente_id)
+        REFERENCES cliente(id)
+        ON DELETE CASCADE
+);
+
 -- Índices para consultas frecuentes (historial por cliente)
 CREATE INDEX IF NOT EXISTS idx_venta_cliente ON venta(cliente_id);
 CREATE INDEX IF NOT EXISTS idx_cobro_cliente ON cobro(cliente_id);
