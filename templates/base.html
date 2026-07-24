@@ -59,9 +59,20 @@
         </button>
         <!-- BOTÓN DE CONFIGURACIÓN -->
         <a href="/configuracion" class="btn-icon" title="Configuración">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-            <circle cx="12" cy="12" r="3"/>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+            />
+            <circle cx="12" cy="12" r="3" />
           </svg>
         </a>
         {{template "bandejaDeEntrada" .}} {{block "acciones-header-cerrarSesion"
@@ -174,11 +185,6 @@
               "toastMsg",
               "La venta se guardó correctamente",
             );
-          } else if (form.action.includes("eliminar")) {
-            sessionStorage.setItem(
-              "toastMsg",
-              "El cliente se eliminó correctamente",
-            );
           } else if (form.action.includes("editar")) {
             sessionStorage.setItem(
               "toastMsg",
@@ -195,6 +201,24 @@
           });
         });
       });
+
+      //TOAST PARA LAS ELIMINACIONES (fuera del submit)
+      const params = new URLSearchParams(window.location.search);
+
+      if (params.get("eliminado") === "cliente") {
+        sessionStorage.setItem(
+          "toastMsg",
+          "El cliente se eliminó correctamente",
+        );
+      }
+
+      if (params.get("eliminado") === "venta") {
+        sessionStorage.setItem("toastMsg", "La venta se eliminó correctamente");
+      }
+
+      if (params.get("eliminado") === "cobro") {
+        sessionStorage.setItem("toastMsg", "El cobro se eliminó correctamente");
+      }
 
       /* --- 2.5. LÓGICA DE FILTROS --- */
       const resumen = document.getElementById("resumen");
