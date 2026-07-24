@@ -356,8 +356,144 @@ func main() {
 			return
 		}
 
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(
+			w,
+			r,
+			"/clientes/"+strconv.Itoa(cliente.ID)+"?eliminado=cliente",
+			http.StatusSeeOther,
+		)
 	}))
+
+	// Eliminar cobros
+	mux.HandleFunc("POST /cobro/{id}/eliminar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		idCobro, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+
+		cobro, err := ObtenerCobroPorID(db, idCobro)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		cliente, err := ObtenerClientePorID(db, cobro.ClienteID) 
+
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		ventas := ObtenerVentasDeCliente(db, cliente.ID)
+		cobros := ObtenerCobrosDeCliente(db, cliente.ID)
+
+		password := r.FormValue("password")
+
+		if !validarCredenciales("admin", password) {
+			renderizar(w, "base.html", "clienteDetalle.html", struct {
+				*Cliente
+				Ventas []Venta
+				Cobros []Cobro
+				Error  string
+			}{
+				Cliente: cliente,
+				Ventas:  ventas,
+				Cobros:  cobros,
+				Error:   "Contraseña incorrecta.",
+			})
+			return
+		}
+
+		if err := eliminarCobro(db, idCobro); err != nil {
+			renderizar(w, "base.html", "clienteDetalle.html", struct {
+				*Cliente
+				Ventas []Venta
+				Cobros []Cobro
+				Error  string
+			}{
+				Cliente: cliente,
+				Ventas:  ventas,
+				Cobros:  cobros,
+				Error:   "No se pudo eliminar el cobro.",
+			})
+			return
+		}
+
+		http.Redirect(
+			w,
+			r,
+			"/clientes/"+strconv.Itoa(cliente.ID)+"?eliminado=cobro",
+			http.StatusSeeOther,
+		)
+	}))
+
+
+	// Eliminar ventas
+	mux.HandleFunc("POST /venta/{id}/eliminar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+
+		idVenta, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+
+		venta, err := ObtenerVentaPorID(db, idVenta)
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		cliente, err := ObtenerClientePorID(db, venta.ClienteID) 
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		ventas := ObtenerVentasDeCliente(db, cliente.ID)
+		cobros := ObtenerCobrosDeCliente(db, cliente.ID)
+
+		password := r.FormValue("password")
+
+		if !validarCredenciales("admin", password) {
+			renderizar(w, "base.html", "clienteDetalle.html", struct {
+				*Cliente
+				Ventas []Venta
+				Cobros []Cobro
+				Error  string
+			}{
+				Cliente: cliente,
+				Ventas:  ventas,
+				Cobros:  cobros,
+				Error:   "Contraseña incorrecta.",
+			})
+			return
+		}
+
+		if err := eliminarVenta(db, idVenta); err != nil {
+			renderizar(w, "base.html", "clienteDetalle.html", struct {
+				*Cliente
+				Ventas []Venta
+				Cobros []Cobro
+				Error  string
+			}{
+				Cliente: cliente,
+				Ventas:  ventas,
+				Cobros:  cobros,
+				Error:   "No se pudo eliminar la venta.",
+			})
+			return
+		}
+
+		http.Redirect(
+			w,
+			r,
+			"/clientes/"+strconv.Itoa(cliente.ID)+"?eliminado=venta",
+			http.StatusSeeOther,
+		)
+	}))
+
 
 	// Seccion de estadisticas
 	mux.HandleFunc("GET /estadisticas", requiereLogin(func(w http.ResponseWriter, r *http.Request) {

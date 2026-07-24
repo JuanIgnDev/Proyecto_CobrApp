@@ -110,3 +110,13 @@ func MacroEstadisticaMensualVentas(db *sql.DB) ([13]int, error) {
 
 	return meses, rows.Err()
 }
+
+
+func eliminarVenta(db *sql.DB, idVenta int) error {
+	_, err := db.Exec(`
+		DELETE FROM venta
+		WHERE id = ?
+	`, idVenta)
+
+	return err
+}
