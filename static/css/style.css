@@ -1701,3 +1701,47 @@ h3.config-header-con-icono svg {
   width: 16px;
   height: 16px;
 }
+
+/* =========================================
+   ACCIONES RÁPIDAS (MENÚ PRINCIPAL)
+   ========================================= */
+.fila-cliente {
+  cursor: pointer;
+}
+
+.contenedor-saldos-rapidos {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-quick-notificar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  color: white;
+}
+
+.btn-quick-notificar.wp {
+  background-color: #25D366;
+}
+
+.btn-quick-notificar.wp:hover {
+  background-color: #128C7E;
+  transform: scale(1.1);
+}
+
+.btn-quick-notificar.email {
+  background-color: #3b82f6;
+}
+
+.btn-quick-notificar.email:hover {
+  background-color: #2563eb;
+  transform: scale(1.1);
+}

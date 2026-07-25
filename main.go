@@ -68,6 +68,8 @@ func main() {
 			}
 		}
 
+		config := ObtenerConfiguracion(db)
+
 		renderizar(w, "base.html", "menuPrincipal.html", struct {
 			Clientes         []Cliente
 			TotalACobrar     float64
@@ -75,6 +77,7 @@ func main() {
 			ClientesEnDeuda  int
 			ClientesSinDeuda int
 			TotalClientes    int
+			Config           Configuracion 
 		}{
 			Clientes:         clientes,
 			TotalACobrar:     totalACobrar,
@@ -82,6 +85,7 @@ func main() {
 			ClientesEnDeuda:  clientesEnDeuda,
 			ClientesSinDeuda: len(clientes) - clientesEnDeuda,
 			TotalClientes:    len(clientes),
+			Config:           config,
 		})
 	}))
 
