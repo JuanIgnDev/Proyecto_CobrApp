@@ -54,6 +54,9 @@
       </div>
 
       <div class="header-der">
+        <!-- TEMPORIZADOR -->
+        <div id="temporizador"></div>
+        <!-- BOTON DE CAMBIO DE TEMA -->
         <button id="themeToggle" class="btn-icon" title="Cambiar tema">
           <span id="themeIcon"></span>
         </button>
@@ -276,6 +279,49 @@
           this.value = parts.join(",");
         });
       });
+
+      /*CIERRE DE SESION POR INACTIVIDAD*/
+
+      function iniciarTemporizador(minutosIniciales) {
+        const temporizador = document.getElementById("temporizador");
+
+        let minutos = minutosIniciales;
+        let segundos = 0;
+
+        temporizador.textContent = `${String(minutos).padStart(2, "0")}:00`;
+
+        const intervalo = setInterval(() => {
+          if (minutos === 0 && segundos === 0) {
+            clearInterval(intervalo);
+
+            fetch("/logout", {
+              method: "POST",
+            });
+
+            return;
+          }
+
+          if (segundos === 0) {
+            minutos--;
+            segundos = 59;
+          } else {
+            segundos--;
+          }
+
+          temporizador.textContent =
+            `${String(minutos).padStart(2, "0")}:` +
+            `${String(segundos).padStart(2, "0")}`;
+        }, 1000);
+      }
+
+      // Obtener los minutos desde Go
+      fetch("/configuracion/temporizador")
+        .then((response) => response.json())
+        .then((minutos) => {
+          if (minutos > 0) {
+            iniciarTemporizador(minutos);
+          }
+        });
     </script>
   </body>
 </html>

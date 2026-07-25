@@ -74,12 +74,13 @@ SELECT
       - COALESCE((SELECT SUM(monto) FROM cobro WHERE cobro.cliente_id = c.id), 0) AS saldo_pendiente
 FROM cliente c;
 
--- Agrego esto juani fijate
+
 CREATE TABLE IF NOT EXISTS configuracion (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     dias_alerta INTEGER NOT NULL,
-    mensaje_wp TEXT NOT NULL
+    mensaje_wp TEXT NOT NULL,
+    minutos_inactividad INTEGER CHECK (minutos_inactividad >= 0)
 );
 
-INSERT OR IGNORE INTO configuracion (id,dias_alerta,mensaje_wp)
-VALUES (1, 45, 'Hola {nombre}, te escribo para recordarte que tenés un saldo pendiente de ${saldo}. Avisame cuando puedas regularizarlo. ¡Saludos!');
+INSERT OR IGNORE INTO configuracion (id,dias_alerta,mensaje_wp, minutos_inactividad)
+VALUES (1, 45, 'Hola {nombre}, te escribo para recordarte que tenés un saldo pendiente de ${saldo}. Avisame cuando puedas regularizarlo. ¡Saludos!',30);
