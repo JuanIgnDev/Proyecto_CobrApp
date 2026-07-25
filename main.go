@@ -68,6 +68,8 @@ func main() {
 			}
 		}
 
+		config := ObtenerConfiguracion(db)
+
 		renderizar(w, "base.html", "menuPrincipal.html", struct {
 			Clientes         []Cliente
 			TotalACobrar     float64
@@ -75,6 +77,7 @@ func main() {
 			ClientesEnDeuda  int
 			ClientesSinDeuda int
 			TotalClientes    int
+			Config           Configuracion 
 		}{
 			Clientes:         clientes,
 			TotalACobrar:     totalACobrar,
@@ -82,6 +85,7 @@ func main() {
 			ClientesEnDeuda:  clientesEnDeuda,
 			ClientesSinDeuda: len(clientes) - clientesEnDeuda,
 			TotalClientes:    len(clientes),
+			Config:           config,
 		})
 	}))
 
@@ -130,12 +134,15 @@ func main() {
 		ventas := ObtenerVentasDeCliente(db, id)
 		cobros := ObtenerCobrosDeCliente(db, id)
 
+		config := ObtenerConfiguracion(db)
+
 		renderizar(w, "base.html", "clienteDetalle.html", struct {
 			*Cliente
 			Ventas []Venta
 			Cobros []Cobro
+			Config Configuracion
 			Error  string
-		}{Cliente: cliente, Ventas: ventas, Cobros: cobros, Error: ""})
+		}{Cliente: cliente, Ventas: ventas, Cobros: cobros, Config: config, Error: ""})
 	}))
 
 	// Formulario de venta nueva (mostrar)
@@ -323,6 +330,7 @@ func main() {
 
 		ventas := ObtenerVentasDeCliente(db, id)
 		cobros := ObtenerCobrosDeCliente(db, id)
+		config := ObtenerConfiguracion(db) // NUEVO: Obtenemos config para el render de error
 
 		password := r.FormValue("password")
 
@@ -331,11 +339,13 @@ func main() {
 				*Cliente
 				Ventas []Venta
 				Cobros []Cobro
+				Config Configuracion // NUEVO
 				Error  string
 			}{
 				Cliente: cliente,
 				Ventas:  ventas,
 				Cobros:  cobros,
+				Config:  config,     // NUEVO
 				Error:   "Contraseña incorrecta.",
 			})
 			return
@@ -346,11 +356,13 @@ func main() {
 				*Cliente
 				Ventas []Venta
 				Cobros []Cobro
+				Config Configuracion // NUEVO
 				Error  string
 			}{
 				Cliente: cliente,
 				Ventas:  ventas,
 				Cobros:  cobros,
+				Config:  config,     // NUEVO
 				Error:   "No se pudo eliminar el cliente.",
 			})
 			return
@@ -359,7 +371,7 @@ func main() {
 		http.Redirect(
 			w,
 			r,
-			"/clientes/"+strconv.Itoa(cliente.ID)+"?eliminado=cliente",
+			"/?eliminado=cliente",
 			http.StatusSeeOther,
 		)
 	}))
@@ -388,6 +400,7 @@ func main() {
 
 		ventas := ObtenerVentasDeCliente(db, cliente.ID)
 		cobros := ObtenerCobrosDeCliente(db, cliente.ID)
+		config := ObtenerConfiguracion(db) // NUEVO
 
 		password := r.FormValue("password")
 
@@ -396,11 +409,13 @@ func main() {
 				*Cliente
 				Ventas []Venta
 				Cobros []Cobro
+				Config Configuracion // NUEVO
 				Error  string
 			}{
 				Cliente: cliente,
 				Ventas:  ventas,
 				Cobros:  cobros,
+				Config:  config,     // NUEVO
 				Error:   "Contraseña incorrecta.",
 			})
 			return
@@ -411,11 +426,13 @@ func main() {
 				*Cliente
 				Ventas []Venta
 				Cobros []Cobro
+				Config Configuracion // NUEVO
 				Error  string
 			}{
 				Cliente: cliente,
 				Ventas:  ventas,
 				Cobros:  cobros,
+				Config:  config,     // NUEVO
 				Error:   "No se pudo eliminar el cobro.",
 			})
 			return
@@ -453,6 +470,7 @@ func main() {
 
 		ventas := ObtenerVentasDeCliente(db, cliente.ID)
 		cobros := ObtenerCobrosDeCliente(db, cliente.ID)
+		config := ObtenerConfiguracion(db) // NUEVO
 
 		password := r.FormValue("password")
 
@@ -461,11 +479,13 @@ func main() {
 				*Cliente
 				Ventas []Venta
 				Cobros []Cobro
+				Config Configuracion // NUEVO
 				Error  string
 			}{
 				Cliente: cliente,
 				Ventas:  ventas,
 				Cobros:  cobros,
+				Config:  config,     // NUEVO
 				Error:   "Contraseña incorrecta.",
 			})
 			return
@@ -476,11 +496,13 @@ func main() {
 				*Cliente
 				Ventas []Venta
 				Cobros []Cobro
+				Config Configuracion // NUEVO
 				Error  string
 			}{
 				Cliente: cliente,
 				Ventas:  ventas,
 				Cobros:  cobros,
+				Config:  config,     // NUEVO
 				Error:   "No se pudo eliminar la venta.",
 			})
 			return

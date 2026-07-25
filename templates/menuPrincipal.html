@@ -4,9 +4,7 @@
 <div class="resumen" id="resumen">
   <button type="button" class="resumen-item" data-filter="debe">
     <span class="resumen-label">Clientes en deuda</span>
-    <span class="resumen-monto"
-      >{{.ClientesEnDeuda}} de {{.TotalClientes}}</span
-    >
+    <span class="resumen-monto">{{.ClientesEnDeuda}} de {{.TotalClientes}}</span>
   </button>
   <button type="button" class="resumen-item" data-filter="all">
     <span class="resumen-label">Total a cobrar</span>
@@ -22,18 +20,9 @@
 <!--Barra de busqueda y boton donde podemos agregar clientes-->
 <div class="toolbar">
   <div class="search-box">
-    <input
-      type="text"
-      id="buscador"
-      placeholder="Buscar cliente..."
-      autocomplete="off"
-    />
+    <input type="text" id="buscador" placeholder="Buscar cliente..." autocomplete="off" />
   </div>
-  <button
-    class="btn-nuevo"
-    type="button"
-    onclick="location.href = '/cliente_nuevo'"
-  >
+  <button class="btn-nuevo" type="button" onclick="location.href = '/cliente_nuevo'">
     + Nuevo cliente
   </button>
 </div>
@@ -42,9 +31,10 @@
 {{if .Clientes}}
 <main class="libro" id="listaClientes">
   {{range .Clientes}}
-  <a
+  <!-- Usamos un div en lugar de 'a' para evitar conflictos con los botones internos -->
+  <div
     class="fila-cliente"
-    href="/clientes/{{.ID}}"
+    onclick="location.href='/clientes/{{.ID}}'"
     data-nombre="{{.ID}}{{.Nombre}} {{.Apellido}}"
     data-status="{{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}favor{{else}}aldia{{end}}"
   >
@@ -52,56 +42,96 @@
       {{.Nombre}} {{.Apellido}}
       <span class="id-cliente">ID: {{.ID}}</span>
     </span>
+    
     <span class="leader"></span>
 
-    {{if gt .Saldo 0.0}}
-    <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
-    {{else if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
-    <span class="saldo a-favor">+${{slice $saldoTxt 1}} A FAVOR</span>
-    {{else}}
-    <span class="saldo al-dia">Al día</span>
-    {{end}}
-  </a>
+    <!-- Contenedor para el saldo y el botón de acción rápida -->
+    <div class="contenedor-saldos-rapidos">
+      {{if gt .Saldo 0.0}}
+        <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
+        
+        <!-- BOTONES MÁGICOS RÁPIDOS -->
+        {{if .Telefono}}
+          <button class="btn-quick-notificar wp" type="button" onclick="event.stopPropagation(); notificarRapido(this)" 
+            data-tipo="wp" data-contacto="{{.Telefono}}" data-nombre="{{.Nombre}}" data-saldo="{{.Saldo}}" data-template="{{$.Config.MensajeWP}}" title="Cobrar por WhatsApp">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+        {{else if .Email}}
+          <button class="btn-quick-notificar email" type="button" onclick="event.stopPropagation(); notificarRapido(this)" 
+            data-tipo="email" data-contacto="{{.Email}}" data-nombre="{{.Nombre}}" data-saldo="{{.Saldo}}" data-template="{{$.Config.MensajeWP}}" title="Cobrar por Email">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          </button>
+        {{end}}
+
+      {{else if lt .Saldo 0.0}} 
+        {{$saldoTxt := printf "%.2f" .Saldo}}
+        <span class="saldo a-favor">+${{slice $saldoTxt 1}} A FAVOR</span>
+      {{else}}
+        <span class="saldo al-dia">Al día</span>
+      {{end}}
+    </div>
+  </div>
   {{end}}
 </main>
 {{else}}
 <div class="vacio">
   <span class="sello">SIN REGISTROS</span>
-
+</div>
 {{end}}
 
-  <script>
-    //funcion para buscador
-    const buscador = document.getElementById("buscador");
+<script>
+  // Buscar cliente
+  const buscador = document.getElementById("buscador");
 
-    if (buscador) {
-      buscador.addEventListener("input", () => {
-        window.cobrappFiltroTexto(buscador.value);
-      });
+  if (buscador) {
+    buscador.addEventListener("input", () => {
+      window.cobrappFiltroTexto(buscador.value);
+    });
+  }
+
+  // Agregar los miles a los valores
+  const array = [".resumen-monto", ".saldo"];
+
+  for (let index = 0; index < array.length; index++) {
+    document.querySelectorAll(array[index]).forEach((saldo) => {
+      let texto = saldo.textContent;
+      let numero = texto.match(/[\d.]+/);
+
+      if (numero) {
+        let valor = Number(numero[0]);
+        saldo.textContent = texto.replace(
+          numero[0],
+          valor.toLocaleString("es-AR", {
+            minimumFractionDigits: 0,
+          }),
+        );
+      }
+    });
+  }
+
+  // LÓGICA PARA LOS BOTONES RÁPIDOS
+  function notificarRapido(btn) {
+    const tipo = btn.dataset.tipo;
+    const contacto = btn.dataset.contacto;
+    const nombre = btn.dataset.nombre;
+    const saldo = parseFloat(btn.dataset.saldo);
+    let template = btn.dataset.template || "Hola {nombre}, te escribo para recordarte que tenés un saldo pendiente de ${saldo}.";
+
+    const saldoFormateado = saldo.toLocaleString("es-AR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+
+    let mensaje = template.replace(/{nombre}/g, nombre).replace(/{saldo}/g, saldoFormateado);
+
+    if (tipo === "wp") {
+      let telLimpio = contacto.replace(/\D/g, "");
+      if (telLimpio.startsWith("0")) telLimpio = telLimpio.substring(1);
+      if (!telLimpio.startsWith("54")) telLimpio = "54" + telLimpio;
+      window.open(`https://wa.me/${telLimpio}?text=${encodeURIComponent(mensaje)}`, "_blank");
+    } else if (tipo === "email") {
+      window.location.href = `mailto:${contacto}?subject=${encodeURIComponent("Aviso de saldo pendiente")}&body=${encodeURIComponent(mensaje)}`;
     }
-
-    //funcion para agregar los miles a los valores
-    const array = [".resumen-monto", ".saldo"];
-
-    for (let index = 0; index < array.length; index++) {
-      document.querySelectorAll(array[index]).forEach((saldo) => {
-        let texto = saldo.textContent;
-
-        let numero = texto.match(/[\d.]+/);
-
-        if (numero) {
-          let valor = Number(numero[0]);
-
-          saldo.textContent = texto.replace(
-            numero[0],
-            valor.toLocaleString("es-AR", {
-              minimumFractionDigits: 0,
-            }),
-          );
-        }
-      });
-    }
-  </script>
-</div>
-
+  }
+</script>
 {{end}}
