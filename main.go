@@ -603,19 +603,22 @@ func main() {
 	mux.HandleFunc("POST /configuracion", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		diasStr := r.FormValue("dias_alerta")
 		mensaje := r.FormValue("mensaje_wp")
+		minutos_inactividadStr := r.FormValue("minutos_inactividad")
 
 		dias, err := strconv.Atoi(diasStr)
-		if err != nil || dias < 1 {
+		minutos_inactividad, err := strconv.Atoi(minutos_inactividadStr)
+
+		if err != nil || dias < 1 || minutos_inactividad < 0 {
 			config := ObtenerConfiguracion(db)
 			renderizar(w, "base.html", "configuracion.html", struct {
 				Config Configuracion
 				Error  string
 				Exito  string
-			}{Config: config, Error: "La cantidad de días debe ser un número válido mayor a 0."})
+			}{Config: config, Error: "No se puede guardar esos valores, compruebe dias y minutos."})
 			return
 		}
 
-		if err := GuardarConfiguracion(db, dias, mensaje); err != nil {
+		if err := GuardarConfiguracion(db, dias, mensaje, minutos_inactividad); err != nil {
 			config := ObtenerConfiguracion(db)
 			renderizar(w, "base.html", "configuracion.html", struct {
 				Config Configuracion
@@ -848,6 +851,15 @@ func main() {
 		}),
 	)
 
+	//lleva las configuraciones a js
+	mux.HandleFunc("GET /configuracion/temporizador", func(w http.ResponseWriter, r *http.Request) {
+		config := ObtenerConfiguracion(db)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(config.Minutos_inactividad)
+	})
+
+
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
 
@@ -855,6 +867,7 @@ func main() {
 
 func renderizar(w http.ResponseWriter, layout, pagina string, datos any) {
 	tmpl, err := template.ParseFiles("templates/sideBar.html", "templates/bandejaDeEntrada.html", "templates/"+pagina, "templates/"+layout)
+
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
