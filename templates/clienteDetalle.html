@@ -89,11 +89,6 @@
       </button>
     </div>
 
-    <!-- MODAL DE CONFIRMACIÓN DE ELIMINACIÓN -->
-    {{if .Error}}
-    <p class="saldo debe mensaje-error" id="error-login">{{.Error}}</p>
-    {{end}}
-
     <div class="modal-overlay oculto" id="confirmacion">
       <div class="modal-card">
         <form method="POST" class="form-cliente" id="form-password">
@@ -211,7 +206,7 @@
               <path d="m15 5 4 4" />
             </svg>
           </a>
-                    <button
+          <button
             type="button"
             class="btn-flotante eliminar"
             onclick="
@@ -387,9 +382,15 @@
   }
 
   /* ==================================================
-     3. LÓGICA DE FORMATEO DE MONEDA
+     3. LÓGICA DE FORMATEO DE MONEDA Y ERRORES
      ================================================== */
   document.addEventListener("DOMContentLoaded", () => {
+    {{if .Error}}
+    if (typeof showToast === 'function') {
+      showToast("{{.Error}}", true);
+    }
+    {{end}}
+
     document.querySelectorAll(".balance-monto, .saldo").forEach((el) => {
       let texto = el.textContent;
       let numero = texto.match(/[\d.]+/);

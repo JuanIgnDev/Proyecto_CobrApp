@@ -1603,3 +1603,15 @@ textarea.input-texto:focus {
   background: var(--paid-bg);
   color: var(--paid-text);
 }
+
+/* Íconos en los títulos de configuración */
+h3.config-header-con-icono {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+h3.config-header-con-icono svg {
+  color: var(--accent);
+  flex-shrink: 0;
+}

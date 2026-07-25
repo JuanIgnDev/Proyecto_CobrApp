@@ -359,7 +359,7 @@ func main() {
 		http.Redirect(
 			w,
 			r,
-			"/clientes/"+strconv.Itoa(cliente.ID)+"?eliminado=cliente",
+			"/?eliminado=cliente",
 			http.StatusSeeOther,
 		)
 	}))

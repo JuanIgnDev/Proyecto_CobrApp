@@ -7,11 +7,9 @@
   </div>
 
   <div class="form-contenedor-estrecho contenedor-config">
-    <!-- Bloque para mostrar errores o mensajes de éxito -->
+    <!-- Bloque para mostrar errores fijos (si los hay) -->
     {{if .Error}}
     <p class="saldo debe mensaje-error">{{.Error}}</p>
-    {{end}} {{if .Exito}}
-    <p class="saldo al-dia mensaje-exito">{{.Exito}}</p>
     {{end}}
 
     <form
@@ -21,15 +19,13 @@
     >
       <!-- TARJETA 1: Alertas -->
       <div class="ficha-seccion config-tarjeta">
-        <h3>Alertas de deudores</h3>
+        <h3 class="config-header-con-icono">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          Alertas de deudores
+        </h3>
         <div class="config-body">
-          <label for="dias_alerta" class="config-label"
-            >¿Cuándo se considera deuda vencida?</label
-          >
-          <span class="config-label-desc"
-            >El circulito rojo de notificaciones se encenderá cuando pasen esta
-            cantidad de días sin registrar un cobro.</span
-          >
+          <label for="dias_alerta" class="config-label">¿Cuándo se considera deuda vencida?</label>
+          <span class="config-label-desc">El circulito rojo de notificaciones se encenderá cuando pasen esta cantidad de días sin registrar un cobro.</span>
 
           <div class="config-input-group">
             <input
@@ -48,35 +44,32 @@
 
       <!-- TARJETA 2: WhatsApp -->
       <div class="ficha-seccion config-tarjeta">
-        <h3>Integración con WhatsApp</h3>
+        <h3 class="config-header-con-icono">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+          Integración con WhatsApp
+        </h3>
         <div class="config-body">
-          <label for="mensaje_wp" class="config-label"
-            >Plantilla de mensaje predeterminado</label
-          >
-          <span class="config-label-desc"
-            >Escribí <b>{nombre}</b> y <b>{saldo}</b> para que la app los
-            reemplace automáticamente al abrir el chat.</span
-          >
+          <label for="mensaje_wp" class="config-label">Plantilla de mensaje predeterminado</label>
+          <span class="config-label-desc">Escribí <b>{nombre}</b> y <b>{saldo}</b> para que la app los reemplace automáticamente al abrir el chat.</span>
 
           <textarea
             id="mensaje_wp"
             name="mensaje_wp"
             class="input-texto"
             rows="4"
-          >
-{{if .Config.MensajeWP}}{{.Config.MensajeWP}}{{else}}Hola {nombre}, te escribo para recordarte que tenés un saldo pendiente de ${saldo}. Avisame cuando puedas regularizarlo. ¡Saludos!{{end}}</textarea
-          >
+          >{{if .Config.MensajeWP}}{{.Config.MensajeWP}}{{else}}Hola {nombre}, te escribo para recordarte que tenés un saldo pendiente de ${saldo}. Avisame cuando puedas regularizarlo. ¡Saludos!{{end}}</textarea>
         </div>
       </div>
 
       <!-- TARJETA 3: Minutos de inactividad -->
       <div class="ficha-seccion config-tarjeta">
-        <h3>Configurar cantidad de minutos de inactividad:</h3>
+        <h3 class="config-header-con-icono">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Cierre de sesión automático
+        </h3>
         <div class="config-body">
-          <span class="config-label-desc"
-            >En caso de no querer tener cierre de sesion por inactividad,
-            ingrese 0.</span
-          >
+          <label for="minutos_inactividad" class="config-label">Minutos de inactividad</label>
+          <span class="config-label-desc">En caso de no querer tener cierre de sesión por inactividad, ingrese 0.</span>
 
           <div class="config-input-group">
             <input
@@ -84,22 +77,18 @@
               id="minutos_inactividad"
               name="minutos_inactividad"
               class="input-numero"
-              value="{{if .Config.Minutos_inactividad}}{{.Config.Minutos_inactividad}}{{end}}"
+              value="{{if .Config.Minutos_inactividad}}{{.Config.Minutos_inactividad}}{{else}}0{{end}}"
               min="0"
-              max="60"
+              max="1440"
             />
-            <span class="config-unidad">Minutos</span>
+            <span class="config-unidad">minutos</span>
           </div>
         </div>
       </div>
 
       <!-- BOTONES -->
       <div class="form-acciones config-acciones">
-        <button
-          class="btn-secundario"
-          type="button"
-          onclick="location.href = '/'"
-        >
+        <button class="btn-secundario" type="button" onclick="location.href = '/'">
           Cancelar
         </button>
         <button class="btn-primario" type="submit">
@@ -109,4 +98,14 @@
     </form>
   </div>
 </main>
+
+<!-- Lógica del TOAST para el mensaje de éxito -->
+{{if .Exito}}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // Reutilizamos la función global de base.html
+    showToast("{{.Exito}}");
+  });
+</script>
+{{end}}
 {{end}}
