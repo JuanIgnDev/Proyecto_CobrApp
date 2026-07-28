@@ -110,9 +110,9 @@
     <footer class="footer-app">
       <span class="footer-logo">CobrApp.</span>
       <p>Desarrollado por Juan Ignacio Estanguet y Elias Magnoli.</p>
-      <span class="footer-copy"
-        >&copy; 2026 Todos los derechos reservados.</span
-      >
+      <span class="footer-copy">
+        &copy; <span id="anioActual"></span> Todos los derechos reservados.
+      </span>
     </footer>
 
     <div id="toast-container"></div>
@@ -156,9 +156,9 @@
         const toast = document.createElement("div");
         toast.className = `toast ${isError ? "error" : ""}`;
         toast.innerHTML = `${isError ? iconError : iconSuccess} <span>${message}</span>`;
-        
+
         container.appendChild(toast);
-        
+
         setTimeout(() => toast.classList.add("show"), 10);
         setTimeout(() => {
           toast.classList.remove("show");
@@ -186,7 +186,11 @@
             showToast("El cobro se eliminó correctamente");
           }
           // Limpia la URL silenciosamente
-          window.history.replaceState({}, document.title, window.location.pathname);
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname,
+          );
         }
       });
 
@@ -199,11 +203,20 @@
           if (form.action.includes("cliente_nuevo")) {
             sessionStorage.setItem("toastMsg", "Cliente creado exitosamente");
           } else if (form.action.includes("cobro_nuevo")) {
-            sessionStorage.setItem("toastMsg", "El cobro se registró correctamente");
+            sessionStorage.setItem(
+              "toastMsg",
+              "El cobro se registró correctamente",
+            );
           } else if (form.action.includes("venta_nueva")) {
-            sessionStorage.setItem("toastMsg", "La venta se guardó correctamente");
+            sessionStorage.setItem(
+              "toastMsg",
+              "La venta se guardó correctamente",
+            );
           } else if (form.action.includes("editar")) {
-            sessionStorage.setItem("toastMsg", "Los cambios se guardaron correctamente");
+            sessionStorage.setItem(
+              "toastMsg",
+              "Los cambios se guardaron correctamente",
+            );
           }
 
           const currencyInputs = form.querySelectorAll(".input-moneda");
@@ -310,6 +323,10 @@
             iniciarTemporizador(minutos);
           }
         });
+
+      //año actual para el footer
+      document.getElementById("anioActual").textContent =
+        new Date().getFullYear();
     </script>
   </body>
 </html>
