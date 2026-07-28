@@ -881,20 +881,71 @@ func main() {
 		json.NewEncoder(w).Encode(config.Minutos_inactividad)
 	})
 
+	//exportacion a pdf
+	mux.HandleFunc("GET /clientes/{id}/pdf", func(w http.ResponseWriter, r *http.Request) {
+
+		idCliente, err := strconv.Atoi(r.PathValue("id"))
+
+		if err != nil {
+			http.Error(w, "ID inválido", 400)
+			return
+		}
+
+
+		cliente, err := ObtenerClientePorID(db, idCliente)
+
+		if err != nil {
+			http.NotFound(w, r)
+			return
+		}
+
+
+		ventas := ObtenerVentasDeCliente(db, idCliente)
+		cobros := ObtenerCobrosDeCliente(db, idCliente)
+
+
+		pdfBytes, err := generarPDF(cliente, ventas, cobros)
+
+		if err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+
+		w.Header().Set("Content-Type", "application/pdf")
+
+		w.Header().Set(
+			"Content-Disposition",
+			`inline; filename="cliente.pdf"`,
+		)
+
+
+		w.Write(pdfBytes)
+
+	})
 
 	log.Println("Servidor iniciado en http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))
-
 }
 
 func renderizar(w http.ResponseWriter, layout, pagina string, datos any) {
-	tmpl, err := template.ParseFiles("templates/sideBar.html", "templates/bandejaDeEntrada.html", "templates/"+pagina, "templates/"+layout)
+
+	tmpl, err := template.ParseFiles(
+		"templates/sideBar.html",
+		"templates/bandejaDeEntrada.html",
+		"templates/"+pagina,
+		"templates/"+layout,
+	)
 
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	if err := tmpl.ExecuteTemplate(w, "base", datos); err != nil {
+
+	err = tmpl.ExecuteTemplate(w, "base", datos)
+
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
+
