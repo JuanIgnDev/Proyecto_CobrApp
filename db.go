@@ -13,6 +13,10 @@ func ConectarDB(ruta string) (*sql.DB, error) {
 		return nil, err
 	}
 
+	if _, err := db.Exec(`DROP VIEW IF EXISTS vista_saldo_cliente;`); err != nil {
+		return nil, err
+	}
+
 	esquema, err := os.ReadFile("./data/schema.sql")
 	if err != nil {
 		return nil, err
