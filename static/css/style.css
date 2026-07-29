@@ -288,6 +288,7 @@ textarea.input-texto:focus,
   padding-top: 2rem;
 }
 
+
 /* =========================================
    5. BOTONES GLOBALES
    ========================================= */
@@ -751,6 +752,10 @@ textarea.input-texto:focus,
   gap: 0.25rem;
 }
 
+.ficha-contacto{
+  margin-top: 1rem;
+}
+
 .ficha-cliente {
   display: flex;
   align-items: flex-start;
@@ -845,12 +850,43 @@ textarea.input-texto:focus,
   display: flex;
   gap: 0.75rem;
   margin-bottom: 1.25rem;
+  width: 100%;
+}
+
+.balance-hero{
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.btn-aviso {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.btn-aviso:hover {
+  background: var(--bg-main);
+  border-color: var(--text-muted);
 }
 
 .btn-aviso svg {
   width: 16px;
   height: 16px;
   flex-shrink: 0;
+  margin-top: -2px;
 }
 
 .btn-aviso.wp svg {
@@ -1188,8 +1224,22 @@ body.modal-abierto {
 .contacto-lista {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.5rem;
   margin-top: 1rem;
+  background: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.contacto-lista > h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.5rem;
 }
 
 .contacto-item {
@@ -1202,8 +1252,8 @@ body.modal-abierto {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   background: var(--favor-bg);
   color: var(--accent);
@@ -1214,11 +1264,11 @@ body.modal-abierto {
   display: flex;
   flex-direction: column;
   text-align: left;
-  gap: 0.1rem;
+  gap: 0.15rem;
 }
 
 .contacto-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-muted);
   font-weight: 600;
   text-transform: uppercase;
@@ -1226,7 +1276,7 @@ body.modal-abierto {
 }
 
 .contacto-valor {
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   color: var(--text-main);
   text-decoration: none;
   font-weight: 500;
@@ -1299,6 +1349,39 @@ body.modal-abierto {
   height: 280px;
 }
 
+.vista-botones {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-vista {
+  appearance: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-vista:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.btn-vista.activo {
+  background: var(--accent);
+  color: var(--accent-fg);
+  border-color: var(--accent);
+  box-shadow: 0 2px 4px rgba(83, 74, 183, 0.3);
+}
+
 .leyenda-comparacion {
   display: flex;
   gap: 1rem;
@@ -1316,8 +1399,13 @@ body.modal-abierto {
   vertical-align: middle;
 }
 
-.punto-ventas { background: var(--accent); }
-.punto-cobros { background: var(--favor-text); }
+.punto-ventas {
+  background: var(--accent);
+}
+
+.punto-cobros {
+  background: var(--favor-text);
+}
 
 .ranking-lista {
   counter-reset: ranking;
@@ -1372,12 +1460,56 @@ body.modal-abierto {
   color: var(--text-main);
 }
 
-.contenedor-config { max-width: 100%; padding-top: 0; }
-.form-config { max-width: 100%; padding: 0; background: transparent; border: none; box-shadow: none; }
-.config-tarjeta { margin-bottom: 1.5rem; }
+.contenedor-config {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.contenedor-config > span:first-child,
+.contenedor-config > p:first-child {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.contenedor-config h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 0;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+  display: block;
+}
+
+.form-config {
+  max-width: 100%;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.config-tarjeta {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
 
 .config-body {
-  padding: 1.5rem;
+  padding: 1.25rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -1404,7 +1536,15 @@ body.modal-abierto {
 h3.config-header-con-icono {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-main);
 }
 
 h3.config-header-con-icono svg {
@@ -1425,7 +1565,10 @@ h3.config-header-con-icono svg {
   margin-top: auto;
 }
 
-.footer-app p { font-size: 0.875rem; margin: 0; }
+.footer-app p {
+  font-size: 0.875rem;
+  margin: 0;
+}
 
 .footer-logo {
   font-weight: 700;
@@ -1442,7 +1585,9 @@ h3.config-header-con-icono svg {
 /* =========================================
    11. BANDEJA DE ENTRADA Y SIDEBAR
    ========================================= */
-.contenedor-bandejaEntrada { position: relative; }
+.contenedor-bandejaEntrada {
+  position: relative;
+}
 
 .bandejaDeEntrada {
   position: absolute;
@@ -1490,8 +1635,13 @@ h3.config-header-con-icono svg {
   color: inherit;
 }
 
-.notificacion-item:last-child { border-bottom: none; }
-.notificacion-item:hover { background: var(--bg-main); }
+.notificacion-item:last-child {
+  border-bottom: none;
+}
+
+.notificacion-item:hover {
+  background: var(--bg-main);
+}
 
 .notificacion-titulo {
   font-size: 0.85rem;
@@ -1575,7 +1725,9 @@ h3.config-header-con-icono svg {
   z-index: 1000;
 }
 
-.sidebar.abierta { left: 0; }
+.sidebar.abierta {
+  left: 0;
+}
 
 .sidebar a {
   color: var(--text-main);
@@ -1625,4 +1777,166 @@ body.dark .cover--header {
 
 body.dark .contacto-icon {
   background: var(--bg-main);
+}
+
+body.dark .btn-quick-notificar.light-wp {
+  background-color: #064e3b;
+  color: #34d399;
+}
+
+body.dark .btn-quick-notificar.light-email {
+  background-color: #1e3a8a;
+  color: #93c5fd;
+}
+
+/* =========================================
+   13. FIX RESPONSIVO DEFINITIVO (MOBILE)
+   ========================================= */
+
+/* 1. Arreglo del Título (Solo para portadas, SIN romper el header) */
+.cover:not(.cover--header) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.cover:not(.cover--header) > span:first-child,
+.cover:not(.cover--header) > p:first-child {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+.cover:not(.cover--header) > h1,
+.cover:not(.cover--header) > h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 0;
+  margin-bottom: 2rem;
+  line-height: 1.2;
+  display: block;
+}
+
+/* 2. Proteger el Header (Recuperar el Sticky y alinear en fila) */
+.cover--header {
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  width: 100% !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 900 !important;
+}
+
+/* 3. Evitar que la página de Contacto desborde */
+.contenedor-contactos,
+div:has(> .contacto-lista) {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  gap: 1rem !important;
+}
+
+/* 4. Adaptación perfecta para pantallas chicas */
+@media (max-width: 640px) {
+
+  /* A. Grillas colapsables */
+  .form-grid,
+  .resumen,
+  .kpi-grid,
+  .ficha-mini-stats {
+    grid-template-columns: 1fr !important;
+    display: grid !important;
+    width: 100% !important;
+  }
+
+  /* B. Rescate del botón flotante (FAB) */
+  .btn-fab {
+    position: fixed !important;
+    bottom: 1.5rem !important;
+    right: 1.5rem !important;
+    width: 56px !important;
+    height: 56px !important;
+    z-index: 99999 !important;
+    display: flex !important;
+  }
+
+  /* C. Ajuste de tarjetas de clientes (Protegemos los botones) */
+  .fila-cliente {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+
+  .cliente-info-izq {
+    min-width: 0; /* Permite que textos muy largos se acorten en vez de empujar */
+    flex-shrink: 1;
+  }
+
+  .cliente-texto {
+    min-width: 0;
+  }
+
+  /* Si un nombre es larguísimo, le pone "..." al final */
+  .nombre-cliente {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cliente-info-der {
+    display: flex !important;
+    flex-direction: row !important; /* Monto y botón lado a lado */
+    align-items: center !important;
+    gap: 0.5rem !important;
+    flex-shrink: 0; /* ¡Prohíbe que el bloque derecho se aplaste! */
+  }
+
+  .badge-monto {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+    flex-shrink: 0 !important;
+  }
+
+  .btn-quick-notificar {
+    width: 38px !important;
+    height: 38px !important;
+    flex-shrink: 0 !important; /* Obliga al botón a mantener su forma redonda */
+  }
+  
+  .btn-quick-notificar svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* =========================================
+   14. FIX FINAL: MÓVIL (AVATAR Y CONTACTOS)
+   ========================================= */
+@media (max-width: 640px) {
+  /* 1. Ocultar las iniciales en celulares para liberar espacio */
+  .avatar-iniciales {
+    display: none !important;
+  }
+
+  /* 2. Asegurar que la grilla o contenedores de contacto se apilen bien */
+  .contenedor-contactos,
+  .contacto-lista {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  /* 3. Evitar que los nombres de los creadores/contactos se crucen */
+  .contacto-item {
+    width: 100% !important;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
 }
