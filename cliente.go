@@ -13,11 +13,10 @@ type Cliente struct {
 	Apellido string
 	Email    string
 	Telefono string
-	Saldo    float64 // saldo_pendiente de vista_saldo_cliente
+	Saldo    float64
 }
 
-// ObtenerClientes trae todos los clientes junto con su saldo pendiente,
-// usando la vista vista_saldo_cliente definida en schema.sql.
+// ObtenerClientes trae todos los clientes junto con su saldo pendiente
 func ObtenerClientes(db *sql.DB) []Cliente {
 	rows, err := db.Query(`
 		SELECT cliente_id, nombre, apellido, email, telefono, saldo_pendiente
@@ -31,7 +30,7 @@ func ObtenerClientes(db *sql.DB) []Cliente {
 	defer rows.Close()
 
 	var clientes []Cliente
-	
+
 	for rows.Next() {
 		var c Cliente
 		var emailDB sql.NullString
@@ -55,10 +54,9 @@ func ObtenerClientes(db *sql.DB) []Cliente {
 	return clientes
 }
 
-// ObtenerClientePorID trae un cliente puntual (para la vista de detalle).
+// ObtenerClientePorID trae un cliente puntual 
 func ObtenerClientePorID(db *sql.DB, id int) (*Cliente, error) {
 	var c Cliente
-
 	var emailDB sql.NullString
 	var telefonoDB sql.NullString
 
@@ -67,7 +65,7 @@ func ObtenerClientePorID(db *sql.DB, id int) (*Cliente, error) {
 		FROM vista_saldo_cliente
 		WHERE cliente_id = ?
 	`, id).Scan(&c.ID, &c.Nombre, &c.Apellido, &emailDB, &telefonoDB, &c.Saldo)
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -83,9 +81,8 @@ func ObtenerClientePorID(db *sql.DB, id int) (*Cliente, error) {
 	return &c, nil
 }
 
-// CrearCliente inserta un cliente nuevo. email y telefono pueden venir vacíos.
+// CrearCliente inserta un cliente nuevo. 
 func CrearCliente(db *sql.DB, nombre, apellido, email, telefono string) error {
-	
 	var emailDB sql.NullString
 	if email != "" {
 		emailDB.String = email
@@ -97,7 +94,7 @@ func CrearCliente(db *sql.DB, nombre, apellido, email, telefono string) error {
 		telefonoDB.String = telefono
 		telefonoDB.Valid = true
 	}
-	
+
 	_, err := db.Exec(`
 		INSERT INTO cliente (nombre, apellido, email, telefono)
 		VALUES (?, ?, ?, ?)
@@ -106,9 +103,7 @@ func CrearCliente(db *sql.DB, nombre, apellido, email, telefono string) error {
 }
 
 // ModificarCliente actualiza los datos de un cliente.
-// email y telefono pueden venir vacíos.
 func ModificarCliente(db *sql.DB, id int, nombre, apellido, email, telefono string) error {
-
 	var emailDB sql.NullString
 	if email != "" {
 		emailDB.String = email
@@ -142,8 +137,7 @@ func eliminarCliente(db *sql.DB, id int) error {
 	return err
 }
 
-
-//FUNCION PARA LAS ESTADISTICAS
+// FUNCIONES PARA LAS ESTADISTICAS
 func MicroEstadistica(db *sql.DB, periodo string) (int, error) {
 	var formato string
 
@@ -191,15 +185,14 @@ func MacroEstadisticaMensualClientes(db *sql.DB) ([13]int, error) {
 		if err := rows.Scan(&mes, &cantidad); err != nil {
 			return meses, err
 		}
-		//ARRANCA DE 1 Y VA HASTA 12
-		nroMes, _ := strconv.Atoi(mes) // "01" -> 1
+		nroMes, _ := strconv.Atoi(mes) 
 		meses[nroMes] = cantidad
 	}
 
 	return meses, rows.Err()
 }
 
-func ObtenerTopDeudores(db *sql.DB, limite int)[]Cliente {
+func ObtenerTopDeudores(db *sql.DB, limite int) []Cliente {
 	rows, err := db.Query(`
 		SELECT cliente_id, nombre, apellido, email, telefono, saldo_pendiente
 		FROM vista_saldo_cliente

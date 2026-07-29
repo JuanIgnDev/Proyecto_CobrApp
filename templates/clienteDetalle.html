@@ -1,79 +1,33 @@
 {{define "contenido"}}
 <main class="libro">
-  <a href="/" class="link-volver">
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <path d="m12 19-7-7 7-7" />
-      <path d="M19 12H5" />
-    </svg>
-    Volver al inicio
-  </a>
+  <div class="ficha-header">
+    <a href="/" class="link-volver">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m12 19-7-7 7-7" />
+        <path d="M19 12H5" />
+      </svg>
+      Clientes
+    </a>
 
-  <!-- Balance -->
-  <section
-    class="balance-hero {{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}a-favor{{else}}al-dia{{end}}"
-  >
-    {{if gt .Saldo 0.0}}
-    <span class="balance-label">Debe:</span>
-    <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
-    {{else if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
-    <span class="balance-label">A favor</span>
-    <span class="balance-monto balance-monto-favor"
-      >+${{slice $saldoTxt 1}}</span
-    >
-    {{else}}
-    <span class="balance-label">Saldo actual</span>
-    <span class="balance-monto">Al día</span>
-    {{end}}
-  </section>
-
-  <!-- Datos de contacto -->
-  <section class="ficha-contacto">
-    <!-- BOTONES FLOTANTES EN EL BORDE (Solo de la ficha) -->
-    <div class="acciones-flotantes">
+    <div class="ficha-header-acciones">
       <button
-        class="btn-flotante editar"
+        type="button"
+        class="btn-icon icono-editar"
         onclick="location.href='/clientes/{{.ID}}/editar'"
         title="Editar cliente"
       >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
           <path d="m15 5 4 4" />
         </svg>
       </button>
       <button
         type="button"
-        class="btn-flotante eliminar"
-        onclick="mostrarConfirmacion('/clientes/{{.ID}}/eliminar', 'Ingrese la contraseña para eliminar al cliente', 'ATENCION: Al eliminar el cliente se borran sus cobros y pagos asociados.')"
+        class="btn-icon icono-eliminar"
+        onclick="mostrarConfirmacion('/clientes/{{.ID}}/eliminar', 'Ingrese la contraseña para eliminar al cliente', 'ATENCION: Al eliminar el cliente se borran sus ventas y cobros asociados.')"
         title="Eliminar cliente"
       >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M3 6h18" />
           <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
           <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
@@ -81,335 +35,231 @@
           <line x1="14" y1="11" x2="14" y2="17" />
         </svg>
       </button>
-
-      <button
-        type="button"
-        class="btn-flotante"
-        onclick="exportarPDF({{.ID}})"
-        title="Exportar a Pdf"
-      >
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <path
-            d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-          />
-          <path d="M14 2v6h6" />
-          <text
-            x="6.5"
-            y="18"
-            font-size="5"
-            font-family="Arial"
-            fill="currentColor"
-            stroke="none"
-          >
-            PDF
-          </text>
-        </svg>
-      </button>
     </div>
+  </div>
 
-    <!-- MODAL -->
-    <div class="modal-overlay oculto" id="confirmacion">
-      <div class="modal-card">
-        <form method="POST" class="form-cliente" id="form-password">
-          <p
-            class="texto-centrado-bold"
-            style="font-size: 1.2rem"
-            id="confirmacion-eliminacion-contenido"
-          ></p>
-          <p
-            class="texto-centrado-bold"
-            style="font-size: 0.8rem; color: var(--text-muted)"
-            id="confirmacion-eliminacion-contenido-atencion"
-          ></p>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            placeholder="Contraseña"
-            required
-          />
-          <div class="modal-buttons">
-            <button
-              type="button"
-              class="btn-secundario"
-              id="btn-cancelar-eliminar"
-              onclick="window.dejarDeMostrarConfirmacion()"
-            >
-              Cancelar
-            </button>
-            <button type="submit" class="btn-destructivo">
-              Confirmar eliminación
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
-    <div class="cabecera-contacto">
-      <h2>{{.Nombre}} {{.Apellido}}</h2>
-    </div>
-
-    <dl>
-      {{if .Email}}
-      <div>
-        <dt>Email</dt>
-        <dd class="contacto-dato-fila">
-          {{.Email}}
-          <!-- Muestra aviso por mail si tiene deuda y NO tiene teléfono -->
-          {{if and (gt .Saldo 0.0) (not .Telefono)}}
-          <button
-            class="btn-notificar-inline email btn-enviar-aviso"
-            type="button"
-            data-email="{{.Email}}"
-            data-nombre="{{.Nombre}}"
-            data-saldo="{{.Saldo}}"
-            data-template="{{.Config.MensajeWP}}"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <rect width="20" height="16" x="2" y="4" rx="2" />
-              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-            </svg>
-            Enviar aviso
+  <!-- MODAL DE CONFIRMACION -->
+  <div class="modal-overlay oculto" id="confirmacion">
+    <div class="modal-card">
+      <form method="POST" class="form-cliente" id="form-password">
+        <p class="texto-centrado-bold" id="confirmacion-eliminacion-contenido"></p>
+        <p class="texto-centrado-bold texto-atencion" id="confirmacion-eliminacion-contenido-atencion"></p>
+        <input type="password" id="password" name="password" placeholder="Contraseña" required />
+        <div class="modal-buttons">
+          <button type="button" class="btn-secundario" id="btn-cancelar-eliminar" onclick="window.dejarDeMostrarConfirmacion()">
+            Cancelar
           </button>
-          {{end}}
-        </dd>
+          <button type="submit" class="btn-destructivo">Confirmar eliminación</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TARJETA DE IDENTIDAD + SALDO -->
+  <section class="ficha-cliente {{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}a-favor{{else}}al-dia{{end}}">
+    <div class="ficha-cliente-identidad">
+      <div class="ficha-cliente-nombre-fila">
+        <h2>{{.Nombre}} {{.Apellido}}</h2>
+        <span class="saldo {{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}a-favor{{else}}al-dia{{end}}">
+          {{if gt .Saldo 0.0}}Debe{{else if lt .Saldo 0.0}}A favor{{else}}Al día{{end}}
+        </span>
       </div>
-      {{end}} {{if .Telefono}}
-      <div>
-        <dt>Teléfono</dt>
-        <dd class="contacto-dato-fila">
-          {{.Telefono}}
-          <!-- Muestra aviso por WhatsApp si tiene deuda -->
-          {{if gt .Saldo 0.0}}
-          <button
-            class="btn-notificar-inline wp btn-enviar-aviso"
-            type="button"
-            data-telefono="{{.Telefono}}"
-            data-nombre="{{.Nombre}}"
-            data-saldo="{{.Saldo}}"
-            data-template="{{.Config.MensajeWP}}"
-          >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-              />
-            </svg>
-            Enviar aviso
-          </button>
-          {{end}}
-        </dd>
-      </div>
+      {{if or .Telefono .Email}}
+      <p class="ficha-cliente-contacto-linea">
+        {{if .Telefono}}{{.Telefono}}{{end}}{{if and .Telefono .Email}} · {{end}}{{if .Email}}{{.Email}}{{end}}
+      </p>
       {{end}}
-    </dl>
+    </div>
+
+    <div class="ficha-cliente-monto">
+      {{if gt .Saldo 0.0}}
+      <span class="balance-label">Debe</span>
+      <span class="balance-monto">${{printf "%.2f" .Saldo}}</span>
+      {{else if lt .Saldo 0.0}} {{$saldoTxt := printf "%.2f" .Saldo}}
+      <span class="balance-label">A favor</span>
+      <span class="balance-monto balance-monto-favor">+${{slice $saldoTxt 1}}</span>
+      {{else}}
+      <span class="balance-label">Saldo</span>
+      <span class="balance-monto">Al día</span>
+      {{end}}
+    </div>
   </section>
 
-  <!-- Acciones principales (Ya no se estiran raro) -->
-  <div class="ficha-acciones">
+  <!-- AVISOS: solo si tiene deuda y hay algún dato de contacto -->
+  {{if gt .Saldo 0.0}} {{if or .Telefono .Email}}
+  <div class="acciones-aviso">
+    {{if .Telefono}}
     <button
-      class="btn-nuevo"
+      class="btn-aviso wp btn-enviar-aviso"
       type="button"
-      onclick="location.href='/clientes/{{.ID}}/venta_nueva'"
+      data-telefono="{{.Telefono}}"
+      data-nombre="{{.Nombre}}"
+      data-saldo="{{.Saldo}}"
+      data-template="{{.Config.MensajeWP}}"
     >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
+      </svg>
+      Avisar por WhatsApp
+    </button>
+    {{end}} {{if .Email}}
+    <button
+      class="btn-aviso mail btn-enviar-aviso"
+      type="button"
+      data-email="{{.Email}}"
+      data-nombre="{{.Nombre}}"
+      data-saldo="{{.Saldo}}"
+      data-template="{{.Config.MensajeWP}}"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect width="20" height="16" x="2" y="4" rx="2" />
+        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+      </svg>
+      Enviar mail
+    </button>
+    {{end}}
+  </div>
+  {{end}} {{end}}
+
+  <div class="ficha-mini-stats">
+    <div class="mini-stat">
+      <span class="mini-stat-label">Última venta</span>
+      <span class="mini-stat-valor">{{if .Ventas}}{{slice (index .Ventas 0).Fecha 0 10}}{{else}}—{{end}}</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-stat-label">Último aviso enviado</span>
+      <span class="mini-stat-valor">{{.UltimoAviso}}</span>
+    </div>
+    <div class="mini-stat">
+      <span class="mini-stat-label">Días en deuda</span>
+      <span class="mini-stat-valor">{{if gt .Saldo 0.0}}{{.DiasEnDeuda}} día{{if ne .DiasEnDeuda 1}}s{{end}}{{else}}—{{end}}</span>
+    </div>
+  </div>
+
+  <!-- Acciones principales -->
+  <div class="ficha-acciones">
+    <button class="btn-nuevo" type="button" onclick="location.href='/clientes/{{.ID}}/venta_nueva'">
       + Cargar Venta
     </button>
-    <button
-      class="btn-nuevo btn-pagar"
-      type="button"
-      onclick="location.href='/clientes/{{.ID}}/cobro_nuevo'"
-    >
+    <button class="btn-nuevo btn-pagar" type="button" onclick="location.href='/clientes/{{.ID}}/cobro_nuevo'">
       + Registrar Cobro
     </button>
   </div>
 
-  <!-- Cabecera de Historial -->
+  <!-- HISTORIAL UNIFICADO -->
   <div class="historial-header">
-    <h2 class="historial-titulo">Historial de Movimientos</h2>
-    <div class="filtro-mes-container">
-      <label for="filtro-mes" class="filtro-mes-label">Filtrar por mes:</label>
-      <select id="filtro-mes" class="input-mes">
-        <option value="">Todos los meses</option>
-      </select>
+    <h2 class="historial-titulo">Historial</h2>
+    <div class="historial-header-acciones">
+      <button type="button" class="btn-exportar-historial" onclick="exportarPDF('{{.ID}}')" title="Descargar historial en PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <path d="M14 2v6h6" />
+        </svg>
+        PDF
+      </button>
+      <div class="filtro-mes-container">
+        <select id="filtro-mes" class="input-mes" aria-label="Filtrar por mes">
+          <option value="">Todos los meses</option>
+        </select>
+      </div>
     </div>
   </div>
 
-  <div class="contenedor-tablas">
-    <!-- SECCIÓN VENTAS -->
-    <section class="ficha-seccion">
-      <h3>Ventas</h3>
-      {{if .Ventas}}
-      <div id="lista-ventas">
-        {{range $index, $venta := .Ventas}}
-        <div class="fila-cliente venta-item {{if ge $index 3}}oculto{{end}}">
-          <div class="item-detalles">
-            <span class="item-fecha">{{slice .Fecha 0 10}}</span>
-            {{if .Descripcion}}
-            <span class="item-descripcion">{{.Descripcion}}</span>
-            {{end}}
-          </div>
-          <span class="saldo debe">${{printf "%.2f" .Total}}</span>
-
-          <!-- Botonera limpia para las filas -->
-          <div class="acciones-fila">
-            <a
-              href="/venta/{{.ID}}/modificar"
-              class="btn-accion-fila"
-              title="Editar venta"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                <path d="m15 5 4 4" />
-              </svg>
-            </a>
-            <button
-              type="button"
-              class="btn-accion-fila eliminar"
-              onclick="mostrarConfirmacion('/venta/{{.ID}}/eliminar', 'Ingrese la contraseña para eliminar una venta.', 'ATENCION: Tenga en cuenta que eliminar una venta va afectar en el saldo actual del cliente.')"
-              title="Eliminar venta"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M3 6h18" />
-                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                <line x1="10" y1="11" x2="10" y2="17" />
-                <line x1="14" y1="11" x2="14" y2="17" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        {{end}}
+  <div class="historial-lista" id="listaHistorial">
+    {{range .Ventas}}
+    <div class="historial-item" data-tipo="venta" data-fecha="{{.Fecha}}">
+      <div class="historial-icono venta">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="8" cy="21" r="1" />
+          <circle cx="19" cy="21" r="1" />
+          <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 2-1.58l1.65-7.43H5.12" />
+        </svg>
       </div>
-      {{if gt (len .Ventas) 3}}
-      <div class="historial-footer">
-        <button id="btn-ver-ventas" type="button" class="btn-historial">
-          Ver historial completo ({{len .Ventas}}) ↓
+      <div class="historial-info">
+        <span class="historial-item-titulo">{{if .Descripcion}}{{.Descripcion}}{{else}}Venta{{end}}</span>
+        <span class="historial-item-fecha">{{slice .Fecha 0 10}} · {{slice .Fecha 11 16}}</span>
+      </div>
+      <span class="historial-item-monto venta">+${{printf "%.2f" .Total}}</span>
+      <div class="acciones-fila">
+        <a href="/venta/{{.ID}}/modificar" class="btn-accion-fila" title="Editar venta">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+            <path d="m15 5 4 4" />
+          </svg>
+        </a>
+        <button
+          type="button"
+          class="btn-accion-fila eliminar"
+          onclick="mostrarConfirmacion('/venta/{{.ID}}/eliminar', 'Ingrese la contraseña para eliminar una venta.', 'ATENCION: Tenga en cuenta que eliminar una venta va a afectar el saldo actual del cliente.')"
+          title="Eliminar venta"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
         </button>
       </div>
-      {{end}} {{else}}
-      <p class="vacio-inline">Todavía no hay ventas cargadas.</p>
-      {{end}}
-    </section>
-
-    <!-- SECCIÓN COBROS -->
-    <section class="ficha-seccion">
-      <h3>Cobros</h3>
-      {{if .Cobros}}
-      <div id="lista-cobros">
-        {{range $index, $cobro := .Cobros}}
-        <div class="fila-cliente cobro-item {{if ge $index 3}}oculto{{end}}">
-          <div class="item-detalles">
-            <span class="item-fecha">{{slice .Fecha 0 10}}</span>
-            <span class="item-descripcion">
-              {{if .Observacion}}{{.Observacion}}{{else}}Pagó{{end}}
-            </span>
-          </div>
-          <span class="saldo al-dia">${{printf "%.2f" .Monto}}</span>
-
-          <!-- Botonera limpia para las filas -->
-          <div class="acciones-fila">
-            <a
-              href="/cobro/{{.ID}}/modificar"
-              class="btn-accion-fila"
-              title="Editar cobro"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                <path d="m15 5 4 4" />
-              </svg>
-            </a>
-            <button
-              type="button"
-              class="btn-accion-fila eliminar"
-              onclick="mostrarConfirmacion('/cobro/{{.ID}}/eliminar', 'Ingrese la contraseña para eliminar el cobro.', 'ATENCION: Tenga en cuenta que eliminar un cobro va afectar en el saldo actual del cliente.')"
-              title="Eliminar cobro"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M3 6h18" />
-                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
-                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
-                <line x1="10" y1="11" x2="10" y2="17" />
-                <line x1="14" y1="11" x2="14" y2="17" />
-              </svg>
-            </button>
-          </div>
-        </div>
-        {{end}}
+    </div>
+    {{end}} {{range .Cobros}}
+    <div class="historial-item" data-tipo="cobro" data-fecha="{{.Fecha}}">
+      <div class="historial-icono cobro">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+          <polyline points="22 4 12 14.01 9 11.01" />
+        </svg>
       </div>
-      {{if gt (len .Cobros) 3}}
-      <div class="historial-footer">
-        <button id="btn-ver-cobros" type="button" class="btn-historial">
-          Ver historial completo ({{len .Cobros}}) ↓
+      <div class="historial-info">
+        <span class="historial-item-titulo">{{if .Observacion}}{{.Observacion}}{{else}}Cobro{{end}}</span>
+        <span class="historial-item-fecha">{{slice .Fecha 0 10}} · {{slice .Fecha 11 16}}</span>
+      </div>
+      <span class="historial-item-monto cobro">−${{printf "%.2f" .Monto}}</span>
+      <div class="acciones-fila">
+        <a href="/cobro/{{.ID}}/modificar" class="btn-accion-fila" title="Editar cobro">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+            <path d="m15 5 4 4" />
+          </svg>
+        </a>
+        <button
+          type="button"
+          class="btn-accion-fila eliminar"
+          onclick="mostrarConfirmacion('/cobro/{{.ID}}/eliminar', 'Ingrese la contraseña para eliminar el cobro.', 'ATENCION: Tenga en cuenta que eliminar un cobro va a afectar el saldo actual del cliente.')"
+          title="Eliminar cobro"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18" />
+            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            <line x1="10" y1="11" x2="10" y2="17" />
+            <line x1="14" y1="11" x2="14" y2="17" />
+          </svg>
         </button>
       </div>
-      {{end}} {{else}}
-      <p class="vacio-inline">Todavía no hay cobros cargados.</p>
-      {{end}}
-    </section>
+    </div>
+    {{end}}
+  </div>
+
+  <p class="vacio-inline oculto" id="historialVacio">Todavía no hay movimientos.</p>
+
+  <div class="historial-footer oculto" id="footerHistorial">
+    <button id="btn-ver-historial" type="button" class="btn-historial">
+      Ver historial completo ↓
+    </button>
   </div>
 </main>
 
 <script>
   /* ==================================================
-     1. LÓGICA DEL MODAL DE CONFIRMACIÓN
+     1. MODAL DE CONFIRMACIÓN
      ================================================== */
   window.mostrarConfirmacion = function (action, mensaje, atencion) {
     const overlay = document.getElementById("confirmacion");
     document.getElementById("form-password").action = action;
-    document.getElementById("confirmacion-eliminacion-contenido").textContent =
-      mensaje;
-    document.getElementById(
-      "confirmacion-eliminacion-contenido-atencion",
-    ).textContent = atencion;
+    document.getElementById("confirmacion-eliminacion-contenido").textContent = mensaje;
+    document.getElementById("confirmacion-eliminacion-contenido-atencion").textContent = atencion;
     if (overlay) {
       overlay.classList.remove("oculto");
       document.body.classList.add("modal-abierto");
@@ -428,8 +278,7 @@
   if (overlayElem) {
     const modalCard = overlayElem.querySelector(".modal-card");
     overlayElem.addEventListener("click", window.dejarDeMostrarConfirmacion);
-    if (modalCard)
-      modalCard.addEventListener("click", (e) => e.stopPropagation());
+    if (modalCard) modalCard.addEventListener("click", (e) => e.stopPropagation());
   }
 
   document.addEventListener("keydown", (e) => {
@@ -437,48 +286,89 @@
   });
 
   /* ==================================================
-     2. LÓGICA DE HISTORIAL DESPLEGABLE
+     2. HISTORIAL UNIFICADO: ordenar, limitar y filtrar
      ================================================== */
-  const btnVerVentas = document.getElementById("btn-ver-ventas");
-  if (btnVerVentas) {
-    btnVerVentas.addEventListener("click", function () {
-      const items = document.querySelectorAll(".venta-item");
-      const expandir = this.innerText.includes("completo");
-      items.forEach((item, index) => {
-        if (index >= 3) item.style.display = expandir ? "flex" : "none";
-      });
-      this.innerText = expandir
-        ? "Ocultar historial ↑"
-        : "Ver historial completo (" + items.length + ") ↓";
+  const listaHistorial = document.getElementById("listaHistorial");
+  const historialVacio = document.getElementById("historialVacio");
+  const footerHistorial = document.getElementById("footerHistorial");
+  const btnVerHistorial = document.getElementById("btn-ver-historial");
+  const LIMITE_INICIAL = 5;
+
+  let items = Array.from(listaHistorial.querySelectorAll(".historial-item"));
+
+  // Orden cronológico descendente
+  items.sort((a, b) => (b.dataset.fecha > a.dataset.fecha ? 1 : -1));
+  items.forEach((item) => listaHistorial.appendChild(item));
+
+  if (items.length === 0) {
+    historialVacio.classList.remove("oculto");
+  } else {
+    items.forEach((item, index) => {
+      item.style.display = index < LIMITE_INICIAL ? "" : "none";
     });
+    if (items.length > LIMITE_INICIAL) {
+      footerHistorial.classList.remove("oculto");
+    }
   }
 
-  const btnVerCobros = document.getElementById("btn-ver-cobros");
-  if (btnVerCobros) {
-    btnVerCobros.addEventListener("click", function () {
-      const items = document.querySelectorAll(".cobro-item");
+  if (btnVerHistorial) {
+    btnVerHistorial.addEventListener("click", function () {
       const expandir = this.innerText.includes("completo");
-      items.forEach((item, index) => {
-        if (index >= 3) item.style.display = expandir ? "flex" : "none";
+      const filasVisibles = items.filter((item) => item.dataset.oculto !== "mes");
+      filasVisibles.forEach((item, index) => {
+        item.style.display = expandir || index < LIMITE_INICIAL ? "" : "none";
       });
-      this.innerText = expandir
-        ? "Ocultar historial ↑"
-        : "Ver historial completo (" + items.length + ") ↓";
+      this.innerText = expandir ? "Ocultar historial ↑" : "Ver historial completo ↓";
     });
   }
 
   /* ==================================================
-     3. LÓGICA DE FORMATEO DE MONEDA Y ERRORES
+     3. FILTRO MENSUAL
+     ================================================== */
+  const selectMes = document.getElementById("filtro-mes");
+  if (selectMes && items.length > 0) {
+    const nombresMeses = ["", "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    const mesesSet = new Set(items.map((item) => item.dataset.fecha.slice(0, 7)));
+    const mesesArray = Array.from(mesesSet).sort().reverse();
+
+    mesesArray.forEach((mesStr) => {
+      const [year, month] = mesStr.split("-");
+      const option = document.createElement("option");
+      option.value = mesStr;
+      option.textContent = nombresMeses[parseInt(month, 10)] + " " + year;
+      selectMes.appendChild(option);
+    });
+
+    selectMes.addEventListener("change", function () {
+      const mesBuscado = this.value;
+
+      if (mesBuscado !== "") {
+        footerHistorial.classList.add("oculto");
+        items.forEach((item) => {
+          const coincide = item.dataset.fecha.startsWith(mesBuscado);
+          item.style.display = coincide ? "" : "none";
+        });
+      } else {
+        items.forEach((item, index) => {
+          item.style.display = index < LIMITE_INICIAL ? "" : "none";
+        });
+        if (btnVerHistorial) btnVerHistorial.innerText = "Ver historial completo ↓";
+        if (items.length > LIMITE_INICIAL) footerHistorial.classList.remove("oculto");
+      }
+    });
+  }
+
+  /* ==================================================
+     4. FORMATEO DE MONEDA Y ERRORES
      ================================================== */
   document.addEventListener("DOMContentLoaded", () => {
     const serverError = "{{.Error}}";
-    if (serverError !== "") {
-      if (typeof showToast === "function") {
-        showToast(serverError, true);
-      }
+    if (serverError !== "" && typeof showToast === "function") {
+      showToast(serverError, true);
     }
 
-    document.querySelectorAll(".balance-monto, .saldo").forEach((el) => {
+    document.querySelectorAll(".balance-monto, .saldo, .historial-item-monto").forEach((el) => {
       let texto = el.textContent;
       let numero = texto.match(/[\d.]+/);
       if (numero && texto.includes("$")) {
@@ -493,91 +383,7 @@
   });
 
   /* ==================================================
-     4. LÓGICA DE FILTRO MENSUAL
-     ================================================== */
-  const selectMes = document.getElementById("filtro-mes");
-  if (selectMes) {
-    const ventas = document.querySelectorAll(".venta-item");
-    const cobros = document.querySelectorAll(".cobro-item");
-    const mesesSet = new Set();
-
-    const extraerMes = (item) => {
-      const textoFechaElem = item.querySelector(".item-fecha");
-      if (textoFechaElem) {
-        const partes = textoFechaElem.textContent.trim().split("-");
-        if (partes.length >= 2) mesesSet.add(partes[0] + "-" + partes[1]);
-      }
-    };
-
-    ventas.forEach(extraerMes);
-    cobros.forEach(extraerMes);
-
-    const mesesArray = Array.from(mesesSet).sort().reverse();
-    const nombresMeses = [
-      "",
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre",
-    ];
-
-    mesesArray.forEach((mesStr) => {
-      const [year, month] = mesStr.split("-");
-      const option = document.createElement("option");
-      option.value = mesStr;
-      option.textContent = nombresMeses[parseInt(month, 10)] + " " + year;
-      selectMes.appendChild(option);
-    });
-
-    selectMes.addEventListener("change", function () {
-      const mesBuscado = this.value;
-      const fVentas = document.getElementById("btn-ver-ventas")?.parentElement;
-      const fCobros = document.getElementById("btn-ver-cobros")?.parentElement;
-
-      if (mesBuscado !== "") {
-        if (fVentas) fVentas.classList.add("oculto");
-        if (fCobros) fCobros.classList.add("oculto");
-
-        ventas.forEach((item) => {
-          item.style.display = item
-            .querySelector(".item-fecha")
-            .textContent.trim()
-            .startsWith(mesBuscado)
-            ? "flex"
-            : "none";
-        });
-        cobros.forEach((item) => {
-          item.style.display = item
-            .querySelector(".item-fecha")
-            .textContent.trim()
-            .startsWith(mesBuscado)
-            ? "flex"
-            : "none";
-        });
-      } else {
-        if (fVentas) fVentas.classList.remove("oculto");
-        if (fCobros) fCobros.classList.remove("oculto");
-
-        ventas.forEach(
-          (item, index) => (item.style.display = index < 3 ? "flex" : "none"),
-        );
-        cobros.forEach(
-          (item, index) => (item.style.display = index < 3 ? "flex" : "none"),
-        );
-      }
-    });
-  }
-
-  /* ==================================================
-     5. LÓGICA DE NOTIFICACIÓN (WHATSAPP / EMAIL)
+     5. NOTIFICACIÓN (WHATSAPP / EMAIL)
      ================================================== */
   document.querySelectorAll(".btn-enviar-aviso").forEach((btn) => {
     btn.addEventListener("click", function () {
@@ -585,34 +391,37 @@
       const email = this.dataset.email;
       const nombre = this.dataset.nombre;
       const saldo = parseFloat(this.dataset.saldo);
-      let template =
-        this.dataset.template ||
-        "Hola {nombre}, te escribo para recordarte que tenés un saldo pendiente de ${saldo}.";
+      let template = this.dataset.template || "Hola {nombre}, te escribo para recordarte que tenés un saldo pendiente de ${saldo}.";
 
       const saldoFormateado = saldo.toLocaleString("es-AR", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       });
 
-      let mensaje = template
-        .replace(/{nombre}/g, nombre)
-        .replace(/{saldo}/g, saldoFormateado);
+      let mensaje = template.replace(/{nombre}/g, nombre).replace(/{saldo}/g, saldoFormateado);
 
       if (telefono) {
         let telLimpio = telefono.replace(/\D/g, "");
         if (telLimpio.startsWith("0")) telLimpio = telLimpio.substring(1);
         if (!telLimpio.startsWith("54")) telLimpio = "54" + telLimpio;
-        window.open(
-          `https://wa.me/${telLimpio}?text=${encodeURIComponent(mensaje)}`,
-          "_blank",
-        );
+        window.open(`https://wa.me/${telLimpio}?text=${encodeURIComponent(mensaje)}`, "_blank");
+        registrarAviso("wp");
       } else if (email) {
         window.location.href = `mailto:${email}?subject=${encodeURIComponent("Aviso de saldo pendiente")}&body=${encodeURIComponent(mensaje)}`;
+        registrarAviso("email");
       }
     });
   });
 
-  /*Exportacion a pdf, abre otra pestaña nueva.*/
+  function registrarAviso(tipo) {
+    fetch("/clientes/{{.ID}}/aviso", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "tipo=" + encodeURIComponent(tipo),
+    }).catch(() => {});
+  }
+
+  /* Exportación a PDF */
   function exportarPDF(id) {
     window.open(`/clientes/${id}/pdf`, "_blank");
   }

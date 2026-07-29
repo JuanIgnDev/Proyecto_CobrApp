@@ -1,12 +1,47 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 )
+
+// ContextoCliente es lo que recibe clienteDetalle.html. Antes esta misma
+// estructura estaba repetida (con pequeñas variaciones) en 7 lugares
+// distintos de este archivo; armarContextoCliente() la arma una sola vez.
+type ContextoCliente struct {
+	*Cliente
+	Ventas      []Venta
+	Cobros      []Cobro
+	Config      Configuracion
+	DiasEnDeuda int
+	UltimoAviso string
+	Error       string
+}
+
+func armarContextoCliente(db *sql.DB, cliente *Cliente, errMsg string) ContextoCliente {
+	ventas := ObtenerVentasDeCliente(db, cliente.ID)
+	cobros := ObtenerCobrosDeCliente(db, cliente.ID)
+	config := ObtenerConfiguracion(db)
+
+	dias := 0
+	if fechaRef, err := ObtenerFechaReferencia(db, cliente.ID); err == nil {
+		dias = DiasDesde(fechaRef)
+	}
+
+	return ContextoCliente{
+		Cliente:     cliente,
+		Ventas:      ventas,
+		Cobros:      cobros,
+		Config:      config,
+		DiasEnDeuda: dias,
+		UltimoAviso: ObtenerUltimoAviso(db, cliente.ID),
+		Error:       errMsg,
+	}
+}
 
 func main() {
 
@@ -77,7 +112,7 @@ func main() {
 			ClientesEnDeuda  int
 			ClientesSinDeuda int
 			TotalClientes    int
-			Config           Configuracion 
+			Config           Configuracion
 		}{
 			Clientes:         clientes,
 			TotalACobrar:     totalACobrar,
@@ -131,18 +166,7 @@ func main() {
 			return
 		}
 
-		ventas := ObtenerVentasDeCliente(db, id)
-		cobros := ObtenerCobrosDeCliente(db, id)
-
-		config := ObtenerConfiguracion(db)
-
-		renderizar(w, "base.html", "clienteDetalle.html", struct {
-			*Cliente
-			Ventas []Venta
-			Cobros []Cobro
-			Config Configuracion
-			Error  string
-		}{Cliente: cliente, Ventas: ventas, Cobros: cobros, Config: config, Error: ""})
+		renderizar(w, "base.html", "clienteDetalle.html", armarContextoCliente(db, cliente, ""))
 	}))
 
 	// Formulario de venta nueva (mostrar)
@@ -313,6 +337,25 @@ func main() {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}))
 
+	// Registrar que se le mandó un aviso (WhatsApp o email) a un cliente
+	mux.HandleFunc("POST /clientes/{id}/aviso", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
+		id, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil {
+			http.Error(w, "ID inválido", http.StatusBadRequest)
+			return
+		}
+
+		tipo := r.FormValue("tipo") // "wp" o "email"
+
+		if err := RegistrarAviso(db, id, tipo); err != nil {
+			log.Println("Error registrando el aviso:", err)
+			http.Error(w, "No se pudo registrar el aviso", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+	}))
+
 	// Eliminar clientes
 	mux.HandleFunc("POST /clientes/{id}/eliminar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 
@@ -328,43 +371,15 @@ func main() {
 			return
 		}
 
-		ventas := ObtenerVentasDeCliente(db, id)
-		cobros := ObtenerCobrosDeCliente(db, id)
-		config := ObtenerConfiguracion(db) // NUEVO: Obtenemos config para el render de error
-
 		password := r.FormValue("password")
 
 		if !validarCredenciales("admin", password) {
-			renderizar(w, "base.html", "clienteDetalle.html", struct {
-				*Cliente
-				Ventas []Venta
-				Cobros []Cobro
-				Config Configuracion // NUEVO
-				Error  string
-			}{
-				Cliente: cliente,
-				Ventas:  ventas,
-				Cobros:  cobros,
-				Config:  config,     // NUEVO
-				Error:   "Contraseña incorrecta.",
-			})
+			renderizar(w, "base.html", "clienteDetalle.html", armarContextoCliente(db, cliente, "Contraseña incorrecta."))
 			return
 		}
 
 		if err := eliminarCliente(db, id); err != nil {
-			renderizar(w, "base.html", "clienteDetalle.html", struct {
-				*Cliente
-				Ventas []Venta
-				Cobros []Cobro
-				Config Configuracion // NUEVO
-				Error  string
-			}{
-				Cliente: cliente,
-				Ventas:  ventas,
-				Cobros:  cobros,
-				Config:  config,     // NUEVO
-				Error:   "No se pudo eliminar el cliente.",
-			})
+			renderizar(w, "base.html", "clienteDetalle.html", armarContextoCliente(db, cliente, "No se pudo eliminar el cliente."))
 			return
 		}
 
@@ -391,50 +406,22 @@ func main() {
 			return
 		}
 
-		cliente, err := ObtenerClientePorID(db, cobro.ClienteID) 
+		cliente, err := ObtenerClientePorID(db, cobro.ClienteID)
 
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 
-		ventas := ObtenerVentasDeCliente(db, cliente.ID)
-		cobros := ObtenerCobrosDeCliente(db, cliente.ID)
-		config := ObtenerConfiguracion(db) // NUEVO
-
 		password := r.FormValue("password")
 
 		if !validarCredenciales("admin", password) {
-			renderizar(w, "base.html", "clienteDetalle.html", struct {
-				*Cliente
-				Ventas []Venta
-				Cobros []Cobro
-				Config Configuracion // NUEVO
-				Error  string
-			}{
-				Cliente: cliente,
-				Ventas:  ventas,
-				Cobros:  cobros,
-				Config:  config,     // NUEVO
-				Error:   "Contraseña incorrecta.",
-			})
+			renderizar(w, "base.html", "clienteDetalle.html", armarContextoCliente(db, cliente, "Contraseña incorrecta."))
 			return
 		}
 
 		if err := eliminarCobro(db, idCobro); err != nil {
-			renderizar(w, "base.html", "clienteDetalle.html", struct {
-				*Cliente
-				Ventas []Venta
-				Cobros []Cobro
-				Config Configuracion // NUEVO
-				Error  string
-			}{
-				Cliente: cliente,
-				Ventas:  ventas,
-				Cobros:  cobros,
-				Config:  config,     // NUEVO
-				Error:   "No se pudo eliminar el cobro.",
-			})
+			renderizar(w, "base.html", "clienteDetalle.html", armarContextoCliente(db, cliente, "No se pudo eliminar el cobro."))
 			return
 		}
 
@@ -445,7 +432,6 @@ func main() {
 			http.StatusSeeOther,
 		)
 	}))
-
 
 	// Eliminar ventas
 	mux.HandleFunc("POST /venta/{id}/eliminar", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
@@ -462,49 +448,21 @@ func main() {
 			return
 		}
 
-		cliente, err := ObtenerClientePorID(db, venta.ClienteID) 
+		cliente, err := ObtenerClientePorID(db, venta.ClienteID)
 		if err != nil {
 			http.NotFound(w, r)
 			return
 		}
 
-		ventas := ObtenerVentasDeCliente(db, cliente.ID)
-		cobros := ObtenerCobrosDeCliente(db, cliente.ID)
-		config := ObtenerConfiguracion(db) // NUEVO
-
 		password := r.FormValue("password")
 
 		if !validarCredenciales("admin", password) {
-			renderizar(w, "base.html", "clienteDetalle.html", struct {
-				*Cliente
-				Ventas []Venta
-				Cobros []Cobro
-				Config Configuracion // NUEVO
-				Error  string
-			}{
-				Cliente: cliente,
-				Ventas:  ventas,
-				Cobros:  cobros,
-				Config:  config,     // NUEVO
-				Error:   "Contraseña incorrecta.",
-			})
+			renderizar(w, "base.html", "clienteDetalle.html", armarContextoCliente(db, cliente, "Contraseña incorrecta."))
 			return
 		}
 
 		if err := eliminarVenta(db, idVenta); err != nil {
-			renderizar(w, "base.html", "clienteDetalle.html", struct {
-				*Cliente
-				Ventas []Venta
-				Cobros []Cobro
-				Config Configuracion // NUEVO
-				Error  string
-			}{
-				Cliente: cliente,
-				Ventas:  ventas,
-				Cobros:  cobros,
-				Config:  config,     // NUEVO
-				Error:   "No se pudo eliminar la venta.",
-			})
+			renderizar(w, "base.html", "clienteDetalle.html", armarContextoCliente(db, cliente, "No se pudo eliminar la venta."))
 			return
 		}
 
@@ -515,7 +473,6 @@ func main() {
 			http.StatusSeeOther,
 		)
 	}))
-
 
 	// Seccion de estadisticas
 	mux.HandleFunc("GET /estadisticas", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
@@ -596,12 +553,12 @@ func main() {
 			TotalClientesUltMes int
 			TotalClientesUltAño int
 			DatosGraficoJSON    template.JS
-			TopDeudores			[]Cliente
+			TopDeudores         []Cliente
 		}{
 			TotalClientesUltMes: TotalClientesUltMes,
 			TotalClientesUltAño: TotalClientesUltAño,
 			DatosGraficoJSON:    template.JS(jsonDatos),
-			TopDeudores:		TopDeudores,
+			TopDeudores:         TopDeudores,
 		})
 	}))
 
@@ -613,7 +570,7 @@ func main() {
 	// MOSTRAR la pantalla de configuración
 	mux.HandleFunc("GET /configuracion", requiereLogin(func(w http.ResponseWriter, r *http.Request) {
 		config := ObtenerConfiguracion(db)
-		
+
 		renderizar(w, "base.html", "configuracion.html", struct {
 			Config Configuracion
 			Error  string
@@ -891,7 +848,6 @@ func main() {
 			return
 		}
 
-
 		cliente, err := ObtenerClientePorID(db, idCliente)
 
 		if err != nil {
@@ -899,10 +855,8 @@ func main() {
 			return
 		}
 
-
 		ventas := ObtenerVentasDeCliente(db, idCliente)
 		cobros := ObtenerCobrosDeCliente(db, idCliente)
-
 
 		pdfBytes, err := generarPDF(cliente, ventas, cobros)
 
@@ -911,14 +865,12 @@ func main() {
 			return
 		}
 
-
 		w.Header().Set("Content-Type", "application/pdf")
 
 		w.Header().Set(
 			"Content-Disposition",
 			`inline; filename="cliente.pdf"`,
 		)
-
 
 		w.Write(pdfBytes)
 
@@ -948,4 +900,3 @@ func renderizar(w http.ResponseWriter, layout, pagina string, datos any) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
-
