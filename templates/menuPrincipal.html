@@ -1,6 +1,6 @@
 {{define "contenido"}}
 
-<!--Resumen de clientes en deudas y a favor-->
+<!-- Resumen de clientes en deudas y a favor -->
 <div class="resumen" id="resumen">
   <button type="button" class="resumen-item" data-filter="debe">
     <span class="resumen-label">Clientes en deuda</span>
@@ -17,57 +17,57 @@
 </div>
 <p class="resumen-hint" id="resumenHint"></p>
 
-<!--Barra de busqueda y boton donde podemos agregar clientes-->
+<!-- Barra de búsqueda limpia -->
 <div class="toolbar">
   <div class="search-box">
     <input type="text" id="buscador" placeholder="Buscar cliente..." autocomplete="off" />
   </div>
-  <button class="btn-nuevo" type="button" onclick="location.href = '/cliente_nuevo'">
-    + Nuevo cliente
-  </button>
 </div>
 
-<!--Seccion de informacion de clientes-->
+<!-- Sección de información de clientes -->
 {{if .Clientes}}
 <main class="libro" id="listaClientes">
   {{range .Clientes}}
-  <!-- Usamos un div en lugar de 'a' para evitar conflictos con los botones internos -->
   <div
     class="fila-cliente"
     onclick="location.href='/clientes/{{.ID}}'"
     data-nombre="{{.ID}}{{.Nombre}} {{.Apellido}}"
     data-status="{{if gt .Saldo 0.0}}debe{{else if lt .Saldo 0.0}}favor{{else}}aldia{{end}}"
   >
-    <span class="nombre-cliente">
-      {{.Nombre}} {{.Apellido}}
-      <span class="id-cliente">ID: {{.ID}}</span>
-    </span>
+    <!-- Lado Izquierdo: Iniciales + Nombre + ID -->
+    <div class="cliente-info-izq">
+      <div class="avatar-iniciales {{if gt .Saldo 0.0}}avatar-deuda{{else}}avatar-aldia{{end}}">
+        {{slice .Nombre 0 1}}{{slice .Apellido 0 1}}
+      </div>
+      <div class="cliente-texto">
+        <span class="nombre-cliente">{{.Nombre}} {{.Apellido}}</span>
+        <span class="id-cliente">ID {{.ID}}</span>
+      </div>
+    </div>
     
-    <span class="leader"></span>
-
-    <!-- Contenedor para el saldo y el botón de acción rápida -->
-    <div class="contenedor-saldos-rapidos">
+    <!-- Lado Derecho: Saldo + Acciones Rápidas -->
+    <div class="cliente-info-der">
       {{if gt .Saldo 0.0}}
-        <span class="saldo debe">DEBE ${{printf "%.2f" .Saldo}}</span>
+        <span class="badge-monto debe">${{printf "%.2f" .Saldo}}</span>
         
-        <!-- BOTONES MÁGICOS RÁPIDOS -->
+        <!-- Botones rápidos (Diseño claro) -->
         {{if .Telefono}}
-          <button class="btn-quick-notificar wp" type="button" onclick="event.stopPropagation(); notificarRapido(this)" 
-            data-tipo="wp" data-contacto="{{.Telefono}}" data-nombre="{{.Nombre}}" data-saldo="{{.Saldo}}" data-template="{{$.Config.MensajeWP}}" title="Cobrar por WhatsApp">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          <button class="btn-quick-notificar light-wp" type="button" onclick="event.stopPropagation(); notificarRapido(this)" 
+            data-tipo="wp" data-id="{{.ID}}" data-contacto="{{.Telefono}}" data-nombre="{{.Nombre}}" data-saldo="{{.Saldo}}" data-template="{{$.Config.MensajeWP}}" aria-label="Cobrar por WhatsApp">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </button>
         {{else if .Email}}
-          <button class="btn-quick-notificar email" type="button" onclick="event.stopPropagation(); notificarRapido(this)" 
-            data-tipo="email" data-contacto="{{.Email}}" data-nombre="{{.Nombre}}" data-saldo="{{.Saldo}}" data-template="{{$.Config.MensajeWP}}" title="Cobrar por Email">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <button class="btn-quick-notificar light-email" type="button" onclick="event.stopPropagation(); notificarRapido(this)" 
+            data-tipo="email" data-id="{{.ID}}" data-contacto="{{.Email}}" data-nombre="{{.Nombre}}" data-saldo="{{.Saldo}}" data-template="{{$.Config.MensajeWP}}" aria-label="Cobrar por Email">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
           </button>
         {{end}}
 
       {{else if lt .Saldo 0.0}} 
         {{$saldoTxt := printf "%.2f" .Saldo}}
-        <span class="saldo a-favor">+${{slice $saldoTxt 1}} A FAVOR</span>
+        <span class="badge-monto favor">+${{slice $saldoTxt 1}}</span>
       {{else}}
-        <span class="saldo al-dia">Al día</span>
+        <span class="badge-monto aldia">Al día</span>
       {{end}}
     </div>
   </div>
@@ -79,6 +79,11 @@
 </div>
 {{end}}
 
+<!-- BOTÓN FLOTANTE (FAB) PARA NUEVO CLIENTE -->
+<button class="btn-fab" type="button" onclick="location.href = '/cliente_nuevo'" title="Nuevo cliente">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+</button>
+
 <script>
   // Buscar cliente
   const buscador = document.getElementById("buscador");
@@ -89,29 +94,25 @@
     });
   }
 
-  // Agregar los miles a los valores
-  const array = [".resumen-monto", ".saldo"];
+  // Formateo de moneda
+  document.querySelectorAll(".resumen-monto, .badge-monto").forEach((el) => {
+    let texto = el.textContent;
+    let numero = texto.match(/[\d.]+/);
 
-  for (let index = 0; index < array.length; index++) {
-    document.querySelectorAll(array[index]).forEach((saldo) => {
-      let texto = saldo.textContent;
-      let numero = texto.match(/[\d.]+/);
+    if (numero && texto.includes("$")) {
+      let valor = parseFloat(numero[0]);
+      let formateado = valor.toLocaleString("es-AR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      el.textContent = texto.replace(numero[0], formateado);
+    }
+  });
 
-      if (numero) {
-        let valor = Number(numero[0]);
-        saldo.textContent = texto.replace(
-          numero[0],
-          valor.toLocaleString("es-AR", {
-            minimumFractionDigits: 0,
-          }),
-        );
-      }
-    });
-  }
-
-  // LÓGICA PARA LOS BOTONES RÁPIDOS
+  // Lógica de notificaciones rápidas
   function notificarRapido(btn) {
     const tipo = btn.dataset.tipo;
+    const id = btn.dataset.id; // <-- Capturamos el ID
     const contacto = btn.dataset.contacto;
     const nombre = btn.dataset.nombre;
     const saldo = parseFloat(btn.dataset.saldo);
@@ -129,9 +130,21 @@
       if (telLimpio.startsWith("0")) telLimpio = telLimpio.substring(1);
       if (!telLimpio.startsWith("54")) telLimpio = "54" + telLimpio;
       window.open(`https://wa.me/${telLimpio}?text=${encodeURIComponent(mensaje)}`, "_blank");
+      registrarAviso(tipo, id);
     } else if (tipo === "email") {
       window.location.href = `mailto:${contacto}?subject=${encodeURIComponent("Aviso de saldo pendiente")}&body=${encodeURIComponent(mensaje)}`;
+      registrarAviso(tipo, id);
     }
+  }
+
+  // Pega directo al backend para guardar la fecha del aviso en silencio
+  function registrarAviso(tipo, id) {
+    if (!id) return;
+    fetch(`/clientes/${id}/aviso`, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: "tipo=" + encodeURIComponent(tipo),
+    }).catch(() => {});
   }
 </script>
 {{end}}

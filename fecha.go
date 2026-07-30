@@ -23,3 +23,22 @@ func normalizarFecha(fechaForm string) (string, error) {
 
 	return fechaParseada.Format("2006-01-02 15:04:05"), nil
 }
+
+// DiasDesde calcula cuántos días pasaron desde una fecha guardada en el
+// mismo formato que usa la DB ("2006-01-02 15:04:05"). Se usa para
+// "días en deuda" en la ficha del cliente. Si la fecha viene vacía o
+// mal formada, devuelve 0 en vez de cortar el render de la página.
+func DiasDesde(fechaRef string) int {
+	const formato = "2006-01-02 15:04:05"
+
+	fecha, err := time.Parse(formato, fechaRef)
+	if err != nil {
+		return 0
+	}
+
+	dias := int(time.Since(fecha).Hours() / 24)
+	if dias < 0 {
+		dias = 0
+	}
+	return dias
+}

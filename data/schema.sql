@@ -1,9 +1,6 @@
--- Esquema SQLite para Proyecto_CobrApp
--- Basado en clientes_deudas.drawio
-
 PRAGMA foreign_keys = ON;
 
--- Cliente (en el diagrama: cuentaCliente)
+-- Cliente 
 CREATE TABLE IF NOT EXISTS cliente (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre      TEXT NOT NULL,
@@ -13,7 +10,7 @@ CREATE TABLE IF NOT EXISTS cliente (
     creado_en   TEXT NOT NULL DEFAULT (datetime('now'))
 );
 
--- Venta: cada cliente puede tener muchas ventas (1..N)
+-- Venta
 CREATE TABLE IF NOT EXISTS venta (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     cliente_id   INTEGER NOT NULL,
@@ -23,9 +20,7 @@ CREATE TABLE IF NOT EXISTS venta (
     FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE
 );
 
--- Cobro: cada cliente puede tener muchos cobros (1..N)
--- OJO: en el diagrama el cobro se asocia a la CUENTA del cliente,
--- no a una venta específica (modelo de cuenta corriente).
+-- Cobro
 CREATE TABLE IF NOT EXISTS cobro (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
     cliente_id   INTEGER NOT NULL,
@@ -35,32 +30,33 @@ CREATE TABLE IF NOT EXISTS cobro (
     FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE
 );
 
---Notificacion
+-- Notificacion
 CREATE TABLE IF NOT EXISTS notificacion (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-
     cliente_id INTEGER NOT NULL,
-
     tipo TEXT NOT NULL,
-
     titulo TEXT NOT NULL,
-
     fecha_referencia TEXT NOT NULL,
-
     estado TEXT NOT NULL DEFAULT 'pendiente',
-
     fecha_creacion TEXT NOT NULL DEFAULT (datetime('now')),
-
-    FOREIGN KEY (cliente_id)
-        REFERENCES cliente(id)
-        ON DELETE CASCADE
+    FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE
 );
 
--- Índices para consultas frecuentes (historial por cliente)
+-- Aviso
+CREATE TABLE IF NOT EXISTS aviso (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    cliente_id   INTEGER NOT NULL,
+    tipo         TEXT NOT NULL,
+    fecha        TEXT NOT NULL DEFAULT (datetime('now')),
+    FOREIGN KEY (cliente_id) REFERENCES cliente(id) ON DELETE CASCADE
+);
+
+-- Índices 
 CREATE INDEX IF NOT EXISTS idx_venta_cliente ON venta(cliente_id);
 CREATE INDEX IF NOT EXISTS idx_cobro_cliente ON cobro(cliente_id);
+CREATE INDEX IF NOT EXISTS idx_aviso_cliente ON aviso(cliente_id);
 
--- Vista de saldo/deuda por cliente: total vendido - total cobrado
+-- Vista de saldo
 CREATE VIEW IF NOT EXISTS vista_saldo_cliente AS
 SELECT
     c.id AS cliente_id,
@@ -74,7 +70,7 @@ SELECT
       - COALESCE((SELECT SUM(monto) FROM cobro WHERE cobro.cliente_id = c.id), 0) AS saldo_pendiente
 FROM cliente c;
 
-
+-- Configuracion
 CREATE TABLE IF NOT EXISTS configuracion (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     dias_alerta INTEGER NOT NULL,
