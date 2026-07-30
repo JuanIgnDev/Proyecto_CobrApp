@@ -3,10 +3,14 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"html/template"
+	"io/fs"
 	"log"
 	"net/http"
+	"path/filepath"
 	"strconv"
+	"time"
 )
 
 // ContextoCliente es lo que recibe clienteDetalle.html. Antes esta misma
@@ -45,18 +49,47 @@ func armarContextoCliente(db *sql.DB, cliente *Cliente, errMsg string) ContextoC
 
 func main() {
 
-	//Conectar la DB primero
-	db, err := ConectarDB("./data/cobrapp.db")
+	// --- 1. Logs: antes que nada, para que hasta los errores de arranque queden registrados ---
+	archivoLog, err := ConfigurarLogs()
+	if err != nil {
+		// Si esto falla seguimos igual: log.Println sin ConfigurarLogs()
+		// simplemente escribe a la consola, no es fatal.
+		log.Println("No se pudo configurar el log a archivo, sigo solo por consola:", err)
+	} else {
+		defer archivoLog.Close()
+	}
+
+	// --- 2. Config: leemos config.json (puerto, empresa) de al lado del ejecutable ---
+	config := CargarConfigApp()
+	log.Println("Configuración cargada. Empresa:", config.Empresa, "| Puerto preferido:", config.Puerto)
+
+	// --- 3. Ruta de la DB: siempre relativa al ejecutable, no a "donde se lo invocó" ---
+	dirBase, err := dirEjecutable()
+	if err != nil {
+		log.Fatal("ERROR: No se pudo determinar la carpeta del ejecutable:", err)
+	}
+	rutaDB := filepath.Join(dirBase, "data", "cobrapp.db")
+
+	db, err := ConectarDB(rutaDB)
 	if err != nil {
 		log.Fatal("ERROR: No se pudo conectar a la db:", err)
 	}
 	defer db.Close()
-	log.Println("Se conectó correctamente a la db!")
+	log.Println("Se conectó correctamente a la db en:", rutaDB)
+
+	// --- 4. Backups: uno ahora, y de ahí en más uno cada 24hs, en segundo plano ---
+	go IniciarBackupsPeriodicos(rutaDB)
 
 	mux := http.NewServeMux()
 
-	//carga archivos css
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	// Archivos estáticos (css, imágenes) embebidos en el binario (ver
+	// embebidos.go). fs.Sub "recorta" el prefijo "static/" para que las
+	// URLs sigan siendo /static/css/style.css como antes.
+	staticSinPrefijo, err := fs.Sub(staticFS, "static")
+	if err != nil {
+		log.Fatal("ERROR: No se pudo preparar los archivos estáticos embebidos:", err)
+	}
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(staticSinPrefijo))))
 
 	// --- Login / logout: NUNCA van envueltas en requiereLogin, si no nadie podría loguearse ---
 
@@ -876,13 +909,38 @@ func main() {
 
 	})
 
-	log.Println("Servidor iniciado en http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	// --- Puerto: probamos el de config.json; si está ocupado, buscamos uno libre ---
+	puerto, err := puertoLibre(config.Puerto)
+	if err != nil {
+		log.Fatal("ERROR: No se pudo encontrar un puerto libre:", err)
+	}
+	if puerto != config.Puerto {
+		log.Printf("El puerto %d estaba ocupado, uso el %d en su lugar\n", config.Puerto, puerto)
+	}
+
+	url := fmt.Sprintf("http://localhost:%d", puerto)
+	log.Println("Servidor iniciado en", url)
+
+	// Abrimos el navegador un instante después de arrancar, en otra
+	// goroutine: si lo hacemos antes de que el servidor esté escuchando,
+	// el navegador puede llegar a mostrar "no se pudo conectar".
+	go func() {
+		time.Sleep(300 * time.Millisecond)
+		if err := abrirNavegador(url); err != nil {
+			log.Println("No se pudo abrir el navegador automáticamente:", err)
+		}
+	}()
+
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", puerto), mux))
 }
 
 func renderizar(w http.ResponseWriter, layout, pagina string, datos any) {
 
-	tmpl, err := template.ParseFiles(
+	// ParseFS es el equivalente de ParseFiles pero leyendo de un embed.FS
+	// (memoria, dentro del binario) en vez de leer del disco. Las rutas
+	// se escriben igual, por eso el resto del código no cambia.
+	tmpl, err := template.ParseFS(
+		plantillasFS,
 		"templates/sideBar.html",
 		"templates/bandejaDeEntrada.html",
 		"templates/"+pagina,
