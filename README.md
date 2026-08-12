@@ -14,6 +14,9 @@ Entre sus principales funcionalidades se encuentran:
 
 El objetivo principal de CobrApp es centralizar la información y automatizar tareas de gestión, reduciendo la dependencia de registros manuales y facilitando el seguimiento de las operaciones.
 
+👨‍💻 Tecnologias utilizadas:
+Go · SQLite · HTML · CSS · JavaScript
+
 ## Capturas
 ### Dashboard
 <img width="813" height="623" alt="Captura desde 2026-08-12 18-28-02" src="https://github.com/user-attachments/assets/859f9039-e955-4d9d-a4b9-340ff0534d0c" />
@@ -42,8 +45,3 @@ El objetivo principal de CobrApp es centralizar la información y automatizar ta
 ### Configuracion
 <img width="658" height="653" alt="Captura desde 2026-08-12 16-36-57" src="https://github.com/user-attachments/assets/ae383366-4161-452f-ba28-a506f2c070d0" />
 
-Tecnologías
-Go · SQLite · HTML · CSS · JavaScript
-
-Repositorio publico donde se encuentra (Cuenta con imágenes ilustrativas de como se ve la App): 
-JuanIgnDev/Proyecto_CobrApp
