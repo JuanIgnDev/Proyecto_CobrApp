@@ -288,7 +288,6 @@ textarea.input-texto:focus,
   padding-top: 2rem;
 }
 
-
 /* =========================================
    5. BOTONES GLOBALES
    ========================================= */
@@ -447,7 +446,9 @@ textarea.input-texto:focus,
   font-weight: 500;
   text-decoration: none;
   margin-bottom: 1.5rem;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .link-volver:hover {
@@ -706,7 +707,9 @@ textarea.input-texto:focus,
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(83, 74, 183, 0.4);
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s;
+  transition:
+    transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+    box-shadow 0.2s;
   z-index: 900;
 }
 
@@ -752,7 +755,7 @@ textarea.input-texto:focus,
   gap: 0.25rem;
 }
 
-.ficha-contacto{
+.ficha-contacto {
   margin-top: 1rem;
 }
 
@@ -853,7 +856,7 @@ textarea.input-texto:focus,
   width: 100%;
 }
 
-.balance-hero{
+.balance-hero {
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
@@ -1215,7 +1218,9 @@ body.modal-abierto {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* =========================================
@@ -1426,7 +1431,10 @@ body.modal-abierto {
   border-radius: var(--radius-md);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .ranking-item:hover {
@@ -1450,9 +1458,18 @@ body.modal-abierto {
   text-align: center;
 }
 
-.ranking-item:nth-child(1)::before { color: var(--debt-text); font-size: 1.1rem; }
-.ranking-item:nth-child(2)::before { color: #f97316; font-size: 1rem; }
-.ranking-item:nth-child(3)::before { color: #eab308; font-size: 1rem; }
+.ranking-item:nth-child(1)::before {
+  color: var(--debt-text);
+  font-size: 1.1rem;
+}
+.ranking-item:nth-child(2)::before {
+  color: #f97316;
+  font-size: 1rem;
+}
+.ranking-item:nth-child(3)::before {
+  color: #eab308;
+  font-size: 1rem;
+}
 
 .ranking-nombre {
   font-size: 0.875rem;
@@ -1735,7 +1752,9 @@ h3.config-header-con-icono svg {
   font-weight: 500;
   padding: 0.75rem 1rem;
   border-radius: var(--radius-md);
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .sidebar a:hover {
@@ -1787,6 +1806,21 @@ body.dark .btn-quick-notificar.light-wp {
 body.dark .btn-quick-notificar.light-email {
   background-color: #1e3a8a;
   color: #93c5fd;
+}
+
+/*SOLUCION LOGIN QUE NO ESTA CENTRADO */
+.login-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  margin-top: 2rem;
+}
+
+.login-wrap .form-cliente {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
 }
 
 /* =========================================
@@ -1845,7 +1879,6 @@ div:has(> .contacto-lista) {
 
 /* 4. Adaptación perfecta para pantallas chicas */
 @media (max-width: 640px) {
-
   /* A. Grillas colapsables */
   .form-grid,
   .resumen,
@@ -1908,7 +1941,7 @@ div:has(> .contacto-lista) {
     height: 38px !important;
     flex-shrink: 0 !important; /* Obliga al botón a mantener su forma redonda */
   }
-  
+
   .btn-quick-notificar svg {
     width: 16px;
     height: 16px;
