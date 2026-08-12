@@ -1,8 +1,13 @@
 # CobrApp
-Sistema web para la gestión de clientes y cobranzas.
+Sistema web para gestionar clientes y sus respectivas cuentas. Esto genera una trazabilidad y concentracion de la informacion, sin perdida de papeles o notas sueltas.
+Ademas brinda herramientas como estadisticas, permitiendo realizar analisis de datos.
+Herramientas para exportacion de historial a pdf.
+Api de envio de mensajes a travez de mail o WhatsApp.
+Configuraciones, para cerrar aplicacion en un determinado tiempo, modificacion de mensaje predeterminado, dias para notificar la falta de cobro a un cliente.
+Notificaciones automaticas.
+Cambio de tema para mejorar la experiencia del usuario del sistema.
 
 ## Capturas
-
 ### Dashboard
 <img width="1349" height="460" alt="Captura desde 2026-08-12 16-32-56" src="https://github.com/user-attachments/assets/1b37f656-2e16-4c6b-9f37-4e30492c0589" />
 
@@ -18,8 +23,9 @@ Sistema web para la gestión de clientes y cobranzas.
 <img width="798" height="653" alt="Captura desde 2026-08-12 16-37-32" src="https://github.com/user-attachments/assets/b85f0e05-defa-4f5f-9f95-6db5589146d3" />
 
 
-### Detalle del cliente
-[imagen]
+### Detalle del cliente exportado a pdf.
+<img width="715" height="601" alt="Captura desde 2026-08-12 17-31-19" src="https://github.com/user-attachments/assets/ad6fff1f-5162-4b09-bc13-3b496cbb2b7a" />
+
 
 ### Estadísticas
 <img width="900" height="658" alt="Captura desde 2026-08-12 16-35-44" src="https://github.com/user-attachments/assets/46d04c64-3cb8-4990-9c26-27a4479b97d6" />
